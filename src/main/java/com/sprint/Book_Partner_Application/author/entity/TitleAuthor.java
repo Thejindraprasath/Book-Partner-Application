@@ -1,5 +1,6 @@
 package com.sprint.Book_Partner_Application.author.entity;
 
+import com.sprint.Book_Partner_Application.book.entity.Title;
 import jakarta.persistence.*;
 import lombok.*;
 

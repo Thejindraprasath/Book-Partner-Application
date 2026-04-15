@@ -1,4 +1,5 @@
 package com.sprint.Book_Partner_Application.employee.entity;
+import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;

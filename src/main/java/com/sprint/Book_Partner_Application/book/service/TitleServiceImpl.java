@@ -1,5 +1,6 @@
 package com.sprint.Book_Partner_Application.book.service;
 
+import com.sprint.Book_Partner_Application.author.dto.AuthorDTO;
 import com.sprint.Book_Partner_Application.author.entity.TitleAuthor;
 import com.sprint.Book_Partner_Application.author.repository.TitleAuthorRepository;
 import com.sprint.Book_Partner_Application.book.dto.RoySchedDTO;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 
-public class TitleServiceImpl {
+public class TitleServiceImpl implements TitleService {
     private final TitleRepository titleRepository;
     private final PublisherRepository publisherRepository;
     private final TitleAuthorRepository titleAuthorRepository;

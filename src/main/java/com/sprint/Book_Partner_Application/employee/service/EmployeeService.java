@@ -1,8 +1,10 @@
 package com.sprint.Book_Partner_Application.employee.service;
 
+import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.employee.dto.EmployeeDTO;
 import com.sprint.Book_Partner_Application.employee.dto.JobDTO;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 public interface EmployeeService {

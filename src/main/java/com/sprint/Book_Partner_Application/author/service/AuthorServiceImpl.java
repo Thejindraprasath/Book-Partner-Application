@@ -1,20 +1,13 @@
 package com.sprint.Book_Partner_Application.author.service;
 
-
 import com.sprint.Book_Partner_Application.author.dto.AuthorDTO;
 import com.sprint.Book_Partner_Application.author.dto.TitleAuthorDTO;
 import com.sprint.Book_Partner_Application.author.entity.Author;
 import com.sprint.Book_Partner_Application.author.entity.TitleAuthor;
 import com.sprint.Book_Partner_Application.author.repository.AuthorRepository;
 import com.sprint.Book_Partner_Application.author.repository.TitleAuthorRepository;
-import com.sprint.Book_Partner_Application.author.dto.AuthorDTO;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.dto.TitleAuthorDTO;
-import com.sprint.Book_Partner_Application.entity.Author;
-import com.sprint.Book_Partner_Application.entity.TitleAuthor;
 import com.sprint.Book_Partner_Application.exception.ResourceNotFoundException;
-import com.sprint.Book_Partner_Application.repository.AuthorRepository;
-import com.sprint.Book_Partner_Application.repository.TitleAuthorRepository;
 import com.sprint.Book_Partner_Application.author.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,7 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AuthorServiceImpl implements com.sprint.Book_Partner_Application.author.service.AuthorServicerService {
+public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository authorRepository;
     private final TitleAuthorRepository titleAuthorRepository;

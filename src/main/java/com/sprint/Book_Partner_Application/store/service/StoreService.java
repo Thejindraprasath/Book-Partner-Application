@@ -5,8 +5,8 @@ package com.sprint.Book_Partner_Application.store.service;
 //package com.bookpartner.service;
 
 import com.sprint.Book_Partner_Application.store.dto.DiscountDTO;
-import com.sprint.Book_Partner_Application.store.dto.PageResponse;
-import com.sprint.Book_Partner_Application.store.dto.SaleDTO;
+import com.sprint.Book_Partner_Application.dto.PageResponse;
+import com.sprint.Book_Partner_Application.sales.dto.SaleDTO;
 import com.sprint.Book_Partner_Application.store.dto.StoreDTO;
 import org.springframework.data.domain.Pageable;
 

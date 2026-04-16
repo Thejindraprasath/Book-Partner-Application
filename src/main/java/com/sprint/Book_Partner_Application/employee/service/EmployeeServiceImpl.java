@@ -8,16 +8,18 @@ import com.sprint.Book_Partner_Application.employee.entity.Job;
 import com.sprint.Book_Partner_Application.employee.repository.EmployeeRepository;
 import com.sprint.Book_Partner_Application.employee.repository.JobRepository;
 
+
 import com.sprint.Book_Partner_Application.exception.*;
+
 
 import com.sprint.Book_Partner_Application.exception.ResourceNotFoundException;
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
-
+//import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -33,16 +35,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final JobRepository jobRepository;
     private final PublisherRepository publisherRepository;
 
-    // ───────────────── JOB ─────────────────
+    // ───────────── JOB ─────────────
 
     @Override
     public JobDTO.Response createJob(JobDTO.Request request) {
 
-        // Business validation
         if (request.getMinLvl() > request.getMaxLvl()) {
-            throw new InvalidOperationException(
-                    "minLvl cannot be greater than maxLvl"
-            );
+            throw new InvalidOperationException("minLvl cannot be greater than maxLvl");
         }
 
         Job job = Job.builder()
@@ -57,7 +56,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional(readOnly = true)
     public List<JobDTO.Response> getAllJobs() {
-        return jobRepository.findAll().stream()
+        return jobRepository.findAll()
+                .stream()
                 .map(this::mapJobToResponse)
                 .collect(Collectors.toList());
     }
@@ -88,12 +88,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         return mapJobToResponse(jobRepository.save(job));
     }
 
-    // ───────────────── EMPLOYEE ─────────────────
+    // ───────────── EMPLOYEE ─────────────
 
     @Override
     public EmployeeDTO.Response createEmployee(EmployeeDTO.Request request) {
 
-        // Duplicate check
         if (employeeRepository.existsById(request.getEmpId())) {
             throw new DuplicateResourceException("Employee", "empId", request.getEmpId());
         }
@@ -104,7 +103,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         Publisher publisher = publisherRepository.findById(request.getPubId())
                 .orElseThrow(() -> new ResourceNotFoundException("Publisher", "pubId", request.getPubId()));
 
-        // Business validation
         if (request.getJobLvl() != null &&
                 (request.getJobLvl() < job.getMinLvl() || request.getJobLvl() > job.getMaxLvl())) {
 
@@ -128,15 +126,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         return mapEmpToResponse(employeeRepository.save(employee));
     }
 
-
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<EmployeeDTO.Response> getAllEmployees(String pubId, Short jobId, Pageable pageable) {
         Page<Employee> page = employeeRepository.findWithFilters(pubId, jobId, pageable);
-
         return PageResponse.from(page.map(this::mapEmpToResponse));
     }
-
 
     @Override
     @Transactional(readOnly = true)
@@ -164,7 +159,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
             emp.setJob(job);
 
-            // Business validation again
             if (request.getJobLvl() != null &&
                     (request.getJobLvl() < job.getMinLvl() || request.getJobLvl() > job.getMaxLvl())) {
 
@@ -194,9 +188,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee emp = employeeRepository.findById(empId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "empId", empId));
 
-        // Example: prevent delete if needed (future use)
-        // throw new ResourceInUseException("Employee", empId, "active assignments");
-
         employeeRepository.delete(emp);
     }
 
@@ -213,7 +204,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .collect(Collectors.toList());
     }
 
-    // ───────────────── MAPPERS ─────────────────
+    // ───────────── MAPPERS ─────────────
 
     private JobDTO.Response mapJobToResponse(Job j) {
         return JobDTO.Response.builder()

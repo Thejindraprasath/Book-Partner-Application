@@ -7,7 +7,9 @@ import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.employee.dto.EmployeeDTO;
 import com.sprint.Book_Partner_Application.employee.entity.Employee;
 import com.sprint.Book_Partner_Application.employee.repository.EmployeeRepository;
+
 import com.sprint.Book_Partner_Application.exception.*;
+
 import com.sprint.Book_Partner_Application.publisher.dto.PublisherDTO;
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
@@ -77,7 +79,6 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
 
-
     @Override
     public PublisherDTO.Response updatePublisher(String pubId, PublisherDTO.UpdateRequest request) {
 
@@ -107,7 +108,7 @@ public class PublisherServiceImpl implements PublisherService {
         Publisher publisher = publisherRepository.findById(pubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Publisher", "pubId", pubId));
 
-        // 🔴 Check child dependencies
+        // Check child dependencies
         boolean hasEmployees = employeeRepository.existsByPublisher_PubId(pubId);
         boolean hasTitles = titleRepository.existsByPublisher_PubId(pubId);
 

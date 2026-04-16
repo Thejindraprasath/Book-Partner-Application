@@ -4,6 +4,7 @@ package com.sprint.Book_Partner_Application.store.service;
 //}
 //package com.bookpartner.service;
 
+import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.store.dto.DiscountDTO;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.sales.dto.SaleDTO;

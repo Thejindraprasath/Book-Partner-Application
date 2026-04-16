@@ -90,8 +90,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         return mapEmpToResponse(employeeRepository.save(employee));
     }
 
-    @Override
     @Transactional(readOnly = true)
+    @Override
     public PageResponse<EmployeeDTO.Response> getAllEmployees(String pubId, Short jobId, Pageable pageable) {
         Page<Employee> page = employeeRepository.findWithFilters(pubId, jobId, pageable);
         return PageResponse.from(page.map(this::mapEmpToResponse));

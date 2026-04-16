@@ -123,5 +123,6 @@ public class PublisherServiceImpl implements PublisherService {
                 .state(p.getState())
                 .country(p.getCountry())
                 .build();
+    }}
     }
 }

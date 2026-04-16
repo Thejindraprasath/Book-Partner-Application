@@ -32,4 +32,6 @@ public interface TitleRepository extends JpaRepository<Title, String> {
             Pageable pageable);
 
     List<Title> findByTitleContainingIgnoreCase(String keyword);
+
+    boolean existsByPublisher_PubId(String pubId);
 }

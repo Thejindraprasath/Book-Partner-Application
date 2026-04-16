@@ -9,7 +9,7 @@ import com.sprint.Book_Partner_Application.employee.entity.Employee;
 import com.sprint.Book_Partner_Application.employee.repository.EmployeeRepository;
 
 import com.sprint.Book_Partner_Application.exception.*;
-import com.sprint.Book_Partner_Application.exception.ResourceNotFoundException;
+
 import com.sprint.Book_Partner_Application.publisher.dto.PublisherDTO;
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
@@ -36,12 +36,12 @@ public class PublisherServiceImpl implements PublisherService {
     @Override
     public PublisherDTO.Response createPublisher(PublisherDTO.Request request) {
 
-        // 🔴 Duplicate check
+        // Duplicate check
         if (publisherRepository.existsById(request.getPubId())) {
             throw new DuplicateResourceException("Publisher", "pubId", request.getPubId());
         }
 
-        // 🔴 Business validation
+        // Business validation
         if (request.getState() != null && request.getState().length() != 2) {
             throw new BusinessValidationException("state", "must be exactly 2 characters");
         }
@@ -79,7 +79,6 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
 
-
     @Override
     public PublisherDTO.Response updatePublisher(String pubId, PublisherDTO.UpdateRequest request) {
 
@@ -109,7 +108,7 @@ public class PublisherServiceImpl implements PublisherService {
         Publisher publisher = publisherRepository.findById(pubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Publisher", "pubId", pubId));
 
-        // 🔴 Check child dependencies
+        // Check child dependencies
         boolean hasEmployees = employeeRepository.existsByPublisher_PubId(pubId);
         boolean hasTitles = titleRepository.existsByPublisher_PubId(pubId);
 
@@ -161,7 +160,6 @@ public class PublisherServiceImpl implements PublisherService {
                 .state(p.getState())
                 .country(p.getCountry())
                 .build();
-    }}
     }
 
     private EmployeeDTO.Response mapEmployee(Employee e) {
@@ -195,5 +193,3 @@ public class PublisherServiceImpl implements PublisherService {
                 .build();
     }
 }
-}
-

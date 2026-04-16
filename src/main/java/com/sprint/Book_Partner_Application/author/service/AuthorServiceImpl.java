@@ -6,16 +6,10 @@ import com.sprint.Book_Partner_Application.author.entity.Author;
 import com.sprint.Book_Partner_Application.author.entity.TitleAuthor;
 import com.sprint.Book_Partner_Application.author.repository.AuthorRepository;
 import com.sprint.Book_Partner_Application.author.repository.TitleAuthorRepository;
-
 import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.exception.ResourceNotFoundException;
-import com.sprint.Book_Partner_Application.author.service.AuthorService;
+import com.sprint.Book_Partner_Application.exception.*;
 
-import com.sprint.Book_Partner_Application.author.service.AuthorService;
-import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,17 +26,15 @@ public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository authorRepository;
     private final TitleAuthorRepository titleAuthorRepository;
 
-    // ─── CREATE ─────────────────────────────────────────────────────────────
+    // ✅ CREATE AUTHOR
     @Override
     public AuthorDTO.Response createAuthor(AuthorDTO.Request request) {
 
-        // Duplicate check
         if (authorRepository.existsById(request.getAuId())) {
             throw new DuplicateResourceException("Author", "auId", request.getAuId());
         }
 
-        // Business validation example
-        if (request.getContract() != null && !(request.getContract() == 0 || request.getContract() == 1)) {
+        if (request.getContract() != 0 && request.getContract() != 1) {
             throw new BusinessValidationException("contract", "must be 0 or 1");
         }
 
@@ -58,50 +50,56 @@ public class AuthorServiceImpl implements AuthorService {
                 .contract(request.getContract())
                 .build();
 
-        return mapToResponse(authorRepository.save(author));
+        Author saved = authorRepository.save(author);
+
+        return mapToResponse(saved);
     }
 
-    // ─── READ ALL ──────────────────────────────────────────────────────────
+    // ✅ GET ALL AUTHORS (WITH FILTER + PAGINATION)
     @Override
-    @Transactional(readOnly = true)
-    public PageResponse<AuthorDTO.Response> getAllAuthors(String city, String state, Integer contract, Pageable
-            pageable) {
+    @Transactional(Transactional.TxType.SUPPORTS)
+    public PageResponse<AuthorDTO.Response> getAllAuthors(
+            String city, String state, Integer contract, Pageable pageable) {
 
-        // Logical validation
-        if (contract != null && !(contract == 0 || contract == 1)) {
-            throw new InvalidOperationException("Contract filter must be 0 or 1");
+        if (contract != null && contract != 0 && contract != 1) {
+            throw new InvalidOperationException("Contract must be 0 or 1");
         }
 
         Page<Author> page = authorRepository.findWithFilters(city, state, contract, pageable);
+
+        // 🔥 IMPORTANT: Using your PageResponse.from()
         return PageResponse.from(page.map(this::mapToResponse));
     }
 
-    // ─── READ BY ID ────────────────────────────────────────────────────────
+    // ✅ GET AUTHOR BY ID
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(Transactional.TxType.SUPPORTS)
     public AuthorDTO.Response getAuthorById(String auId) {
+
         Author author = authorRepository.findById(auId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author", "auId", auId));
+
         return mapToResponse(author);
     }
 
-    // ─── UPDATE ────────────────────────────────────────────────────────────
+    // ✅ UPDATE AUTHOR
     @Override
     public AuthorDTO.Response updateAuthor(String auId, AuthorDTO.UpdateRequest request) {
 
         Author author = authorRepository.findById(auId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author", "auId", auId));
 
-        // Business validations
-        if (request.getContract() != null && !(request.getContract() == 0 || request.getContract() == 1)) {
+        if (request.getContract() != null &&
+                request.getContract() != 0 &&
+                request.getContract() != 1) {
             throw new BusinessValidationException("contract", "must be 0 or 1");
         }
 
-        if (request.getZip() != null && request.getZip().length() < 5) {
-            throw new BusinessValidationException("zip", "must be at least 5 characters");
+        if (request.getZip() != null && request.getZip().length() != 5) {
+            throw new BusinessValidationException("zip", "must be exactly 5 digits");
         }
 
-        // Apply updates
+        // Partial update
         if (request.getAuLname() != null) author.setAuLname(request.getAuLname());
         if (request.getAuFname() != null) author.setAuFname(request.getAuFname());
         if (request.getPhone() != null) author.setPhone(request.getPhone());
@@ -111,46 +109,40 @@ public class AuthorServiceImpl implements AuthorService {
         if (request.getZip() != null) author.setZip(request.getZip());
         if (request.getContract() != null) author.setContract(request.getContract());
 
-        return mapToResponse(authorRepository.save(author));
+        Author updated = authorRepository.save(author);
+
+        return mapToResponse(updated);
     }
 
-    // ─── DELETE ────────────────────────────────────────────────────────────
+    // ✅ DELETE AUTHOR
     @Override
     public void deleteAuthor(String auId) {
 
         Author author = authorRepository.findById(auId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author", "auId", auId));
 
-        // Check dependencies
-        boolean hasTitles = titleAuthorRepository.existsByAuId(auId);
+        // 🔥 FIX: No existsByAuId → use findByAuId
+        List<TitleAuthor> associations = titleAuthorRepository.findByAuId(auId);
 
-        if (hasTitles) {
-            throw new ResourceInUseException(
-                    "Author",
-                    auId,
-                    "title associations"
-            );
+        if (!associations.isEmpty()) {
+            throw new ResourceInUseException("Author", auId, "title associations");
         }
 
         authorRepository.delete(author);
     }
 
-    // ─── GET PRODUCTS BY AUTHOR ────────────────────────────────────────────
+    // ✅ GET TITLES BY AUTHOR
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(Transactional.TxType.SUPPORTS)
     public List<TitleAuthorDTO.Response> getProductsByAuthor(String auId) {
 
-        // Validate author existence
         authorRepository.findById(auId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author", "auId", auId));
 
         List<TitleAuthor> list = titleAuthorRepository.findByAuId(auId);
 
-        // Logical case: no associations
         if (list.isEmpty()) {
-            throw new InvalidOperationException(
-                    "No titles found for Author '" + auId + "'"
-            );
+            throw new InvalidOperationException("No titles found for Author '" + auId + "'");
         }
 
         return list.stream()
@@ -158,7 +150,8 @@ public class AuthorServiceImpl implements AuthorService {
                 .collect(Collectors.toList());
     }
 
-    // ─── MAPPERS ───────────────────────────────────────────────────────────
+    // ✅ MAPPER METHODS
+
     private AuthorDTO.Response mapToResponse(Author a) {
         return AuthorDTO.Response.builder()
                 .auId(a.getAuId())
@@ -174,11 +167,12 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     private TitleAuthorDTO.Response mapTitleAuthorToResponse(TitleAuthor ta) {
-        String authorName = ta.getAuthor() != null
+
+        String authorName = (ta.getAuthor() != null)
                 ? ta.getAuthor().getAuFname() + " " + ta.getAuthor().getAuLname()
                 : ta.getAuId();
 
-        String titleName = ta.getTitle() != null
+        String titleName = (ta.getTitle() != null)
                 ? ta.getTitle().getTitle()
                 : ta.getTitleId();
 

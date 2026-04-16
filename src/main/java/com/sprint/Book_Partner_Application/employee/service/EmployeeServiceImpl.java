@@ -7,7 +7,10 @@ import com.sprint.Book_Partner_Application.employee.entity.Employee;
 import com.sprint.Book_Partner_Application.employee.entity.Job;
 import com.sprint.Book_Partner_Application.employee.repository.EmployeeRepository;
 import com.sprint.Book_Partner_Application.employee.repository.JobRepository;
+
 import com.sprint.Book_Partner_Application.exception.*;
+
+import com.sprint.Book_Partner_Application.exception.ResourceNotFoundException;
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
 
@@ -125,8 +128,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         return mapEmpToResponse(employeeRepository.save(employee));
     }
 
+
+    @Transactional(readOnly = true)
     @Override
-    public PageResponse<EmployeeDTO.Response> getAllEmployees(String pubId, Short jobId, java.awt.print.Pageable pageable) {
+    public PageResponse<EmployeeDTO.Response> getAllEmployees(String pubId, Short jobId, Pageable pageable) {
         Page<Employee> page = employeeRepository.findWithFilters(pubId, jobId, pageable);
 
         return PageResponse.from(page.map(this::mapEmpToResponse));
@@ -233,4 +238,5 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .hireDate(e.getHireDate())
                 .build();
     }
+
 }

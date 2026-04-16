@@ -23,10 +23,10 @@ public interface EmployeeService {
 
     PageResponse<EmployeeDTO.Response> getAllEmployees(String pubId, Short jobId, Pageable pageable);
 
-
     @Transactional(readOnly = true)
     PageResponse<EmployeeDTO.Response> getAllEmployees(
             String pubId, Short jobId, org.springframework.data.domain.Pageable pageable);
+
 
     EmployeeDTO.Response getEmployeeById(String empId);
 

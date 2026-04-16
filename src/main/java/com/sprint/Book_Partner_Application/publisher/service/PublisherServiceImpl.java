@@ -34,12 +34,12 @@ public class PublisherServiceImpl implements PublisherService {
     @Override
     public PublisherDTO.Response createPublisher(PublisherDTO.Request request) {
 
-        // 🔴 Duplicate check
+        // Duplicate check
         if (publisherRepository.existsById(request.getPubId())) {
             throw new DuplicateResourceException("Publisher", "pubId", request.getPubId());
         }
 
-        // 🔴 Business validation
+        // Business validation
         if (request.getState() != null && request.getState().length() != 2) {
             throw new BusinessValidationException("state", "must be exactly 2 characters");
         }

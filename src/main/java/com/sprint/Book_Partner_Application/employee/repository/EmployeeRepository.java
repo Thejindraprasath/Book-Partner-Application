@@ -28,4 +28,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, String> {
             Pageable pageable);
 
     List<Employee> findByLnameContainingIgnoreCaseOrFnameContainingIgnoreCase(String lname, String fname);
+    boolean existsByPublisher_PubId(String pubId);
 }

@@ -9,7 +9,7 @@ import com.sprint.Book_Partner_Application.author.repository.AuthorRepository;
 import com.sprint.Book_Partner_Application.author.repository.TitleAuthorRepository;
 
 import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.exception.ResourceNotFoundException;
+import com.sprint.Book_Partner_Application.exception.*;
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class AuthorServiceImpl implements AuthorService {
         }
 
         // Validation
-        if (request.getContract() != null && !(request.getContract() == 0 || request.getContract() == 1)) {
+        if (request.getContract() == 0 || request.getContract() == 1) {
             throw new BusinessValidationException("contract", "must be 0 or 1");
         }
 

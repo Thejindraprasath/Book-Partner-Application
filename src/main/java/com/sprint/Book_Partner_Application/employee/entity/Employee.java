@@ -1,4 +1,5 @@
 package com.sprint.Book_Partner_Application.employee.entity;
+
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -9,10 +10,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "employee")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Employee {
+
     @Id
     @Column(name = "emp_id", length = 10, nullable = false)
     @NotBlank(message = "Employee ID is required")
@@ -44,7 +44,6 @@ public class Employee {
     private Job job;
 
     @Column(name = "job_lvl")
-    @Builder.Default
     private Integer jobLvl = 10;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -55,6 +54,26 @@ public class Employee {
     private Publisher publisher;
 
     @Column(name = "hire_date", nullable = false)
-    @Builder.Default
     private LocalDateTime hireDate = LocalDateTime.now();
+
+    // ================= MANUAL CONSTRUCTORS =================
+
+    // ✅ No-Args Constructor (JPA Required)
+    public Employee() {
+    }
+
+    // ✅ Clean Constructor (Best Practice)
+    public Employee(String empId, String fname, String minit, String lname,
+                    Job job, Integer jobLvl,
+                    Publisher publisher, LocalDateTime hireDate) {
+
+        this.empId = empId;
+        this.fname = fname;
+        this.minit = minit;
+        this.lname = lname;
+        this.job = job;
+        this.jobLvl = (jobLvl != null) ? jobLvl : 10;
+        this.publisher = publisher;
+        this.hireDate = (hireDate != null) ? hireDate : LocalDateTime.now();
+    }
 }

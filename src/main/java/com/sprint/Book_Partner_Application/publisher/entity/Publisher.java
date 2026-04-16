@@ -11,8 +11,6 @@ import java.util.List;
 @Entity
 @Table(name = "publishers")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 
 public class Publisher {
@@ -52,4 +50,17 @@ public class Publisher {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Employee> employees = new ArrayList<>();
+
+    public Publisher() {
+    }
+
+    public Publisher(String pubId, String pubName, String city, String state, String country, List<Title> titles, List<Employee> employees) {
+        this.pubId = pubId;
+        this.pubName = pubName;
+        this.city = city;
+        this.state = state;
+        this.country = country;
+        this.titles = titles;
+        this.employees = employees;
+    }
 }

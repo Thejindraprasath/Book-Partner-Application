@@ -49,8 +49,6 @@ class SaleRepositoryTest {
         Title title = new Title();
         title.setTitleId("T001");
         title.setTitle("Test Book");
-
-        // ✅ REQUIRED FIELDS (THIS WAS MISSING)
         title.setType("Fiction");
         title.setPubdate(LocalDateTime.now());
 

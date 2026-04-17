@@ -1,5 +1,6 @@
 package com.sprint.Book_Partner_Application.publisher.service;
 
+import com.sprint.Book_Partner_Application.book.dto.response.TitleResponse;
 import com.sprint.Book_Partner_Application.book.entity.Title;
 import com.sprint.Book_Partner_Application.book.repository.TitleRepository;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
@@ -130,7 +131,7 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TitleDTO.Response> getProductsByPartner(String pubId) {
+    public List<TitleResponse> getProductsByPartner(String pubId) {
 
         publisherRepository.findById(pubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Publisher", "pubId", pubId));
@@ -171,8 +172,8 @@ public class PublisherServiceImpl implements PublisherService {
                 .build();
     }
 
-    private TitleDTO.Response mapTitle(Title t) {
-        return TitleDTO.Response.builder()
+    private TitleResponse mapTitle(Title t) {
+        return TitleResponse.builder()
                 .titleId(t.getTitleId())
                 .title(t.getTitle())
                 .type(t.getType())

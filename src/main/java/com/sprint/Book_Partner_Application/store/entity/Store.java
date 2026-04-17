@@ -10,8 +10,6 @@ import java.util.List;
 @Entity
 @Table(name = "stores")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Store {
 
@@ -45,4 +43,18 @@ public class Store {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Discount> discounts = new ArrayList<>();
+
+    public Store() {
+    }
+
+    public Store(String storId, String storName, String storAddress, String city, String state, String zip, List<Sale> sales, List<Discount> discounts) {
+        this.storId = storId;
+        this.storName = storName;
+        this.storAddress = storAddress;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
+        this.sales = sales;
+        this.discounts = discounts;
+    }
 }

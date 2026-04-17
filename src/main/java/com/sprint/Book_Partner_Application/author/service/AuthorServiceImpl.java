@@ -1,3 +1,4 @@
+
 package com.sprint.Book_Partner_Application.author.service;
 
 import com.sprint.Book_Partner_Application.author.dto.AuthorDTO;
@@ -6,10 +7,11 @@ import com.sprint.Book_Partner_Application.author.entity.Author;
 import com.sprint.Book_Partner_Application.author.entity.TitleAuthor;
 import com.sprint.Book_Partner_Application.author.repository.AuthorRepository;
 import com.sprint.Book_Partner_Application.author.repository.TitleAuthorRepository;
+
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.exception.*;
-
 import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,15 +28,17 @@ public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository authorRepository;
     private final TitleAuthorRepository titleAuthorRepository;
 
-    // ✅ CREATE AUTHOR
+    // ─── CREATE AUTHOR ─────────────────────────────────────────────────────
     @Override
     public AuthorDTO.Response createAuthor(AuthorDTO.Request request) {
 
+        // Duplicate check
         if (authorRepository.existsById(request.getAuId())) {
             throw new DuplicateResourceException("Author", "auId", request.getAuId());
         }
 
-        if (request.getContract() != 0 && request.getContract() != 1) {
+        // Validation
+        if (request.getContract() == 0 || request.getContract() == 1) {
             throw new BusinessValidationException("contract", "must be 0 or 1");
         }
 
@@ -50,28 +54,25 @@ public class AuthorServiceImpl implements AuthorService {
                 .contract(request.getContract())
                 .build();
 
-        Author saved = authorRepository.save(author);
-
-        return mapToResponse(saved);
+        return mapToResponse(authorRepository.save(author));
     }
 
-    // ✅ GET ALL AUTHORS (WITH FILTER + PAGINATION)
+    // ─── GET ALL AUTHORS (FILTER + PAGINATION) ─────────────────────────────
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public PageResponse<AuthorDTO.Response> getAllAuthors(
             String city, String state, Integer contract, Pageable pageable) {
 
-        if (contract != null && contract != 0 && contract != 1) {
-            throw new InvalidOperationException("Contract must be 0 or 1");
+        if (contract != null && !(contract == 0 || contract == 1)) {
+            throw new InvalidOperationException("Contract filter must be 0 or 1");
         }
 
         Page<Author> page = authorRepository.findWithFilters(city, state, contract, pageable);
 
-        // 🔥 IMPORTANT: Using your PageResponse.from()
         return PageResponse.from(page.map(this::mapToResponse));
     }
 
-    // ✅ GET AUTHOR BY ID
+    // ─── GET AUTHOR BY ID ──────────────────────────────────────────────────
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public AuthorDTO.Response getAuthorById(String auId) {
@@ -82,16 +83,15 @@ public class AuthorServiceImpl implements AuthorService {
         return mapToResponse(author);
     }
 
-    // ✅ UPDATE AUTHOR
+    // ─── UPDATE AUTHOR ─────────────────────────────────────────────────────
     @Override
     public AuthorDTO.Response updateAuthor(String auId, AuthorDTO.UpdateRequest request) {
 
         Author author = authorRepository.findById(auId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author", "auId", auId));
 
-        if (request.getContract() != null &&
-                request.getContract() != 0 &&
-                request.getContract() != 1) {
+        // Validations
+        if (request.getContract() != null && !(request.getContract() == 0 || request.getContract() == 1)) {
             throw new BusinessValidationException("contract", "must be 0 or 1");
         }
 
@@ -114,24 +114,24 @@ public class AuthorServiceImpl implements AuthorService {
         return mapToResponse(updated);
     }
 
-    // ✅ DELETE AUTHOR
+    // ─── DELETE AUTHOR ─────────────────────────────────────────────────────
     @Override
     public void deleteAuthor(String auId) {
 
         Author author = authorRepository.findById(auId)
                 .orElseThrow(() -> new ResourceNotFoundException("Author", "auId", auId));
 
-        // 🔥 FIX: No existsByAuId → use findByAuId
-        List<TitleAuthor> associations = titleAuthorRepository.findByAuId(auId);
+        // Check dependencies (optimized)
+        boolean hasTitles = titleAuthorRepository.existsByAuId(auId);
 
-        if (!associations.isEmpty()) {
+        if (hasTitles) {
             throw new ResourceInUseException("Author", auId, "title associations");
         }
 
         authorRepository.delete(author);
     }
 
-    // ✅ GET TITLES BY AUTHOR
+    // ─── GET TITLES BY AUTHOR ──────────────────────────────────────────────
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public List<TitleAuthorDTO.Response> getProductsByAuthor(String auId) {
@@ -150,8 +150,7 @@ public class AuthorServiceImpl implements AuthorService {
                 .collect(Collectors.toList());
     }
 
-    // ✅ MAPPER METHODS
-
+    // ─── MAPPERS ───────────────────────────────────────────────────────────
     private AuthorDTO.Response mapToResponse(Author a) {
         return AuthorDTO.Response.builder()
                 .auId(a.getAuId())

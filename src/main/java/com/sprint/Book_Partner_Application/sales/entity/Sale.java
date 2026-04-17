@@ -13,8 +13,6 @@ import java.util.Objects;
 @Entity
 @Table(name = "sales")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @IdClass(Sale.SaleId.class)
 public class Sale {
@@ -60,11 +58,29 @@ public class Sale {
     @NotBlank(message = "Payment terms are required")
     private String payterms;
 
+    // ================= MANUAL CONSTRUCTORS =================
+
+    // No-Args Constructor (Required by JPA)
+    public Sale() {
+    }
+
+    // All-Args Constructor
+    public Sale(String storId, String ordNum, String titleId,
+                Store store, Title title,
+                LocalDateTime ordDate, Short qty, String payterms) {
+        this.storId = storId;
+        this.ordNum = ordNum;
+        this.titleId = titleId;
+        this.store = store;
+        this.title = title;
+        this.ordDate = ordDate;
+        this.qty = qty;
+        this.payterms = payterms;
+    }
+
     // ================= COMPOSITE KEY CLASS =================
 
     @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class SaleId implements Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -72,6 +88,17 @@ public class Sale {
         private String storId;
         private String ordNum;
         private String titleId;
+
+        // No-Args Constructor
+        public SaleId() {
+        }
+
+        // All-Args Constructor
+        public SaleId(String storId, String ordNum, String titleId) {
+            this.storId = storId;
+            this.ordNum = ordNum;
+            this.titleId = titleId;
+        }
 
         // IMPORTANT: Explicit equals and hashCode
 

@@ -3,8 +3,12 @@ package com.sprint.Book_Partner_Application.store.service;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.exception.*;
 import com.sprint.Book_Partner_Application.sales.repository.SaleRepository;
-import com.sprint.Book_Partner_Application.store.dto.DiscountDTO;
-import com.sprint.Book_Partner_Application.store.dto.StoreDTO;
+import com.sprint.Book_Partner_Application.store.dto.request.DiscountCreateRequest;
+import com.sprint.Book_Partner_Application.store.dto.request.DiscountUpdateRequest;
+import com.sprint.Book_Partner_Application.store.dto.request.StoreCreateRequest;
+import com.sprint.Book_Partner_Application.store.dto.request.StoreUpdateRequest;
+import com.sprint.Book_Partner_Application.store.dto.response.DiscountResponse;
+import com.sprint.Book_Partner_Application.store.dto.response.StoreResponse;
 import com.sprint.Book_Partner_Application.store.entity.Discount;
 import com.sprint.Book_Partner_Application.store.entity.Store;
 import com.sprint.Book_Partner_Application.store.repository.DiscountRepository;
@@ -16,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,12 +30,10 @@ public class StoreServiceImpl implements StoreService {
     private final SaleRepository saleRepository;
     private final DiscountRepository discountRepository;
 
-    // ─────────────────────────────────────────────────────────────
-    // STORE OPERATIONS
-    // ─────────────────────────────────────────────────────────────
+    // ---------------- STORE ----------------
 
     @Override
-    public StoreDTO.Response createStore(StoreDTO.Request request) {
+    public StoreResponse createStore(StoreCreateRequest request) {
 
         if (storeRepository.existsById(request.getStorId())) {
             throw new DuplicateResourceException("Store", "storId", request.getStorId());
@@ -52,16 +53,14 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<StoreDTO.Response> getAllStores(String city, String state, Pageable pageable) {
-
+    public PageResponse<StoreResponse> getAllStores(String city, String state, Pageable pageable) {
         Page<Store> page = storeRepository.findWithFilters(city, state, pageable);
         return PageResponse.from(page.map(this::mapToResponse));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public StoreDTO.Response getStoreById(String storId) {
-
+    public StoreResponse getStoreById(String storId) {
         Store store = storeRepository.findById(storId)
                 .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", storId));
 
@@ -69,7 +68,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public StoreDTO.Response updateStore(String storId, StoreDTO.UpdateRequest request) {
+    public StoreResponse updateStore(String storId, StoreUpdateRequest request) {
 
         Store store = storeRepository.findById(storId)
                 .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", storId));
@@ -89,23 +88,16 @@ public class StoreServiceImpl implements StoreService {
         Store store = storeRepository.findById(storId)
                 .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", storId));
 
-        boolean hasSales = saleRepository.existsByStorId(storId);
-        boolean hasDiscounts = discountRepository.existsByStore_StorId(storId);
+        if (saleRepository.existsByStorId(storId) ||
+                discountRepository.existsByStore_StorId(storId)) {
 
-        if (hasSales || hasDiscounts) {
-            throw new ResourceInUseException(
-                    "Store",
-                    storId,
-                    "existing sales or discount records"
-            );
+            throw new ResourceInUseException("Store", storId, "existing sales or discount records");
         }
 
         storeRepository.delete(store);
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // SALES
-    // ─────────────────────────────────────────────────────────────
+    // ---------------- SALES ----------------
 
     @Override
     @Transactional(readOnly = true)
@@ -125,43 +117,26 @@ public class StoreServiceImpl implements StoreService {
                         .titleId(s.getTitleId())
                         .titleName(s.getTitle() != null ? s.getTitle().getTitle() : null)
                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // DISCOUNTS
-    // ─────────────────────────────────────────────────────────────
+    // ---------------- DISCOUNT ----------------
 
     @Override
-    @Transactional(readOnly = true)
-    public List<DiscountDTO.Response> getDiscountsByBranch(String storId) {
-        return getDiscountsByBranchId(storId);
-    }
+    public DiscountResponse createDiscount(DiscountCreateRequest request) {
 
-    @Override
-    public DiscountDTO.Response createDiscount(DiscountDTO.Request request) {
-
-        // Business validation
-        if (request.getDiscount().doubleValue() < 0 || request.getDiscount().doubleValue() > 100) {
-            throw new BusinessValidationException("discount", "must be between 0 and 100");
-        }
-
-        // Logical validation
         if (request.getLowqty() >= request.getHighqty()) {
             throw new InvalidOperationException("lowqty must be less than highqty");
         }
 
-        Store store = null;
-        if (request.getStorId() != null) {
-            store = storeRepository.findById(request.getStorId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", request.getStorId()));
-        }
+        Store store = storeRepository.findById(request.getStorId())
+                .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", request.getStorId()));
 
         Discount discount = Discount.builder()
                 .discounttype(request.getDiscounttype())
                 .store(store)
-                .lowqty(request.getLowqty())
-                .highqty(request.getHighqty())
+                .lowqty(request.getLowqty()!= null ? request.getLowqty().shortValue() : null)
+                .highqty(request.getHighqty()!= null ? request.getHighqty().shortValue() : null)
                 .discount(request.getDiscount())
                 .build();
 
@@ -170,15 +145,15 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DiscountDTO.Response> getAllDiscounts() {
+    public List<DiscountResponse> getAllDiscounts() {
         return discountRepository.findAll().stream()
                 .map(this::mapDiscountToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public DiscountDTO.Response getDiscountByType(String discountType) {
+    public DiscountResponse getDiscountByType(String discountType) {
 
         Discount discount = discountRepository.findByDiscounttype(discountType)
                 .orElseThrow(() -> new ResourceNotFoundException("Discount", "type", discountType));
@@ -188,36 +163,41 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DiscountDTO.Response> getDiscountsByBranchId(String storId) {
+    public List<DiscountResponse> getDiscountsByBranch(String storId) {
+        return getDiscountsByBranchId(storId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<DiscountResponse> getDiscountsByBranchId(String storId) {
 
         storeRepository.findById(storId)
                 .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", storId));
 
         return discountRepository.findByStore_StorId(storId).stream()
                 .map(this::mapDiscountToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
-    public DiscountDTO.Response updateDiscount(Long discountId, DiscountDTO.Request request) {
+    public DiscountResponse updateDiscount(Long discountId, DiscountUpdateRequest request) {
 
         Discount discount = discountRepository.findById(discountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Discount", "id", discountId));
 
-        if (request.getDiscount() != null) {
-            if (request.getDiscount().doubleValue() < 0 || request.getDiscount().doubleValue() > 100) {
-                throw new BusinessValidationException("discount", "must be between 0 and 100");
-            }
+        if (request.getDiscount() != null)
             discount.setDiscount(request.getDiscount());
-        }
 
-        if (request.getLowqty() != null && request.getHighqty() != null) {
-            if (request.getLowqty() >= request.getHighqty()) {
+        if (request.getLowqty() != null && request.getHighqty() != null &&request.getLowqty() >= request.getHighqty()) {
                 throw new InvalidOperationException("lowqty must be less than highqty");
             }
-            discount.setLowqty(request.getLowqty());
-            discount.setHighqty(request.getHighqty());
-        }
+            if (request.getLowqty() != null) {
+                discount.setLowqty(request.getLowqty().shortValue());
+            }
+
+            if (request.getHighqty() != null) {
+                discount.setHighqty(request.getHighqty().shortValue());
+            }
 
         if (request.getDiscounttype() != null)
             discount.setDiscounttype(request.getDiscounttype());
@@ -231,12 +211,10 @@ public class StoreServiceImpl implements StoreService {
         return mapDiscountToResponse(discountRepository.save(discount));
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // MAPPERS
-    // ─────────────────────────────────────────────────────────────
+    // ---------------- MAPPERS ----------------
 
-    private StoreDTO.Response mapToResponse(Store s) {
-        return StoreDTO.Response.builder()
+    private StoreResponse mapToResponse(Store s) {
+        return StoreResponse.builder()
                 .storId(s.getStorId())
                 .storName(s.getStorName())
                 .storAddress(s.getStorAddress())
@@ -246,14 +224,14 @@ public class StoreServiceImpl implements StoreService {
                 .build();
     }
 
-    private DiscountDTO.Response mapDiscountToResponse(Discount d) {
-        return DiscountDTO.Response.builder()
+    private DiscountResponse mapDiscountToResponse(Discount d) {
+        return DiscountResponse.builder()
                 .discountId(d.getDiscountId())
                 .discounttype(d.getDiscounttype())
                 .storId(d.getStore() != null ? d.getStore().getStorId() : null)
                 .storName(d.getStore() != null ? d.getStore().getStorName() : null)
-                .lowqty(d.getLowqty())
-                .highqty(d.getHighqty())
+                .lowqty(d.getLowqty() != null ? d.getLowqty().intValue() : null)
+                .highqty(d.getHighqty() != null ? d.getHighqty().intValue() : null)
                 .discount(d.getDiscount())
                 .build();
     }

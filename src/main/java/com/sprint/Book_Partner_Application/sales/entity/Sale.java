@@ -12,7 +12,6 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "sales")
-@Data
 @Builder
 @IdClass(Sale.SaleId.class)
 public class Sale {
@@ -78,7 +77,70 @@ public class Sale {
         this.payterms = payterms;
     }
 
-    // ================= COMPOSITE KEY CLASS =================
+    public String getStorId() {
+        return storId;
+    }
+
+    public void setStorId(String storId) {
+        this.storId = storId;
+    }
+
+    public String getOrdNum() {
+        return ordNum;
+    }
+
+    public void setOrdNum(String ordNum) {
+        this.ordNum = ordNum;
+    }
+
+    public String getTitleId() {
+        return titleId;
+    }
+
+    public void setTitleId(String titleId) {
+        this.titleId = titleId;
+    }
+
+    public Store getStore() {
+        return store;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
+    }
+
+    public Title getTitle() {
+        return title;
+    }
+
+    public void setTitle(Title title) {
+        this.title = title;
+    }
+
+    public LocalDateTime getOrdDate() {
+        return ordDate;
+    }
+
+    public void setOrdDate(LocalDateTime ordDate) {
+        this.ordDate = ordDate;
+    }
+
+    public Short getQty() {
+        return qty;
+    }
+
+    public void setQty(Short qty) {
+        this.qty = qty;
+    }
+
+    public String getPayterms() {
+        return payterms;
+    }
+
+    public void setPayterms(String payterms) {
+        this.payterms = payterms;
+    }
+// ================= COMPOSITE KEY CLASS =================
 
     @Data
     public static class SaleId implements Serializable {

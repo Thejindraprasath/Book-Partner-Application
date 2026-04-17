@@ -1,6 +1,6 @@
 package com.sprint.Book_Partner_Application.employee.controller;
 
-import com.sprint.Book_Partner_Application.common.dto.ApiResponse;
+import com.sprint.Book_Partner_Application.dto.ApiResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.employee.dto.request.EmployeeCreateRequest;
 import com.sprint.Book_Partner_Application.employee.dto.request.EmployeeUpdateRequest;

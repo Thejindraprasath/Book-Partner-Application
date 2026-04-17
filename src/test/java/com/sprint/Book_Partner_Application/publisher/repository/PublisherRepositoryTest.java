@@ -21,7 +21,7 @@ public class PublisherRepositoryTest {
     @Test
     void testSavePublisher() {
 
-        // ✅ Create valid Publisher (matches @Pattern)
+        // Create valid Publisher (matches @Pattern)
         Publisher publisher = Publisher.builder()
                 .pubId("1389")   // MUST match pattern
                 .pubName("O'Reilly Media")
@@ -30,10 +30,10 @@ public class PublisherRepositoryTest {
                 .country("USA")
                 .build();
 
-        // ✅ Save
+        //  Save
         Publisher savedPublisher = publisherRepository.save(publisher);
 
-        // ✅ Assertions
+        //  Assertions
         assertNotNull(savedPublisher);
         assertEquals("1389", savedPublisher.getPubId());
         assertEquals("O'Reilly Media", savedPublisher.getPubName());

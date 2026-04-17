@@ -101,4 +101,52 @@ public class TitleAuthor {
             return Objects.hash(auId, titleId);
         }
     }
+
+    public String getAuId() {
+        return auId;
+    }
+
+    public void setAuId(String auId) {
+        this.auId = auId;
+    }
+
+    public String getTitleId() {
+        return titleId;
+    }
+
+    public void setTitleId(String titleId) {
+        this.titleId = titleId;
+    }
+
+    public Author getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(Author author) {
+        this.author = author;
+    }
+
+    public Title getTitle() {
+        return title;
+    }
+
+    public void setTitle(Title title) {
+        this.title = title;
+    }
+
+    public Short getAuOrd() {
+        return auOrd;
+    }
+
+    public void setAuOrd(Short auOrd) {
+        this.auOrd = auOrd;
+    }
+
+    public Integer getRoyaltyper() {
+        return royaltyper;
+    }
+
+    public void setRoyaltyper(Integer royaltyper) {
+        this.royaltyper = royaltyper;
+    }
 }

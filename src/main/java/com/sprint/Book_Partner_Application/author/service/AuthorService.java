@@ -1,27 +1,31 @@
 package com.sprint.Book_Partner_Application.author.service;
 
-
-import com.sprint.Book_Partner_Application.author.dto.AuthorDTO;
-import com.sprint.Book_Partner_Application.author.dto.TitleAuthorDTO;
-
+import com.sprint.Book_Partner_Application.author.dto.request.AuthorCreateRequest;
+import com.sprint.Book_Partner_Application.author.dto.request.AuthorUpdateRequest;
+import com.sprint.Book_Partner_Application.author.dto.response.AuthorResponse;
+import com.sprint.Book_Partner_Application.author.dto.response.TitleAuthorResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
-
-import com.sprint.Book_Partner_Application.author.dto.AuthorDTO;
-
-import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.author.dto.TitleAuthorDTO;
-
-
 
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface AuthorService {
-    AuthorDTO.Response createAuthor(AuthorDTO.Request request);
-    PageResponse<AuthorDTO.Response> getAllAuthors(String city, String state, Integer contract, Pageable pageable);
-    AuthorDTO.Response getAuthorById(String auId);
-    AuthorDTO.Response updateAuthor(String auId, AuthorDTO.UpdateRequest request);
+
+    AuthorResponse createAuthor(AuthorCreateRequest request);
+
+    PageResponse<AuthorResponse> getAllAuthors(
+            String city,
+            String state,
+            Integer contract,
+            Pageable pageable
+    );
+
+    AuthorResponse getAuthorById(String auId);
+
+    AuthorResponse updateAuthor(String auId, AuthorUpdateRequest request);
+
     void deleteAuthor(String auId);
-    List<TitleAuthorDTO.Response> getProductsByAuthor(String auId);
+
+    List<TitleAuthorResponse> getProductsByAuthor(String auId);
 }

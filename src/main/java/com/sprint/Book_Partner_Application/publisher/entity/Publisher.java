@@ -63,4 +63,60 @@ public class Publisher {
         this.titles = titles;
         this.employees = employees;
     }
+
+    public String getPubId() {
+        return pubId;
+    }
+
+    public void setPubId(String pubId) {
+        this.pubId = pubId;
+    }
+
+    public String getPubName() {
+        return pubName;
+    }
+
+    public void setPubName(String pubName) {
+        this.pubName = pubName;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public List<Title> getTitles() {
+        return titles;
+    }
+
+    public void setTitles(List<Title> titles) {
+        this.titles = titles;
+    }
+
+    public List<Employee> getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(List<Employee> employees) {
+        this.employees = employees;
+    }
 }

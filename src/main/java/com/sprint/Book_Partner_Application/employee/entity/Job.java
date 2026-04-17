@@ -10,8 +10,6 @@ import java.util.List;
 @Entity
 @Table(name = "jobs")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Job {
 
@@ -40,4 +38,15 @@ public class Job {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Employee> employees = new ArrayList<>();
+
+    public Job() {
+    }
+
+    public Job(Short jobId, String jobDesc, Integer minLvl, Integer maxLvl, List<Employee> employees) {
+        this.jobId = jobId;
+        this.jobDesc = jobDesc;
+        this.minLvl = minLvl;
+        this.maxLvl = maxLvl;
+        this.employees = employees;
+    }
 }

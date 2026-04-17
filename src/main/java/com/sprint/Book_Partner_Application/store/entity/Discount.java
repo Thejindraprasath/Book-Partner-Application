@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "discounts")
-@Data
 @Builder
 public class Discount {
 
@@ -35,6 +34,54 @@ public class Discount {
     @Column(name = "discount", nullable = false, precision = 4, scale = 2)
     @NotNull(message = "Discount value is required")
     private BigDecimal discount;
+
+    public Long getDiscountId() {
+        return discountId;
+    }
+
+    public void setDiscountId(Long discountId) {
+        this.discountId = discountId;
+    }
+
+    public String getDiscounttype() {
+        return discounttype;
+    }
+
+    public void setDiscounttype(String discounttype) {
+        this.discounttype = discounttype;
+    }
+
+    public Store getStore() {
+        return store;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
+    }
+
+    public Short getLowqty() {
+        return lowqty;
+    }
+
+    public void setLowqty(Short lowqty) {
+        this.lowqty = lowqty;
+    }
+
+    public Short getHighqty() {
+        return highqty;
+    }
+
+    public void setHighqty(Short highqty) {
+        this.highqty = highqty;
+    }
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
+    }
 
     public Discount() {
     }

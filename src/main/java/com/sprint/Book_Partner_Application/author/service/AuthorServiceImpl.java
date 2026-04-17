@@ -1,18 +1,19 @@
-
 package com.sprint.Book_Partner_Application.author.service;
 
-import com.sprint.Book_Partner_Application.author.dto.AuthorDTO;
-import com.sprint.Book_Partner_Application.author.dto.TitleAuthorDTO;
+import com.sprint.Book_Partner_Application.author.dto.request.AuthorCreateRequest;
+import com.sprint.Book_Partner_Application.author.dto.request.AuthorUpdateRequest;
+import com.sprint.Book_Partner_Application.author.dto.response.AuthorResponse;
+import com.sprint.Book_Partner_Application.author.dto.response.TitleAuthorResponse;
 import com.sprint.Book_Partner_Application.author.entity.Author;
 import com.sprint.Book_Partner_Application.author.entity.TitleAuthor;
 import com.sprint.Book_Partner_Application.author.repository.AuthorRepository;
 import com.sprint.Book_Partner_Application.author.repository.TitleAuthorRepository;
-
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.exception.*;
-import jakarta.transaction.Transactional;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,17 +29,17 @@ public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository authorRepository;
     private final TitleAuthorRepository titleAuthorRepository;
 
-    // ─── CREATE AUTHOR ─────────────────────────────────────────────────────
+    // ─── CREATE AUTHOR ───────────────────────────────
     @Override
-    public AuthorDTO.Response createAuthor(AuthorDTO.Request request) {
+    public AuthorResponse createAuthor(AuthorCreateRequest request) {
 
-        // Duplicate check
         if (authorRepository.existsById(request.getAuId())) {
             throw new DuplicateResourceException("Author", "auId", request.getAuId());
         }
 
-        // Validation
-        if (!(request.getContract() == 0 || request.getContract() == 1)) {
+        // FIXED VALIDATION
+        if (request.getContract() != null &&
+                !(request.getContract() == 0 || request.getContract() == 1)) {
             throw new BusinessValidationException("contract", "must be 0 or 1");
         }
 
@@ -57,41 +58,48 @@ public class AuthorServiceImpl implements AuthorService {
         return mapToResponse(authorRepository.save(author));
     }
 
-    // ─── GET ALL AUTHORS (FILTER + PAGINATION) ─────────────────────────────
+    // ─── GET ALL AUTHORS ───────────────────────────────
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
-    public PageResponse<AuthorDTO.Response> getAllAuthors(
-            String city, String state, Integer contract, Pageable pageable) {
+    public PageResponse<AuthorResponse> getAllAuthors(
+            String city,
+            String state,
+            Integer contract,
+            Pageable pageable
+    ) {
 
         if (contract != null && !(contract == 0 || contract == 1)) {
             throw new InvalidOperationException("Contract filter must be 0 or 1");
         }
 
-        Page<Author> page = authorRepository.findWithFilters(city, state, contract, pageable);
+        Page<Author> page =
+                authorRepository.findWithFilters(city, state, contract, pageable);
 
         return PageResponse.from(page.map(this::mapToResponse));
     }
 
-    // ─── GET AUTHOR BY ID ──────────────────────────────────────────────────
+    // ─── GET AUTHOR BY ID ───────────────────────────────
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
-    public AuthorDTO.Response getAuthorById(String auId) {
+    public AuthorResponse getAuthorById(String auId) {
 
         Author author = authorRepository.findById(auId)
-                .orElseThrow(() -> new ResourceNotFoundException("Author", "auId", auId));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Author", "auId", auId));
 
         return mapToResponse(author);
     }
 
-    // ─── UPDATE AUTHOR ─────────────────────────────────────────────────────
+    // ─── UPDATE AUTHOR ───────────────────────────────
     @Override
-    public AuthorDTO.Response updateAuthor(String auId, AuthorDTO.UpdateRequest request) {
+    public AuthorResponse updateAuthor(String auId, AuthorUpdateRequest request) {
 
         Author author = authorRepository.findById(auId)
-                .orElseThrow(() -> new ResourceNotFoundException("Author", "auId", auId));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Author", "auId", auId));
 
-        // Validations
-        if (request.getContract() != null && !(request.getContract() == 0 || request.getContract() == 1)) {
+        if (request.getContract() != null &&
+                !(request.getContract() == 0 || request.getContract() == 1)) {
             throw new BusinessValidationException("contract", "must be 0 or 1");
         }
 
@@ -99,7 +107,7 @@ public class AuthorServiceImpl implements AuthorService {
             throw new BusinessValidationException("zip", "must be exactly 5 digits");
         }
 
-        // Partial update
+        // Partial updates
         if (request.getAuLname() != null) author.setAuLname(request.getAuLname());
         if (request.getAuFname() != null) author.setAuFname(request.getAuFname());
         if (request.getPhone() != null) author.setPhone(request.getPhone());
@@ -109,19 +117,17 @@ public class AuthorServiceImpl implements AuthorService {
         if (request.getZip() != null) author.setZip(request.getZip());
         if (request.getContract() != null) author.setContract(request.getContract());
 
-        Author updated = authorRepository.save(author);
-
-        return mapToResponse(updated);
+        return mapToResponse(authorRepository.save(author));
     }
 
-    // ─── DELETE AUTHOR ─────────────────────────────────────────────────────
+    // ─── DELETE AUTHOR ───────────────────────────────
     @Override
     public void deleteAuthor(String auId) {
 
         Author author = authorRepository.findById(auId)
-                .orElseThrow(() -> new ResourceNotFoundException("Author", "auId", auId));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Author", "auId", auId));
 
-        // Check dependencies (optimized)
         boolean hasTitles = titleAuthorRepository.existsByAuId(auId);
 
         if (hasTitles) {
@@ -131,13 +137,14 @@ public class AuthorServiceImpl implements AuthorService {
         authorRepository.delete(author);
     }
 
-    // ─── GET TITLES BY AUTHOR ──────────────────────────────────────────────
+    // ─── GET TITLES BY AUTHOR ───────────────────────────────
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
-    public List<TitleAuthorDTO.Response> getProductsByAuthor(String auId) {
+    public List<TitleAuthorResponse> getProductsByAuthor(String auId) {
 
         authorRepository.findById(auId)
-                .orElseThrow(() -> new ResourceNotFoundException("Author", "auId", auId));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Author", "auId", auId));
 
         List<TitleAuthor> list = titleAuthorRepository.findByAuId(auId);
 
@@ -150,9 +157,10 @@ public class AuthorServiceImpl implements AuthorService {
                 .collect(Collectors.toList());
     }
 
-    // ─── MAPPERS ───────────────────────────────────────────────────────────
-    private AuthorDTO.Response mapToResponse(Author a) {
-        return AuthorDTO.Response.builder()
+    // ─── MAPPERS ───────────────────────────────
+    private AuthorResponse mapToResponse(Author a) {
+
+        return AuthorResponse.builder()
                 .auId(a.getAuId())
                 .auLname(a.getAuLname())
                 .auFname(a.getAuFname())
@@ -165,7 +173,7 @@ public class AuthorServiceImpl implements AuthorService {
                 .build();
     }
 
-    private TitleAuthorDTO.Response mapTitleAuthorToResponse(TitleAuthor ta) {
+    private TitleAuthorResponse mapTitleAuthorToResponse(TitleAuthor ta) {
 
         String authorName = (ta.getAuthor() != null)
                 ? ta.getAuthor().getAuFname() + " " + ta.getAuthor().getAuLname()
@@ -175,7 +183,7 @@ public class AuthorServiceImpl implements AuthorService {
                 ? ta.getTitle().getTitle()
                 : ta.getTitleId();
 
-        return TitleAuthorDTO.Response.builder()
+        return TitleAuthorResponse.builder()
                 .auId(ta.getAuId())
                 .authorName(authorName)
                 .titleId(ta.getTitleId())
@@ -185,4 +193,3 @@ public class AuthorServiceImpl implements AuthorService {
                 .build();
     }
 }
-

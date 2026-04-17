@@ -49,4 +49,44 @@ public class Job {
         this.maxLvl = maxLvl;
         this.employees = employees;
     }
+
+    public Short getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(Short jobId) {
+        this.jobId = jobId;
+    }
+
+    public String getJobDesc() {
+        return jobDesc;
+    }
+
+    public void setJobDesc(String jobDesc) {
+        this.jobDesc = jobDesc;
+    }
+
+    public Integer getMinLvl() {
+        return minLvl;
+    }
+
+    public void setMinLvl(Integer minLvl) {
+        this.minLvl = minLvl;
+    }
+
+    public Integer getMaxLvl() {
+        return maxLvl;
+    }
+
+    public void setMaxLvl(Integer maxLvl) {
+        this.maxLvl = maxLvl;
+    }
+
+    public List<Employee> getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(List<Employee> employees) {
+        this.employees = employees;
+    }
 }

@@ -1,25 +1,23 @@
 package com.sprint.Book_Partner_Application.employee.service;
 
 import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.employee.dto.EmployeeDTO;
-import com.sprint.Book_Partner_Application.employee.dto.JobDTO;
+import com.sprint.Book_Partner_Application.employee.dto.request.EmployeeCreateRequest;
+import com.sprint.Book_Partner_Application.employee.dto.request.EmployeeUpdateRequest;
+import com.sprint.Book_Partner_Application.employee.dto.request.JobCreateRequest;
+import com.sprint.Book_Partner_Application.employee.dto.response.EmployeeResponse;
+import com.sprint.Book_Partner_Application.employee.dto.response.JobResponse;
 import com.sprint.Book_Partner_Application.employee.entity.Employee;
 import com.sprint.Book_Partner_Application.employee.entity.Job;
 import com.sprint.Book_Partner_Application.employee.repository.EmployeeRepository;
 import com.sprint.Book_Partner_Application.employee.repository.JobRepository;
-
-
-import com.sprint.Book_Partner_Application.exception.*;
-
-
-import com.sprint.Book_Partner_Application.exception.ResourceNotFoundException;
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
-//import jakarta.transaction.Transactional;
+import com.sprint.Book_Partner_Application.exception.*;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.*;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -38,7 +36,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     // ───────────── JOB ─────────────
 
     @Override
-    public JobDTO.Response createJob(JobDTO.Request request) {
+    public JobResponse createJob(JobCreateRequest request) {
 
         if (request.getMinLvl() > request.getMaxLvl()) {
             throw new InvalidOperationException("minLvl cannot be greater than maxLvl");
@@ -55,7 +53,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<JobDTO.Response> getAllJobs() {
+    public List<JobResponse> getAllJobs() {
         return jobRepository.findAll()
                 .stream()
                 .map(this::mapJobToResponse)
@@ -64,7 +62,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public JobDTO.Response getJobById(Short jobId) {
+    public JobResponse getJobById(Short jobId) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job", "jobId", jobId));
 
@@ -72,7 +70,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public JobDTO.Response updateJob(Short jobId, JobDTO.Request request) {
+    public JobResponse updateJob(Short jobId, JobCreateRequest request) {
 
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job", "jobId", jobId));
@@ -91,7 +89,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     // ───────────── EMPLOYEE ─────────────
 
     @Override
-    public EmployeeDTO.Response createEmployee(EmployeeDTO.Request request) {
+    public EmployeeResponse createEmployee(EmployeeCreateRequest request) {
 
         if (employeeRepository.existsById(request.getEmpId())) {
             throw new DuplicateResourceException("Employee", "empId", request.getEmpId());
@@ -126,16 +124,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         return mapEmpToResponse(employeeRepository.save(employee));
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public PageResponse<EmployeeDTO.Response> getAllEmployees(String pubId, Short jobId, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public PageResponse<EmployeeResponse> getAllEmployees(String pubId, Short jobId, Pageable pageable) {
+
         Page<Employee> page = employeeRepository.findWithFilters(pubId, jobId, pageable);
+
         return PageResponse.from(page.map(this::mapEmpToResponse));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public EmployeeDTO.Response getEmployeeById(String empId) {
+    public EmployeeResponse getEmployeeById(String empId) {
 
         Employee emp = employeeRepository.findById(empId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "empId", empId));
@@ -144,7 +144,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDTO.Response updateEmployee(String empId, EmployeeDTO.UpdateRequest request) {
+    public EmployeeResponse updateEmployee(String empId, EmployeeUpdateRequest request) {
 
         Employee emp = employeeRepository.findById(empId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "empId", empId));
@@ -193,7 +193,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EmployeeDTO.Response> getEmployeesByPartner(String pubId) {
+    public List<EmployeeResponse> getEmployeesByPartner(String pubId) {
 
         publisherRepository.findById(pubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Publisher", "pubId", pubId));
@@ -206,8 +206,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     // ───────────── MAPPERS ─────────────
 
-    private JobDTO.Response mapJobToResponse(Job j) {
-        return JobDTO.Response.builder()
+    private JobResponse mapJobToResponse(Job j) {
+        return JobResponse.builder()
                 .jobId(j.getJobId())
                 .jobDesc(j.getJobDesc())
                 .minLvl(j.getMinLvl())
@@ -215,8 +215,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
     }
 
-    private EmployeeDTO.Response mapEmpToResponse(Employee e) {
-        return EmployeeDTO.Response.builder()
+    private EmployeeResponse mapEmpToResponse(Employee e) {
+        return EmployeeResponse.builder()
                 .empId(e.getEmpId())
                 .fname(e.getFname())
                 .minit(e.getMinit())
@@ -229,5 +229,4 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .hireDate(e.getHireDate())
                 .build();
     }
-
 }

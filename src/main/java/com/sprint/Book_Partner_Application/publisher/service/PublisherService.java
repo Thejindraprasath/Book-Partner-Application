@@ -2,18 +2,29 @@ package com.sprint.Book_Partner_Application.publisher.service;
 
 import com.sprint.Book_Partner_Application.book.dto.TitleDTO;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.employee.dto.EmployeeDTO;
-import com.sprint.Book_Partner_Application.publisher.dto.PublisherDTO;
+import com.sprint.Book_Partner_Application.employee.dto.response.EmployeeResponse;
+import com.sprint.Book_Partner_Application.publisher.dto.request.PublisherCreateRequest;
+import com.sprint.Book_Partner_Application.publisher.dto.request.PublisherUpdateRequest;
+import com.sprint.Book_Partner_Application.publisher.dto.response.PublisherResponse;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface PublisherService {
-    PublisherDTO.Response createPublisher(PublisherDTO.Request request);
-    PageResponse<PublisherDTO.Response> getAllPublishers(String city, String state, String country, Pageable pageable);
-    PublisherDTO.Response getPublisherById(String pubId);
-    PublisherDTO.Response updatePublisher(String pubId, PublisherDTO.UpdateRequest request);
+
+    PublisherResponse createPublisher(PublisherCreateRequest request);
+
+    PageResponse<PublisherResponse> getAllPublishers(
+            String city, String state, String country, Pageable pageable
+    );
+
+    PublisherResponse getPublisherById(String pubId);
+
+    PublisherResponse updatePublisher(String pubId, PublisherUpdateRequest request);
+
     void deletePublisher(String pubId);
-    List<EmployeeDTO.Response> getEmployeesByPartner(String pubId);
+
+    List<EmployeeResponse> getEmployeesByPartner(String pubId);
+
     List<TitleDTO.Response> getProductsByPartner(String pubId);
 }

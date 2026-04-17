@@ -1,6 +1,6 @@
 package com.sprint.Book_Partner_Application.sales.controller;
 
-import com.sprint.Book_Partner_Application.common.dto.ApiResponse;
+import com.sprint.Book_Partner_Application.dto.ApiResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.sales.dto.request.SaleResponse;
 import com.sprint.Book_Partner_Application.sales.dto.response.SaleCreateRequest;

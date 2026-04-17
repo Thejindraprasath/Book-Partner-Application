@@ -5,7 +5,6 @@ import lombok.*;
 
 @Entity
 @Table(name = "roysched")
-@Data
 @Builder
 public class RoySched {
 
@@ -50,6 +49,46 @@ public class RoySched {
         this.title = title;
         this.lorange = lorange;
         this.hirange = hirange;
+        this.royalty = royalty;
+    }
+
+    public Long getRoySchedId() {
+        return roySchedId;
+    }
+
+    public void setRoySchedId(Long roySchedId) {
+        this.roySchedId = roySchedId;
+    }
+
+    public Title getTitle() {
+        return title;
+    }
+
+    public void setTitle(Title title) {
+        this.title = title;
+    }
+
+    public Integer getLorange() {
+        return lorange;
+    }
+
+    public void setLorange(Integer lorange) {
+        this.lorange = lorange;
+    }
+
+    public Integer getHirange() {
+        return hirange;
+    }
+
+    public void setHirange(Integer hirange) {
+        this.hirange = hirange;
+    }
+
+    public Integer getRoyalty() {
+        return royalty;
+    }
+
+    public void setRoyalty(Integer royalty) {
         this.royalty = royalty;
     }
 }

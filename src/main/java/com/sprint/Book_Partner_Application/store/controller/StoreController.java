@@ -1,8 +1,8 @@
 package com.sprint.Book_Partner_Application.store.controller;
 
-import com.sprint.Book_Partner_Application.common.dto.ApiResponse;
+import com.sprint.Book_Partner_Application.dto.ApiResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.sales.dto.SaleDTO;
+import com.sprint.Book_Partner_Application.sales.dto.request.SaleResponse;
 import com.sprint.Book_Partner_Application.store.dto.request.*;
 import com.sprint.Book_Partner_Application.store.dto.response.*;
 import com.sprint.Book_Partner_Application.store.service.StoreService;
@@ -95,7 +95,7 @@ public class StoreController {
     }
 
     @GetMapping("/stores/{storeId}/transactions")
-    public ResponseEntity<ApiResponse<List<SaleDTO.Response>>> getTransactionsByBranch(
+    public ResponseEntity<ApiResponse<List<SaleResponse>>> getTransactionsByBranch(
             @PathVariable String storeId) {
 
         return ResponseEntity.ok(

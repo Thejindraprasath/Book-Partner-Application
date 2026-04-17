@@ -6,7 +6,8 @@ import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.exception.DuplicateResourceException;
 import com.sprint.Book_Partner_Application.exception.InvalidOperationException;
 import com.sprint.Book_Partner_Application.exception.ResourceNotFoundException;
-import com.sprint.Book_Partner_Application.sales.dto.SaleDTO;
+import com.sprint.Book_Partner_Application.sales.dto.request.SaleResponse;
+import com.sprint.Book_Partner_Application.sales.dto.response.SaleCreateRequest;
 import com.sprint.Book_Partner_Application.sales.entity.Sale;
 import com.sprint.Book_Partner_Application.sales.repository.SaleRepository;
 import com.sprint.Book_Partner_Application.store.entity.Store;
@@ -27,9 +28,9 @@ public class SaleServiceImpl implements SaleService {
     private final StoreRepository storeRepository;
     private final TitleRepository titleRepository;
 
-    // ─── CREATE ─────────────────────────────────────────────────────────────
+    // ─── CREATE ─────────────────────────────────────────
     @Override
-    public SaleDTO.Response createSale(SaleDTO.Request request) {
+    public SaleResponse createSale(SaleCreateRequest request) {
 
         Sale.SaleId id = new Sale.SaleId(
                 request.getStorId(),
@@ -37,7 +38,6 @@ public class SaleServiceImpl implements SaleService {
                 request.getTitleId()
         );
 
-        // Duplicate check
         if (saleRepository.existsById(id)) {
             throw new DuplicateResourceException(
                     "Sale",
@@ -46,12 +46,10 @@ public class SaleServiceImpl implements SaleService {
             );
         }
 
-        // Validate Store
         Store store = storeRepository.findById(request.getStorId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Store", "storId", request.getStorId()));
 
-        // Validate Title
         Title title = titleRepository.findById(request.getTitleId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Title", "titleId", request.getTitleId()));
@@ -73,9 +71,9 @@ public class SaleServiceImpl implements SaleService {
         return mapToResponse(saved);
     }
 
-    // ─── GET BY ID ──────────────────────────────────────────────────────────
+    // ─── GET BY ID ──────────────────────────────────────
     @Override
-    public SaleDTO.Response getSaleById(String storId, String ordNum, String titleId) {
+    public SaleResponse getSaleById(String storId, String ordNum, String titleId) {
 
         Sale.SaleId id = new Sale.SaleId(storId, ordNum, titleId);
 
@@ -86,27 +84,21 @@ public class SaleServiceImpl implements SaleService {
         return mapToResponse(sale);
     }
 
-    // ─── GET ALL (PAGINATION) ───────────────────────────────────────────────
+    // ─── GET ALL ────────────────────────────────────────
     @Override
-    public PageResponse<SaleDTO.Response> getAllSales(Pageable pageable) {
+    public PageResponse<SaleResponse> getAllSales(Pageable pageable) {
 
         Page<Sale> page = saleRepository.findAll(pageable);
-
-        List<SaleDTO.Response> content = page.getContent()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
 
         return PageResponse.from(
                 page.map(this::mapToResponse)
         );
     }
 
-    // ─── FILTER: BY BRANCH ──────────────────────────────────────────────────
+    // ─── FILTER: BRANCH ─────────────────────────────────
     @Override
-    public List<SaleDTO.Response> getSalesByBranch(String storId) {
+    public List<SaleResponse> getSalesByBranch(String storId) {
 
-        // Optional validation (recommended)
         if (!storeRepository.existsById(storId)) {
             throw new ResourceNotFoundException("Store", "storId", storId);
         }
@@ -117,9 +109,9 @@ public class SaleServiceImpl implements SaleService {
                 .toList();
     }
 
-    // ─── FILTER: BY PRODUCT ─────────────────────────────────────────────────
+    // ─── FILTER: PRODUCT ────────────────────────────────
     @Override
-    public List<SaleDTO.Response> getSalesByProduct(String titleId) {
+    public List<SaleResponse> getSalesByProduct(String titleId) {
 
         if (!titleRepository.existsById(titleId)) {
             throw new ResourceNotFoundException("Title", "titleId", titleId);
@@ -131,9 +123,9 @@ public class SaleServiceImpl implements SaleService {
                 .toList();
     }
 
-    // ─── FILTER: DATE RANGE ─────────────────────────────────────────────────
+    // ─── FILTER: DATE RANGE ─────────────────────────────
     @Override
-    public List<SaleDTO.Response> getSalesByDateRange(LocalDateTime from, LocalDateTime to) {
+    public List<SaleResponse> getSalesByDateRange(LocalDateTime from, LocalDateTime to) {
 
         if (from.isAfter(to)) {
             throw new InvalidOperationException(
@@ -147,10 +139,10 @@ public class SaleServiceImpl implements SaleService {
                 .toList();
     }
 
-    // ─── MAPPER ─────────────────────────────────────────────────────────────
-    private SaleDTO.Response mapToResponse(Sale sale) {
+    // ─── MAPPER ─────────────────────────────────────────
+    private SaleResponse mapToResponse(Sale sale) {
 
-        return SaleDTO.Response.builder()
+        return SaleResponse.builder()
                 .storId(sale.getStorId())
                 .storName(sale.getStore() != null ? sale.getStore().getStorName() : null)
                 .ordNum(sale.getOrdNum())

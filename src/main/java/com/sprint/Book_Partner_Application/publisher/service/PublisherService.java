@@ -1,6 +1,7 @@
 package com.sprint.Book_Partner_Application.publisher.service;
 
-import com.sprint.Book_Partner_Application.book.dto.TitleDTO;
+
+import com.sprint.Book_Partner_Application.book.dto.response.TitleResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.employee.dto.response.EmployeeResponse;
 import com.sprint.Book_Partner_Application.publisher.dto.request.PublisherCreateRequest;
@@ -26,5 +27,5 @@ public interface PublisherService {
 
     List<EmployeeResponse> getEmployeesByPartner(String pubId);
 
-    List<TitleDTO.Response> getProductsByPartner(String pubId);
+    List<TitleResponse> getProductsByPartner(String pubId);
 }

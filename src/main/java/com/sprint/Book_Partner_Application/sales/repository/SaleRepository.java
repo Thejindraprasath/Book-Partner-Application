@@ -31,5 +31,7 @@ public interface SaleRepository extends JpaRepository<Sale, Sale.SaleId> {
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to);
 
+    boolean existsByStorId(String storId);
+
 //    void deleteById(String id);
 }

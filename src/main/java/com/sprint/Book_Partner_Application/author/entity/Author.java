@@ -1,6 +1,5 @@
 package com.sprint.Book_Partner_Application.author.entity;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -11,8 +10,6 @@ import java.util.List;
 @Entity
 @Table(name = "authors")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Author {
 
@@ -53,4 +50,41 @@ public class Author {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<TitleAuthor> titleAuthors = new ArrayList<>();
+
+    // ================= MANUAL CONSTRUCTORS =================
+
+    // No-Args Constructor (Required by JPA)
+    public Author() {
+    }
+
+    // All-Args Constructor
+    public Author(String auId, String auLname, String auFname, String phone,
+                  String address, String city, String state, String zip,
+                  int contract, List<TitleAuthor> titleAuthors) {
+        this.auId = auId;
+        this.auLname = auLname;
+        this.auFname = auFname;
+        this.phone = phone;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
+        this.contract = contract;
+        this.titleAuthors = titleAuthors;
+    }
+
+    // Optional: Cleaner constructor without relationships (Recommended)
+    public Author(String auId, String auLname, String auFname, String phone,
+                  String address, String city, String state, String zip,
+                  int contract) {
+        this.auId = auId;
+        this.auLname = auLname;
+        this.auFname = auFname;
+        this.phone = phone;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
+        this.contract = contract;
+    }
 }

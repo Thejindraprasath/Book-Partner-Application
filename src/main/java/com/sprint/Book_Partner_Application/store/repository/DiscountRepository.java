@@ -12,4 +12,6 @@ public interface DiscountRepository extends JpaRepository<Discount, Long> {
     List<Discount> findByStore_StorId(String storId);
     Optional<Discount> findByDiscounttype(String discounttype);
     List<Discount> findByStore_StorIdIsNull();
+
+    boolean existsByStore_StorId(String storId);
 }

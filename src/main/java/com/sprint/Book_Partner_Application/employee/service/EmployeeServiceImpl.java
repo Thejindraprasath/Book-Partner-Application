@@ -7,13 +7,19 @@ import com.sprint.Book_Partner_Application.employee.entity.Employee;
 import com.sprint.Book_Partner_Application.employee.entity.Job;
 import com.sprint.Book_Partner_Application.employee.repository.EmployeeRepository;
 import com.sprint.Book_Partner_Application.employee.repository.JobRepository;
+
+
+import com.sprint.Book_Partner_Application.exception.*;
+
+
 import com.sprint.Book_Partner_Application.exception.ResourceNotFoundException;
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
+//import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -23,29 +29,35 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final JobRepository jobRepository;
     private final PublisherRepository publisherRepository;
 
-    // ── JOBS ──────────────────────────────────────────────────────────────────
+    // ───────────── JOB ─────────────
 
     @Override
     public JobDTO.Response createJob(JobDTO.Request request) {
+
+        if (request.getMinLvl() > request.getMaxLvl()) {
+            throw new InvalidOperationException("minLvl cannot be greater than maxLvl");
+        }
+
         Job job = Job.builder()
                 .jobDesc(request.getJobDesc())
                 .minLvl(request.getMinLvl())
                 .maxLvl(request.getMaxLvl())
                 .build();
+
         return mapJobToResponse(jobRepository.save(job));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<JobDTO.Response> getAllJobs() {
-        return jobRepository.findAll().stream()
+        return jobRepository.findAll()
+                .stream()
                 .map(this::mapJobToResponse)
                 .collect(Collectors.toList());
     }
@@ -55,27 +67,50 @@ public class EmployeeServiceImpl implements EmployeeService {
     public JobDTO.Response getJobById(Short jobId) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job", "jobId", jobId));
+
         return mapJobToResponse(job);
     }
 
     @Override
     public JobDTO.Response updateJob(Short jobId, JobDTO.Request request) {
+
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job", "jobId", jobId));
+
+        if (request.getMinLvl() > request.getMaxLvl()) {
+            throw new InvalidOperationException("minLvl cannot be greater than maxLvl");
+        }
+
         job.setJobDesc(request.getJobDesc());
         job.setMinLvl(request.getMinLvl());
         job.setMaxLvl(request.getMaxLvl());
+
         return mapJobToResponse(jobRepository.save(job));
     }
 
-    // ── EMPLOYEES ─────────────────────────────────────────────────────────────
+    // ───────────── EMPLOYEE ─────────────
 
     @Override
     public EmployeeDTO.Response createEmployee(EmployeeDTO.Request request) {
+
+        if (employeeRepository.existsById(request.getEmpId())) {
+            throw new DuplicateResourceException("Employee", "empId", request.getEmpId());
+        }
+
         Job job = jobRepository.findById(request.getJobId())
                 .orElseThrow(() -> new ResourceNotFoundException("Job", "jobId", request.getJobId()));
+
         Publisher publisher = publisherRepository.findById(request.getPubId())
                 .orElseThrow(() -> new ResourceNotFoundException("Publisher", "pubId", request.getPubId()));
+
+        if (request.getJobLvl() != null &&
+                (request.getJobLvl() < job.getMinLvl() || request.getJobLvl() > job.getMaxLvl())) {
+
+            throw new BusinessValidationException(
+                    "jobLvl",
+                    "must be between " + job.getMinLvl() + " and " + job.getMaxLvl()
+            );
+        }
 
         Employee employee = Employee.builder()
                 .empId(request.getEmpId())
@@ -87,6 +122,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .publisher(publisher)
                 .hireDate(request.getHireDate() != null ? request.getHireDate() : LocalDateTime.now())
                 .build();
+
         return mapEmpToResponse(employeeRepository.save(employee));
     }
 
@@ -100,51 +136,75 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional(readOnly = true)
     public EmployeeDTO.Response getEmployeeById(String empId) {
+
         Employee emp = employeeRepository.findById(empId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "empId", empId));
+
         return mapEmpToResponse(emp);
     }
 
     @Override
     public EmployeeDTO.Response updateEmployee(String empId, EmployeeDTO.UpdateRequest request) {
+
         Employee emp = employeeRepository.findById(empId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "empId", empId));
+
         if (request.getFname() != null) emp.setFname(request.getFname());
         if (request.getMinit() != null) emp.setMinit(request.getMinit());
         if (request.getLname() != null) emp.setLname(request.getLname());
+
         if (request.getJobId() != null) {
             Job job = jobRepository.findById(request.getJobId())
                     .orElseThrow(() -> new ResourceNotFoundException("Job", "jobId", request.getJobId()));
+
             emp.setJob(job);
+
+            if (request.getJobLvl() != null &&
+                    (request.getJobLvl() < job.getMinLvl() || request.getJobLvl() > job.getMaxLvl())) {
+
+                throw new BusinessValidationException(
+                        "jobLvl",
+                        "must be between " + job.getMinLvl() + " and " + job.getMaxLvl()
+                );
+            }
         }
+
         if (request.getJobLvl() != null) emp.setJobLvl(request.getJobLvl());
+
         if (request.getPubId() != null) {
             Publisher pub = publisherRepository.findById(request.getPubId())
                     .orElseThrow(() -> new ResourceNotFoundException("Publisher", "pubId", request.getPubId()));
             emp.setPublisher(pub);
         }
+
         if (request.getHireDate() != null) emp.setHireDate(request.getHireDate());
+
         return mapEmpToResponse(employeeRepository.save(emp));
     }
 
     @Override
     public void deleteEmployee(String empId) {
+
         Employee emp = employeeRepository.findById(empId)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "empId", empId));
+
         employeeRepository.delete(emp);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<EmployeeDTO.Response> getEmployeesByPartner(String pubId) {
+
         publisherRepository.findById(pubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Publisher", "pubId", pubId));
-        return employeeRepository.findByPublisher_PubId(pubId).stream()
+
+        return employeeRepository.findByPublisher_PubId(pubId)
+                .stream()
                 .map(this::mapEmpToResponse)
                 .collect(Collectors.toList());
     }
 
-    // ── MAPPERS ───────────────────────────────────────────────────────────────
+    // ───────────── MAPPERS ─────────────
 
     private JobDTO.Response mapJobToResponse(Job j) {
         return JobDTO.Response.builder()
@@ -170,3 +230,4 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
     }
 
+}

@@ -15,4 +15,6 @@ public interface TitleAuthorRepository extends JpaRepository<TitleAuthor, TitleA
     List<TitleAuthor> findByTitleId(String titleId);
     void deleteByAuId(String auId);
     void deleteByTitleId(String titleId);
+
+    boolean existsByAuId(String auId);
 }

@@ -2,6 +2,7 @@ package com.sprint.Book_Partner_Application.store.service;
 
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.exception.*;
+import com.sprint.Book_Partner_Application.sales.dto.request.SaleResponse;
 import com.sprint.Book_Partner_Application.sales.repository.SaleRepository;
 import com.sprint.Book_Partner_Application.store.dto.request.DiscountCreateRequest;
 import com.sprint.Book_Partner_Application.store.dto.request.DiscountUpdateRequest;
@@ -101,13 +102,13 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SaleDTO.Response> getTransactionsByBranch(String storId) {
+    public List<SaleResponse> getTransactionsByBranch(String storId) {
 
         storeRepository.findById(storId)
                 .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", storId));
 
         return saleRepository.findByStorId(storId).stream()
-                .map(s -> SaleDTO.Response.builder()
+                .map(s -> SaleResponse.builder()
                         .storId(s.getStorId())
                         .storName(s.getStore() != null ? s.getStore().getStorName() : null)
                         .ordNum(s.getOrdNum())

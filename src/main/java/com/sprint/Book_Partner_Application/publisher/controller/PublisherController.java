@@ -1,13 +1,14 @@
 package com.sprint.Book_Partner_Application.publisher.controller;
 
-import com.sprint.Book_Partner_Application.common.dto.ApiResponse;
+import com.sprint.Book_Partner_Application.book.dto.response.TitleResponse;
+import com.sprint.Book_Partner_Application.dto.ApiResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.employee.dto.response.EmployeeResponse;
 import com.sprint.Book_Partner_Application.publisher.dto.request.PublisherCreateRequest;
 import com.sprint.Book_Partner_Application.publisher.dto.request.PublisherUpdateRequest;
 import com.sprint.Book_Partner_Application.publisher.dto.response.PublisherResponse;
 import com.sprint.Book_Partner_Application.publisher.service.PublisherService;
-import com.sprint.Book_Partner_Application.book.dto.TitleDTO;
+
 
 
 import lombok.RequiredArgsConstructor;
@@ -94,10 +95,10 @@ public class PublisherController {
 
     // ───────────── GET TITLES BY PUBLISHER ─────────────
     @GetMapping("/{pubId}/titles")
-    public ApiResponse<List<TitleDTO.Response>> getTitlesByPublisher(
+    public ApiResponse<List<TitleResponse>> getTitlesByPublisher(
             @PathVariable String pubId) {
 
-        List<TitleDTO.Response> titles =
+        List<TitleResponse> titles =
                 publisherService.getProductsByPartner(pubId);
 
         return ApiResponse.success(titles);

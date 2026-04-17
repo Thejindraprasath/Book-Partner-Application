@@ -5,7 +5,7 @@ import com.sprint.Book_Partner_Application.author.dto.request.AuthorUpdateReques
 import com.sprint.Book_Partner_Application.author.dto.response.AuthorResponse;
 import com.sprint.Book_Partner_Application.author.dto.response.TitleAuthorResponse;
 import com.sprint.Book_Partner_Application.author.service.AuthorService;
-import com.sprint.Book_Partner_Application.common.dto.ApiResponse;
+import com.sprint.Book_Partner_Application.dto.ApiResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 
 import jakarta.validation.Valid;

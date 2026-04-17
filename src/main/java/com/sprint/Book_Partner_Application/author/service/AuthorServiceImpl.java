@@ -38,7 +38,7 @@ public class AuthorServiceImpl implements AuthorService {
         }
 
         // Validation
-        if ( !(request.getContract() == 0 || request.getContract() == 1)) {
+        if (!(request.getContract() == 0 || request.getContract() == 1)) {
             throw new BusinessValidationException("contract", "must be 0 or 1");
         }
 

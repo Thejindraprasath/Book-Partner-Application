@@ -2,8 +2,8 @@ package com.sprint.Book_Partner_Application.sales.controller;
 
 import com.sprint.Book_Partner_Application.dto.ApiResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.sales.dto.request.SaleResponse;
-import com.sprint.Book_Partner_Application.sales.dto.response.SaleCreateRequest;
+import com.sprint.Book_Partner_Application.sales.dto.response.SaleResponse;
+import com.sprint.Book_Partner_Application.sales.dto.request.SaleCreateRequest;
 import com.sprint.Book_Partner_Application.sales.service.SaleService;
 
 import jakarta.validation.Valid;
@@ -28,7 +28,7 @@ public class SaleController {
     private final SaleService saleService;
 
     // ─── CREATE ─────────────────────────────────────────
-    @PostMapping
+    @PostMapping("/postSale")
     public ResponseEntity<ApiResponse<SaleResponse>> createSale(
             @Valid @RequestBody SaleCreateRequest request) {
 

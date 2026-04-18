@@ -1,4 +1,4 @@
-package com.sprint.Book_Partner_Application.sales.dto.request;
+package com.sprint.Book_Partner_Application.sales.dto.response;
 
 import lombok.Builder;
 

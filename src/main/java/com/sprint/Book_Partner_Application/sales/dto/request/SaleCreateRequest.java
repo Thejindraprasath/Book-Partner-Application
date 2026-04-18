@@ -1,4 +1,4 @@
-package com.sprint.Book_Partner_Application.sales.dto.response;
+package com.sprint.Book_Partner_Application.sales.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.Builder;

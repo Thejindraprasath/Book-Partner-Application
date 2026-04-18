@@ -8,38 +8,52 @@ import com.sprint.Book_Partner_Application.employee.dto.response.EmployeeRespons
 import com.sprint.Book_Partner_Application.employee.dto.response.JobResponse;
 import com.sprint.Book_Partner_Application.employee.entity.Employee;
 import com.sprint.Book_Partner_Application.employee.entity.Job;
+import com.sprint.Book_Partner_Application.employee.exception.*;
 import com.sprint.Book_Partner_Application.employee.repository.EmployeeRepository;
 import com.sprint.Book_Partner_Application.employee.repository.JobRepository;
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
+import com.sprint.Book_Partner_Application.publisher.exception.PublisherNotFoundException;
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
 import com.sprint.Book_Partner_Application.exception.*;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private final EmployeeRepository employeeRepository;
-    private final JobRepository jobRepository;
-    private final PublisherRepository publisherRepository;
+    @Autowired
+    EmployeeRepository employeeRepository;
+    @Autowired
+    JobRepository jobRepository;
+    @Autowired
+    PublisherRepository publisherRepository;
 
-    // ───────────── JOB ─────────────
+    // ════════════════════════════════════════════════════════
+    // JOBS
+    // ════════════════════════════════════════════════════════
 
     @Override
     public JobResponse createJob(JobCreateRequest request) {
+        log.debug("Creating job: {}", request.getJobDesc());
 
-        if (request.getMinLvl() > request.getMaxLvl()) {
-            throw new InvalidOperationException("minLvl cannot be greater than maxLvl");
+        if (request.getMinLvl() >= request.getMaxLvl()
+                || request.getMinLvl() < 10
+                || request.getMaxLvl() > 250) {
+            throw new InvalidJobLevelRangeException(
+                    request.getMinLvl(),
+                    request.getMaxLvl()
+            );
         }
 
         Job job = Job.builder()
@@ -48,7 +62,10 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .maxLvl(request.getMaxLvl())
                 .build();
 
-        return mapJobToResponse(jobRepository.save(job));
+        Job saved = jobRepository.save(job);
+
+        log.info("Job created: {}", saved.getJobId());
+        return mapJobToResponse(saved);
     }
 
     @Override
@@ -64,49 +81,75 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional(readOnly = true)
     public JobResponse getJobById(Short jobId) {
         Job job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new ResourceNotFoundException("Job", "jobId", jobId));
+                .orElseThrow(() -> new JobNotFoundException(jobId));
 
         return mapJobToResponse(job);
     }
 
     @Override
     public JobResponse updateJob(Short jobId, JobCreateRequest request) {
-
         Job job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new ResourceNotFoundException("Job", "jobId", jobId));
+                .orElseThrow(() -> new JobNotFoundException(jobId));
 
-        if (request.getMinLvl() > request.getMaxLvl()) {
-            throw new InvalidOperationException("minLvl cannot be greater than maxLvl");
+        if (request.getMinLvl() >= request.getMaxLvl()
+                || request.getMinLvl() < 10
+                || request.getMaxLvl() > 250) {
+            throw new InvalidJobLevelRangeException(
+                    request.getMinLvl(),
+                    request.getMaxLvl()
+            );
         }
+
+        // Check existing employees before narrowing range
+        employeeRepository.findByJob_JobId(jobId).forEach(emp -> {
+            if (emp.getJobLvl() < request.getMinLvl()
+                    || emp.getJobLvl() > request.getMaxLvl()) {
+
+                throw new JobLevelUpdateBreaksEmployeesException(
+                        emp.getEmpId(),
+                        emp.getJobLvl(),
+                        request.getMinLvl(),
+                        request.getMaxLvl()
+                );
+            }
+        });
 
         job.setJobDesc(request.getJobDesc());
         job.setMinLvl(request.getMinLvl());
         job.setMaxLvl(request.getMaxLvl());
 
-        return mapJobToResponse(jobRepository.save(job));
+        Job updated = jobRepository.save(job);
+
+        log.info("Job updated: {}", jobId);
+        return mapJobToResponse(updated);
     }
 
-    // ───────────── EMPLOYEE ─────────────
+    // ════════════════════════════════════════════════════════
+    // EMPLOYEES
+    // ════════════════════════════════════════════════════════
 
     @Override
     public EmployeeResponse createEmployee(EmployeeCreateRequest request) {
+        log.debug("Creating employee: {}", request.getEmpId());
 
         if (employeeRepository.existsById(request.getEmpId())) {
-            throw new DuplicateResourceException("Employee", "empId", request.getEmpId());
+            throw new EmployeeAlreadyExistsException(request.getEmpId());
         }
 
         Job job = jobRepository.findById(request.getJobId())
-                .orElseThrow(() -> new ResourceNotFoundException("Job", "jobId", request.getJobId()));
+                .orElseThrow(() -> new JobNotFoundException(request.getJobId()));
 
         Publisher publisher = publisherRepository.findById(request.getPubId())
-                .orElseThrow(() -> new ResourceNotFoundException("Publisher", "pubId", request.getPubId()));
+                .orElseThrow(() -> new PublisherNotFoundException(request.getPubId()));
 
-        if (request.getJobLvl() != null &&
-                (request.getJobLvl() < job.getMinLvl() || request.getJobLvl() > job.getMaxLvl())) {
+        int jobLvl = request.getJobLvl() != null ? request.getJobLvl() : 10;
 
-            throw new BusinessValidationException(
-                    "jobLvl",
-                    "must be between " + job.getMinLvl() + " and " + job.getMaxLvl()
+        if (jobLvl < job.getMinLvl() || jobLvl > job.getMaxLvl()) {
+            throw new EmployeeJobLevelMismatchException(
+                    jobLvl,
+                    job.getJobDesc(),
+                    job.getMinLvl(),
+                    job.getMaxLvl()
             );
         }
 
@@ -116,87 +159,109 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .minit(request.getMinit())
                 .lname(request.getLname())
                 .job(job)
-                .jobLvl(request.getJobLvl() != null ? request.getJobLvl() : 10)
+                .jobLvl(jobLvl)
                 .publisher(publisher)
-                .hireDate(request.getHireDate() != null ? request.getHireDate() : LocalDateTime.now())
+                .hireDate(request.getHireDate() != null
+                        ? request.getHireDate()
+                        : LocalDateTime.now())
                 .build();
 
-        return mapEmpToResponse(employeeRepository.save(employee));
+        Employee saved = employeeRepository.save(employee);
+
+        log.info("Employee created: {}", saved.getEmpId());
+        return mapEmpToResponse(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<EmployeeResponse> getAllEmployees(String pubId, Short jobId, Pageable pageable) {
+    public PageResponse<EmployeeResponse> getAllEmployees(
+            String pubId,
+            Short jobId,
+            Pageable pageable) {
 
-        Page<Employee> page = employeeRepository.findWithFilters(pubId, jobId, pageable);
+        if (pubId != null && !publisherRepository.existsById(pubId)) {
+            throw new PublisherNotFoundException(pubId);
+        }
 
-        return PageResponse.from(page.map(this::mapEmpToResponse));
+        if (jobId != null && !jobRepository.existsById(jobId)) {
+            throw new JobNotFoundException(jobId);
+        }
+
+        return PageResponse.from(
+                employeeRepository
+                        .findWithFilters(pubId, jobId, pageable)
+                        .map(this::mapEmpToResponse)
+        );
     }
 
     @Override
     @Transactional(readOnly = true)
     public EmployeeResponse getEmployeeById(String empId) {
-
         Employee emp = employeeRepository.findById(empId)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", "empId", empId));
+                .orElseThrow(() -> new EmployeeNotFoundException(empId));
 
         return mapEmpToResponse(emp);
     }
 
     @Override
     public EmployeeResponse updateEmployee(String empId, EmployeeUpdateRequest request) {
-
         Employee emp = employeeRepository.findById(empId)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", "empId", empId));
+                .orElseThrow(() -> new EmployeeNotFoundException(empId));
 
-        if (request.getFname() != null) emp.setFname(request.getFname());
-        if (request.getMinit() != null) emp.setMinit(request.getMinit());
-        if (request.getLname() != null) emp.setLname(request.getLname());
+        Job jobForValidation = emp.getJob();
 
         if (request.getJobId() != null) {
-            Job job = jobRepository.findById(request.getJobId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Job", "jobId", request.getJobId()));
+            jobForValidation = jobRepository.findById(request.getJobId())
+                    .orElseThrow(() -> new JobNotFoundException(request.getJobId()));
+            emp.setJob(jobForValidation);
+        }
 
-            emp.setJob(job);
+        if (request.getJobLvl() != null && jobForValidation != null) {
+            if (request.getJobLvl() < jobForValidation.getMinLvl()
+                    || request.getJobLvl() > jobForValidation.getMaxLvl()) {
 
-            if (request.getJobLvl() != null &&
-                    (request.getJobLvl() < job.getMinLvl() || request.getJobLvl() > job.getMaxLvl())) {
-
-                throw new BusinessValidationException(
-                        "jobLvl",
-                        "must be between " + job.getMinLvl() + " and " + job.getMaxLvl()
+                throw new EmployeeJobLevelMismatchException(
+                        request.getJobLvl(),
+                        jobForValidation.getJobDesc(),
+                        jobForValidation.getMinLvl(),
+                        jobForValidation.getMaxLvl()
                 );
             }
         }
 
-        if (request.getJobLvl() != null) emp.setJobLvl(request.getJobLvl());
-
         if (request.getPubId() != null) {
             Publisher pub = publisherRepository.findById(request.getPubId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Publisher", "pubId", request.getPubId()));
+                    .orElseThrow(() -> new PublisherNotFoundException(request.getPubId()));
             emp.setPublisher(pub);
         }
 
+        if (request.getFname() != null) emp.setFname(request.getFname());
+        if (request.getMinit() != null) emp.setMinit(request.getMinit());
+        if (request.getLname() != null) emp.setLname(request.getLname());
+        if (request.getJobLvl() != null) emp.setJobLvl(request.getJobLvl());
         if (request.getHireDate() != null) emp.setHireDate(request.getHireDate());
 
-        return mapEmpToResponse(employeeRepository.save(emp));
+        Employee updated = employeeRepository.save(emp);
+
+        log.info("Employee updated: {}", empId);
+        return mapEmpToResponse(updated);
     }
 
     @Override
     public void deleteEmployee(String empId) {
-
         Employee emp = employeeRepository.findById(empId)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", "empId", empId));
+                .orElseThrow(() -> new EmployeeNotFoundException(empId));
 
         employeeRepository.delete(emp);
+
+        log.info("Employee deleted: {}", empId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<EmployeeResponse> getEmployeesByPartner(String pubId) {
-
         publisherRepository.findById(pubId)
-                .orElseThrow(() -> new ResourceNotFoundException("Publisher", "pubId", pubId));
+                .orElseThrow(() -> new PublisherNotFoundException(pubId));
 
         return employeeRepository.findByPublisher_PubId(pubId)
                 .stream()
@@ -204,7 +269,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .collect(Collectors.toList());
     }
 
-    // ───────────── MAPPERS ─────────────
+    // ════════════════════════════════════════════════════════
+    // MAPPERS
+    // ════════════════════════════════════════════════════════
 
     private JobResponse mapJobToResponse(Job j) {
         return JobResponse.builder()

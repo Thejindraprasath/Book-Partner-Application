@@ -12,6 +12,7 @@ import com.sprint.Book_Partner_Application.book.repository.RoySchedRepository;
 import com.sprint.Book_Partner_Application.book.repository.TitleRepository;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
+import com.sprint.Book_Partner_Application.publisher.exception.PublisherNotFoundException;
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
 import com.sprint.Book_Partner_Application.sales.repository.SaleRepository;
 import lombok.RequiredArgsConstructor;

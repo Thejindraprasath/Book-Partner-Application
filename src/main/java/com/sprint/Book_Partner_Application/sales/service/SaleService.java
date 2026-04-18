@@ -1,8 +1,8 @@
 package com.sprint.Book_Partner_Application.sales.service;
 
 import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.sales.dto.request.SaleResponse;
-import com.sprint.Book_Partner_Application.sales.dto.response.SaleCreateRequest;
+import com.sprint.Book_Partner_Application.sales.dto.response.SaleResponse;
+import com.sprint.Book_Partner_Application.sales.dto.request.SaleCreateRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;

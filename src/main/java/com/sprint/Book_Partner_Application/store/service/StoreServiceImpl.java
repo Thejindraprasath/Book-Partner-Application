@@ -1,7 +1,10 @@
 package com.sprint.Book_Partner_Application.store.service;
 
 import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.sales.dto.request.SaleResponse;
+
+import com.sprint.Book_Partner_Application.exception.*;
+import com.sprint.Book_Partner_Application.sales.dto.response.SaleResponse;
+import com.sprint.Book_Partner_Application.sales.repository.SaleRepository;
 import com.sprint.Book_Partner_Application.store.dto.request.DiscountCreateRequest;
 import com.sprint.Book_Partner_Application.store.dto.request.DiscountUpdateRequest;
 import com.sprint.Book_Partner_Application.store.dto.request.StoreCreateRequest;

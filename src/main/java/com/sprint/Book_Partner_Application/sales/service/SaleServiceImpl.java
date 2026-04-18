@@ -1,7 +1,8 @@
-package com.bookpartner.service.impl;
+package com.sprint.Book_Partner_Application.sales.service;
 
 
 import com.sprint.Book_Partner_Application.book.entity.Title;
+import com.sprint.Book_Partner_Application.book.exception.TitleNotFoundException;
 import com.sprint.Book_Partner_Application.book.repository.TitleRepository;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.sales.dto.response.SaleResponse;
@@ -11,6 +12,7 @@ import com.sprint.Book_Partner_Application.sales.exception.*;
 import com.sprint.Book_Partner_Application.sales.repository.SaleRepository;
 import com.sprint.Book_Partner_Application.sales.service.SaleService;
 import com.sprint.Book_Partner_Application.store.entity.Store;
+import com.sprint.Book_Partner_Application.store.exception.StoreNotFoundException;
 import com.sprint.Book_Partner_Application.store.repository.StoreRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,9 @@
 package com.sprint.Book_Partner_Application.store.service;
 
 import com.sprint.Book_Partner_Application.dto.PageResponse;
+
 import com.sprint.Book_Partner_Application.exception.*;
-import com.sprint.Book_Partner_Application.sales.dto.request.SaleResponse;
+import com.sprint.Book_Partner_Application.sales.dto.response.SaleResponse;
 import com.sprint.Book_Partner_Application.sales.repository.SaleRepository;
 import com.sprint.Book_Partner_Application.store.dto.request.DiscountCreateRequest;
 import com.sprint.Book_Partner_Application.store.dto.request.DiscountUpdateRequest;
@@ -12,32 +13,49 @@ import com.sprint.Book_Partner_Application.store.dto.response.DiscountResponse;
 import com.sprint.Book_Partner_Application.store.dto.response.StoreResponse;
 import com.sprint.Book_Partner_Application.store.entity.Discount;
 import com.sprint.Book_Partner_Application.store.entity.Store;
+import com.sprint.Book_Partner_Application.store.exception.*;
 import com.sprint.Book_Partner_Application.store.repository.DiscountRepository;
+import com.sprint.Book_Partner_Application.sales.repository.SaleRepository;
 import com.sprint.Book_Partner_Application.store.repository.StoreRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class StoreServiceImpl implements StoreService {
+    @Autowired
+    private StoreRepository storeRepository;
+    @Autowired
+    private SaleRepository saleRepository;
+    @Autowired
+    private DiscountRepository discountRepository;
 
-    private final StoreRepository storeRepository;
-    private final SaleRepository saleRepository;
-    private final DiscountRepository discountRepository;
-
-    // ---------------- STORE ----------------
+    // ════════════════════════════════════════════════════════
+    // STORES
+    // ════════════════════════════════════════════════════════
 
     @Override
     public StoreResponse createStore(StoreCreateRequest request) {
+        log.debug("Creating store: {}", request.getStorId());
 
         if (storeRepository.existsById(request.getStorId())) {
-            throw new DuplicateResourceException("Store", "storId", request.getStorId());
+            throw new StoreAlreadyExistsException(request.getStorId());
+        }
+
+        if (request.getZip() != null && !request.getZip().matches("^[0-9]{5}$")) {
+            throw new InvalidZipCodeException(request.getZip());
+        }
+
+        if (request.getState() != null && request.getState().length() != 2) {
+            throw new InvalidStateCodeException(request.getState());
         }
 
         Store store = Store.builder()
@@ -49,30 +67,46 @@ public class StoreServiceImpl implements StoreService {
                 .zip(request.getZip())
                 .build();
 
-        return mapToResponse(storeRepository.save(store));
+        Store saved = storeRepository.save(store);
+
+        log.info("Store created: {}", saved.getStorId());
+        return mapToResponse(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public PageResponse<StoreResponse> getAllStores(String city, String state, Pageable pageable) {
-        Page<Store> page = storeRepository.findWithFilters(city, state, pageable);
-        return PageResponse.from(page.map(this::mapToResponse));
+        if (state != null && state.length() != 2) {
+            throw new InvalidStateCodeException(state);
+        }
+
+        return PageResponse.from(
+                storeRepository.findWithFilters(city, state, pageable)
+                        .map(this::mapToResponse)
+        );
     }
 
     @Override
     @Transactional(readOnly = true)
     public StoreResponse getStoreById(String storId) {
         Store store = storeRepository.findById(storId)
-                .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", storId));
+                .orElseThrow(() -> new StoreNotFoundException(storId));
 
         return mapToResponse(store);
     }
 
     @Override
     public StoreResponse updateStore(String storId, StoreUpdateRequest request) {
-
         Store store = storeRepository.findById(storId)
-                .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", storId));
+                .orElseThrow(() -> new StoreNotFoundException(storId));
+
+        if (request.getZip() != null && !request.getZip().matches("^[0-9]{5}$")) {
+            throw new InvalidZipCodeException(request.getZip());
+        }
+
+        if (request.getState() != null && request.getState().length() != 2) {
+            throw new InvalidStateCodeException(request.getState());
+        }
 
         if (request.getStorName() != null) store.setStorName(request.getStorName());
         if (request.getStorAddress() != null) store.setStorAddress(request.getStorAddress());
@@ -80,34 +114,40 @@ public class StoreServiceImpl implements StoreService {
         if (request.getState() != null) store.setState(request.getState());
         if (request.getZip() != null) store.setZip(request.getZip());
 
-        return mapToResponse(storeRepository.save(store));
+        Store updated = storeRepository.save(store);
+
+        log.info("Store updated: {}", storId);
+        return mapToResponse(updated);
     }
 
     @Override
     public void deleteStore(String storId) {
-
         Store store = storeRepository.findById(storId)
-                .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", storId));
+                .orElseThrow(() -> new StoreNotFoundException(storId));
 
-        if (saleRepository.existsByStorId(storId) ||
-                discountRepository.existsByStore_StorId(storId)) {
+        List<?> sales = saleRepository.findByStorId(storId);
+        if (!sales.isEmpty()) {
+            throw new StoreHasActiveSalesException(storId, sales.size());
+        }
 
-            throw new ResourceInUseException("Store", storId, "existing sales or discount records");
+        List<?> discounts = discountRepository.findByStore_StorId(storId);
+        if (!discounts.isEmpty()) {
+            throw new StoreHasActiveDiscountsException(storId, discounts.size());
         }
 
         storeRepository.delete(store);
-    }
 
-    // ---------------- SALES ----------------
+        log.info("Store deleted: {}", storId);
+    }
 
     @Override
     @Transactional(readOnly = true)
     public List<SaleResponse> getTransactionsByBranch(String storId) {
-
         storeRepository.findById(storId)
-                .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", storId));
+                .orElseThrow(() -> new StoreNotFoundException(storId));
 
-        return saleRepository.findByStorId(storId).stream()
+        return saleRepository.findByStorId(storId)
+                .stream()
                 .map(s -> SaleResponse.builder()
                         .storId(s.getStorId())
                         .storName(s.getStore() != null ? s.getStore().getStorName() : null)
@@ -118,48 +158,7 @@ public class StoreServiceImpl implements StoreService {
                         .titleId(s.getTitleId())
                         .titleName(s.getTitle() != null ? s.getTitle().getTitle() : null)
                         .build())
-                .toList();
-    }
-
-    // ---------------- DISCOUNT ----------------
-
-    @Override
-    public DiscountResponse createDiscount(DiscountCreateRequest request) {
-
-        if (request.getLowqty() >= request.getHighqty()) {
-            throw new InvalidOperationException("lowqty must be less than highqty");
-        }
-
-        Store store = storeRepository.findById(request.getStorId())
-                .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", request.getStorId()));
-
-        Discount discount = Discount.builder()
-                .discounttype(request.getDiscounttype())
-                .store(store)
-                .lowqty(request.getLowqty()!= null ? request.getLowqty().shortValue() : null)
-                .highqty(request.getHighqty()!= null ? request.getHighqty().shortValue() : null)
-                .discount(request.getDiscount())
-                .build();
-
-        return mapDiscountToResponse(discountRepository.save(discount));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<DiscountResponse> getAllDiscounts() {
-        return discountRepository.findAll().stream()
-                .map(this::mapDiscountToResponse)
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public DiscountResponse getDiscountByType(String discountType) {
-
-        Discount discount = discountRepository.findByDiscounttype(discountType)
-                .orElseThrow(() -> new ResourceNotFoundException("Discount", "type", discountType));
-
-        return mapDiscountToResponse(discount);
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -168,51 +167,145 @@ public class StoreServiceImpl implements StoreService {
         return getDiscountsByBranchId(storId);
     }
 
+    // ════════════════════════════════════════════════════════
+    // DISCOUNTS
+    // ════════════════════════════════════════════════════════
+
+    @Override
+    public DiscountResponse createDiscount(DiscountCreateRequest request) {
+        log.debug("Creating discount: {}", request.getDiscounttype());
+
+        if (request.getDiscount().compareTo(BigDecimal.ZERO) < 0
+                || request.getDiscount().compareTo(new BigDecimal("100.00")) > 0) {
+            throw new InvalidDiscountValueException(request.getDiscount());
+        }
+
+        Store store = null;
+
+        if (request.getStorId() != null) {
+            store = storeRepository.findById(request.getStorId())
+                    .orElseThrow(() -> new StoreNotFoundException(request.getStorId()));
+
+            boolean typeTaken = discountRepository.findByStore_StorId(request.getStorId())
+                    .stream()
+                    .anyMatch(d -> d.getDiscounttype()
+                            .equalsIgnoreCase(request.getDiscounttype()));
+
+            if (typeTaken) {
+                throw new DiscountAlreadyExistsException(
+                        request.getDiscounttype(),
+                        request.getStorId()
+                );
+            }
+        }
+
+        Short low = request.getLowqty() != null ? request.getLowqty().shortValue() : null;
+        Short high = request.getHighqty() != null ? request.getHighqty().shortValue() : null;
+
+        if (low != null && high != null && low >= high) {
+            throw new InvalidDiscountQtyRangeException(low, high);
+        }
+
+        Discount discount = Discount.builder()
+                .discounttype(request.getDiscounttype())
+                .store(store)
+                .lowqty(low)
+                .highqty(high)
+                .discount(request.getDiscount())
+                .build();
+
+        Discount saved = discountRepository.save(discount);
+
+        log.info("Discount created: {}", saved.getDiscountId());
+        return mapDiscountToResponse(saved);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<DiscountResponse> getAllDiscounts() {
+        return discountRepository.findAll()
+                .stream()
+                .map(this::mapDiscountToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DiscountResponse getDiscountByType(String discountType) {
+        Discount discount = discountRepository.findByDiscounttype(discountType)
+                .orElseThrow(() -> new DiscountNotFoundException(discountType));
+
+        return mapDiscountToResponse(discount);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<DiscountResponse> getDiscountsByBranchId(String storId) {
-
         storeRepository.findById(storId)
-                .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", storId));
+                .orElseThrow(() -> new StoreNotFoundException(storId));
 
-        return discountRepository.findByStore_StorId(storId).stream()
+        return discountRepository.findByStore_StorId(storId)
+                .stream()
                 .map(this::mapDiscountToResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
     public DiscountResponse updateDiscount(Long discountId, DiscountUpdateRequest request) {
+        return null;
+    }
+
+    @Override
+    public DiscountResponse updateDiscount(Long discountId, DiscountCreateRequest request) {
 
         Discount discount = discountRepository.findById(discountId)
-                .orElseThrow(() -> new ResourceNotFoundException("Discount", "id", discountId));
+                .orElseThrow(() -> new DiscountNotFoundException(discountId));
 
-        if (request.getDiscount() != null)
-            discount.setDiscount(request.getDiscount());
-
-        if (request.getLowqty() != null && request.getHighqty() != null &&request.getLowqty() >= request.getHighqty()) {
-                throw new InvalidOperationException("lowqty must be less than highqty");
+        if (request.getDiscount() != null) {
+            if (request.getDiscount().compareTo(BigDecimal.ZERO) < 0
+                    || request.getDiscount().compareTo(new BigDecimal("99.99")) > 0) {
+                throw new InvalidDiscountValueException(request.getDiscount());
             }
-            if (request.getLowqty() != null) {
-                discount.setLowqty(request.getLowqty().shortValue());
-            }
+        }
 
-            if (request.getHighqty() != null) {
-                discount.setHighqty(request.getHighqty().shortValue());
-            }
+        Short low = request.getLowqty() != null ? request.getLowqty().shortValue() : null;
+        Short high = request.getHighqty() != null ? request.getHighqty().shortValue() : null;
 
-        if (request.getDiscounttype() != null)
-            discount.setDiscounttype(request.getDiscounttype());
+        if (low != null && high != null && low >= high) {
+            throw new InvalidDiscountQtyRangeException(low, high);
+        }
 
         if (request.getStorId() != null) {
             Store store = storeRepository.findById(request.getStorId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Store", "storId", request.getStorId()));
+                    .orElseThrow(() -> new StoreNotFoundException(request.getStorId()));
             discount.setStore(store);
         }
 
-        return mapDiscountToResponse(discountRepository.save(discount));
+        if (request.getDiscounttype() != null) {
+            discount.setDiscounttype(request.getDiscounttype());
+        }
+
+        if (low != null) {
+            discount.setLowqty(low);
+        }
+
+        if (high != null) {
+            discount.setHighqty(high);
+        }
+
+        if (request.getDiscount() != null) {
+            discount.setDiscount(request.getDiscount());
+        }
+
+        Discount updated = discountRepository.save(discount);
+
+        log.info("Discount updated: {}", discountId);
+        return mapDiscountToResponse(updated);
     }
 
-    // ---------------- MAPPERS ----------------
+    // ════════════════════════════════════════════════════════
+    // MAPPERS
+    // ════════════════════════════════════════════════════════
 
     private StoreResponse mapToResponse(Store s) {
         return StoreResponse.builder()

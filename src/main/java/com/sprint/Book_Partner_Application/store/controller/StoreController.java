@@ -2,7 +2,7 @@ package com.sprint.Book_Partner_Application.store.controller;
 
 import com.sprint.Book_Partner_Application.dto.ApiResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.sales.dto.request.SaleResponse;
+import com.sprint.Book_Partner_Application.sales.dto.response.SaleResponse;
 import com.sprint.Book_Partner_Application.store.dto.request.*;
 import com.sprint.Book_Partner_Application.store.dto.response.*;
 import com.sprint.Book_Partner_Application.store.service.StoreService;

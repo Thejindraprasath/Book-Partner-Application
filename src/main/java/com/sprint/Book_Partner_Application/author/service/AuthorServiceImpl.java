@@ -8,12 +8,13 @@ import com.sprint.Book_Partner_Application.author.entity.Author;
 import com.sprint.Book_Partner_Application.author.entity.TitleAuthor;
 import com.sprint.Book_Partner_Application.author.repository.AuthorRepository;
 import com.sprint.Book_Partner_Application.author.repository.TitleAuthorRepository;
+import com.sprint.Book_Partner_Application.author.exception.*;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.exception.*;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,22 +23,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class AuthorServiceImpl implements AuthorService {
 
-    private final AuthorRepository authorRepository;
-    private final TitleAuthorRepository titleAuthorRepository;
+    @Autowired
+    private AuthorRepository authorRepository;
+
+    @Autowired
+    private TitleAuthorRepository titleAuthorRepository;
 
     // ─── CREATE AUTHOR ───────────────────────────────
     @Override
     public AuthorResponse createAuthor(AuthorCreateRequest request) {
 
         if (authorRepository.existsById(request.getAuId())) {
-            throw new DuplicateResourceException("Author", "auId", request.getAuId());
+            throw new AuthorAlreadyExistsException(request.getAuId());
         }
 
-        // FIXED VALIDATION
         if (request.getContract() != null &&
                 !(request.getContract() == 0 || request.getContract() == 1)) {
             throw new BusinessValidationException("contract", "must be 0 or 1");
@@ -84,8 +86,7 @@ public class AuthorServiceImpl implements AuthorService {
     public AuthorResponse getAuthorById(String auId) {
 
         Author author = authorRepository.findById(auId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Author", "auId", auId));
+                .orElseThrow(() -> new AuthorNotFoundException(auId));
 
         return mapToResponse(author);
     }
@@ -95,8 +96,7 @@ public class AuthorServiceImpl implements AuthorService {
     public AuthorResponse updateAuthor(String auId, AuthorUpdateRequest request) {
 
         Author author = authorRepository.findById(auId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Author", "auId", auId));
+                .orElseThrow(() -> new AuthorNotFoundException(auId));
 
         if (request.getContract() != null &&
                 !(request.getContract() == 0 || request.getContract() == 1)) {
@@ -107,7 +107,6 @@ public class AuthorServiceImpl implements AuthorService {
             throw new BusinessValidationException("zip", "must be exactly 5 digits");
         }
 
-        // Partial updates
         if (request.getAuLname() != null) author.setAuLname(request.getAuLname());
         if (request.getAuFname() != null) author.setAuFname(request.getAuFname());
         if (request.getPhone() != null) author.setPhone(request.getPhone());
@@ -125,13 +124,12 @@ public class AuthorServiceImpl implements AuthorService {
     public void deleteAuthor(String auId) {
 
         Author author = authorRepository.findById(auId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Author", "auId", auId));
+                .orElseThrow(() -> new AuthorNotFoundException(auId));
 
         boolean hasTitles = titleAuthorRepository.existsByAuId(auId);
 
         if (hasTitles) {
-            throw new ResourceInUseException("Author", auId, "title associations");
+            throw new AuthorHasActiveTitlesException(auId);
         }
 
         authorRepository.delete(author);
@@ -143,8 +141,7 @@ public class AuthorServiceImpl implements AuthorService {
     public List<TitleAuthorResponse> getProductsByAuthor(String auId) {
 
         authorRepository.findById(auId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Author", "auId", auId));
+                .orElseThrow(() -> new AuthorNotFoundException(auId));
 
         List<TitleAuthor> list = titleAuthorRepository.findByAuId(auId);
 

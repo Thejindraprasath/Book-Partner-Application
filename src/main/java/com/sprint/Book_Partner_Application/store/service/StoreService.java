@@ -1,7 +1,7 @@
 package com.sprint.Book_Partner_Application.store.service;
 
 import com.sprint.Book_Partner_Application.dto.PageResponse;
-import com.sprint.Book_Partner_Application.sales.dto.request.SaleResponse;
+import com.sprint.Book_Partner_Application.sales.dto.response.SaleResponse;
 import com.sprint.Book_Partner_Application.store.dto.request.*;
 import com.sprint.Book_Partner_Application.store.dto.response.*;
 
@@ -25,4 +25,6 @@ public interface StoreService {
     DiscountResponse getDiscountByType(String discountType);
     List<DiscountResponse> getDiscountsByBranchId(String storId);
     DiscountResponse updateDiscount(Long discountId, DiscountUpdateRequest request);
+
+    DiscountResponse updateDiscount(Long discountId, DiscountCreateRequest request);
 }

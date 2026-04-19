@@ -19,14 +19,14 @@ class StoreRepositoryTest {
     // ================= HELPER METHOD =================
 
     private Store createStore(String id, String city, String state) {
-        return Store.builder()
-                .storId(id)
-                .storName("ABC Books")
-                .storAddress("123 Main Street")
-                .city(city)
-                .state(state)
-                .zip("60001")
-                .build();
+        Store store = new Store();
+        store.setStorId(id);
+        store.setStorName("ABC Books");
+        store.setStorAddress("123 Main Street");
+        store.setCity(city);
+        store.setState(state);
+        store.setZip("60001");
+        return store;
     }
 
     // ================= CREATE =================
@@ -157,10 +157,9 @@ class StoreRepositoryTest {
 
     @Test
     void testValidationFail() {
-        Store store = Store.builder()
-                .storId("")     // invalid
-                .zip("123")     // invalid
-                .build();
+        Store store = new Store();
+        store.setStorId("");  // invalid
+        store.setZip("123");
 
         assertThrows(ConstraintViolationException.class, () -> {
             storeRepository.saveAndFlush(store);

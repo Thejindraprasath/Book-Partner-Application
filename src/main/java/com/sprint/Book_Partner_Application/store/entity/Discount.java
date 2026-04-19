@@ -2,12 +2,10 @@ package com.sprint.Book_Partner_Application.store.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "discounts")
-@Builder
 public class Discount {
 
     @Id
@@ -19,10 +17,8 @@ public class Discount {
     @NotBlank(message = "Discount type is required")
     private String discounttype;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "stor_id")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Store store;
 
     @Column(name = "lowqty")

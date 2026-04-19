@@ -135,24 +135,9 @@ public class StoreServiceImpl implements StoreService {
         storeRepository.findById(storId)
                 .orElseThrow(() -> new StoreNotFoundException(storId));
 
-//        return saleRepository.findByStorId(storId)
-//                .stream()
-//                .map(s -> SaleResponse.builder()
-//                        .storId(s.getStorId())
-//                        .storName(s.getStore() != null ? s.getStore().getStorName() : null)
-//                        .ordNum(s.getOrdNum())
-//                        .ordDate(s.getOrdDate())
-//                        .qty(s.getQty())
-//                        .payterms(s.getPayterms())
-//                        .titleId(s.getTitleId())
-//                        .titleName(s.getTitle() != null ? s.getTitle().getTitle() : null)
-//                        .build())
-//                .collect(Collectors.toList());
         List<Sale> sales = saleRepository.findByStorId(storId);
         List<SaleResponse> responseList = new ArrayList<>();
 
-//        for (Object obj : sales) {
-//            Sale s = (Sale) obj;
         for (Sale s : sales){
             SaleResponse res = new SaleResponse();
             res.setStorId(s.getStorId());
@@ -193,17 +178,6 @@ public class StoreServiceImpl implements StoreService {
             store = storeRepository.findById(request.getStorId())
                     .orElseThrow(() -> new StoreNotFoundException(request.getStorId()));
 
-//            boolean typeTaken = discountRepository.findByStore_StorId(request.getStorId())
-//                    .stream()
-//                    .anyMatch(d -> d.getDiscounttype()
-//                            .equalsIgnoreCase(request.getDiscounttype()));
-//
-//            if (typeTaken) {
-//                throw new DiscountAlreadyExistsException(
-//                        request.getDiscounttype(),
-//                        request.getStorId()
-//                );
-//            }
             List<Discount> existing = discountRepository.findByStore_StorId(request.getStorId());
 
             for (Discount d : existing) {
@@ -237,10 +211,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public List<DiscountResponse> getAllDiscounts() {
-//        return discountRepository.findAll()
-//                .stream()
-//                .map(this::mapDiscountToResponse)
-//                .collect(Collectors.toList());
+
         List<Discount> list = discountRepository.findAll();
         List<DiscountResponse> result = new ArrayList<>();
 
@@ -264,10 +235,6 @@ public class StoreServiceImpl implements StoreService {
         storeRepository.findById(storId)
                 .orElseThrow(() -> new StoreNotFoundException(storId));
 
-//        return discountRepository.findByStore_StorId(storId)
-//                .stream()
-//                .map(this::mapDiscountToResponse)
-//                .collect(Collectors.toList());
         List<Discount> list = discountRepository.findByStore_StorId(storId);
         List<DiscountResponse> result = new ArrayList<>();
 

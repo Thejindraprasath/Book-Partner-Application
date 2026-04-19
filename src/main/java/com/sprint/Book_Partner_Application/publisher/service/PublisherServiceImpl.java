@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,11 +29,11 @@ public class PublisherServiceImpl implements PublisherService {
     private static final Set<String> STANDARD_PUB_IDS =
             Set.of("1389", "0736", "0877", "1622", "1756");
     @Autowired
-     private PublisherRepository publisherRepository;
+    private PublisherRepository publisherRepository;
     @Autowired
-     private EmployeeRepository employeeRepository;
+    private EmployeeRepository employeeRepository;
     @Autowired
-     private TitleRepository titleRepository;
+    private TitleRepository titleRepository;
 
     // ─── CREATE ─────────────────────────────────────────────
 

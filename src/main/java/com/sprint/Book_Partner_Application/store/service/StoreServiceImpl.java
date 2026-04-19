@@ -15,7 +15,6 @@ import com.sprint.Book_Partner_Application.store.entity.Discount;
 import com.sprint.Book_Partner_Application.store.entity.Store;
 import com.sprint.Book_Partner_Application.store.exception.*;
 import com.sprint.Book_Partner_Application.store.repository.DiscountRepository;
-import com.sprint.Book_Partner_Application.sales.repository.SaleRepository;
 import com.sprint.Book_Partner_Application.store.repository.StoreRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

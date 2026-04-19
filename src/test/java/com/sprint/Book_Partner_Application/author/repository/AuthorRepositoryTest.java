@@ -1,7 +1,5 @@
 package com.sprint.Book_Partner_Application.author.repository;
 
-
-
 import com.sprint.Book_Partner_Application.author.entity.Author;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,27 +29,32 @@ class AuthorRepositoryTest {
 
     @BeforeEach
     void setup() {
-        authorRepository.save(Author.builder()
-                .auId("111-11-1111")
-                .auFname("John")
-                .auLname("Doe")
-                .phone("1234567890")
-                .city("Chennai")
-                .state("TN")
-                .zip("60001")
-                .contract(1)
-                .build());
 
-        authorRepository.save(Author.builder()
-                .auId("222-22-2222")
-                .auFname("Jane")
-                .auLname("Smith")
-                .phone("9876543210")
-                .city("Mumbai")
-                .state("MH")
-                .zip("40001")
-                .contract(0)
-                .build());
+        // FIRST AUTHOR (manual object creation)
+        Author author1 = new Author();
+        author1.setAuId("111-11-1111");
+        author1.setAuFname("John");
+        author1.setAuLname("Doe");
+        author1.setPhone("1234567890");
+        author1.setCity("Chennai");
+        author1.setState("TN");
+        author1.setZip("60001");
+        author1.setContract(1);
+
+        authorRepository.save(author1);
+
+        // SECOND AUTHOR
+        Author author2 = new Author();
+        author2.setAuId("222-22-2222");
+        author2.setAuFname("Jane");
+        author2.setAuLname("Smith");
+        author2.setPhone("9876543210");
+        author2.setCity("Mumbai");
+        author2.setState("MH");
+        author2.setZip("40001");
+        author2.setContract(0);
+
+        authorRepository.save(author2);
     }
 
     // ================= FIND BY CITY =================

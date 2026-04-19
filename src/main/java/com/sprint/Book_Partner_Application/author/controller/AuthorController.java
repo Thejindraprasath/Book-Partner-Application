@@ -9,7 +9,6 @@ import com.sprint.Book_Partner_Application.dto.ApiResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,12 +21,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/authors")
-@RequiredArgsConstructor
 public class AuthorController {
 
-    private final AuthorService authorService;
+    private AuthorService authorService;
 
-    // ─── CREATE AUTHOR ─────────────────────────────────────────────
+    // ✅ MANUAL CONSTRUCTOR (replaces @RequiredArgsConstructor)
+    public AuthorController(AuthorService authorService) {
+        this.authorService = authorService;
+    }
+
+    // ─── CREATE AUTHOR ─────────────────────────────
     @PostMapping
     public ResponseEntity<ApiResponse<AuthorResponse>> createAuthor(
             @Valid @RequestBody AuthorCreateRequest request) {
@@ -38,7 +41,7 @@ public class AuthorController {
                 .body(ApiResponse.success("Author created successfully", response));
     }
 
-    // ─── GET ALL AUTHORS (FILTER + PAGINATION) ─────────────────────
+    // ─── GET ALL AUTHORS ───────────────────────────
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<AuthorResponse>>> getAllAuthors(
             @RequestParam(required = false) String city,
@@ -49,9 +52,12 @@ public class AuthorController {
             @RequestParam(defaultValue = "auLname") String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
 
-        Sort sort = direction.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+        Sort sort;
+        if (direction.equalsIgnoreCase("desc")) {
+            sort = Sort.by(sortBy).descending();
+        } else {
+            sort = Sort.by(sortBy).ascending();
+        }
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
@@ -61,7 +67,7 @@ public class AuthorController {
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
-    // ─── GET AUTHOR BY ID ─────────────────────────────────────────
+    // ─── GET AUTHOR BY ID ─────────────────────────
     @GetMapping("/{auId}")
     public ResponseEntity<ApiResponse<AuthorResponse>> getAuthorById(
             @PathVariable String auId) {
@@ -71,7 +77,7 @@ public class AuthorController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    // ─── UPDATE AUTHOR ────────────────────────────────────────────
+    // ─── UPDATE AUTHOR ────────────────────────────
     @PutMapping("/{auId}")
     public ResponseEntity<ApiResponse<AuthorResponse>> updateAuthor(
             @PathVariable String auId,
@@ -79,25 +85,30 @@ public class AuthorController {
 
         AuthorResponse response = authorService.updateAuthor(auId, request);
 
-        return ResponseEntity.ok(ApiResponse.success("Author updated successfully", response));
+        return ResponseEntity.ok(
+                ApiResponse.success("Author updated successfully", response)
+        );
     }
 
-    // ─── DELETE AUTHOR ────────────────────────────────────────────
+    // ─── DELETE AUTHOR ────────────────────────────
     @DeleteMapping("/{auId}")
     public ResponseEntity<ApiResponse<Void>> deleteAuthor(
             @PathVariable String auId) {
 
         authorService.deleteAuthor(auId);
 
-        return ResponseEntity.ok(ApiResponse.successMessage("Author deleted successfully"));
+        return ResponseEntity.ok(
+                ApiResponse.successMessage("Author deleted successfully")
+        );
     }
 
-    // ─── GET TITLES BY AUTHOR ─────────────────────────────────────
+    // ─── GET TITLES BY AUTHOR ─────────────────────
     @GetMapping("/{auId}/titles")
     public ResponseEntity<ApiResponse<List<TitleAuthorResponse>>> getTitlesByAuthor(
             @PathVariable String auId) {
 
-        List<TitleAuthorResponse> list = authorService.getProductsByAuthor(auId);
+        List<TitleAuthorResponse> list =
+                authorService.getProductsByAuthor(auId);
 
         return ResponseEntity.ok(ApiResponse.success(list));
     }

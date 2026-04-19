@@ -1,10 +1,5 @@
 package com.sprint.Book_Partner_Application.author.dto.response;
 
-
-
-
-import lombok.Builder;
-
 public class AuthorResponse {
 
     private String auId;
@@ -17,9 +12,10 @@ public class AuthorResponse {
     private String zip;
     private int contract;
 
+    // ✅ No-args constructor
     public AuthorResponse() {}
 
-    @Builder
+    // ✅ all-args constructor
     public AuthorResponse(String auId, String auLname, String auFname, String phone,
                           String address, String city, String state,
                           String zip, int contract) {
@@ -35,6 +31,7 @@ public class AuthorResponse {
     }
 
     // Getters and Setters
+
     public String getAuId() { return auId; }
     public void setAuId(String auId) { this.auId = auId; }
 

@@ -2,15 +2,12 @@ package com.sprint.Book_Partner_Application.author.entity;
 
 import com.sprint.Book_Partner_Application.book.entity.Title;
 import jakarta.persistence.*;
-import lombok.*;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
 @Table(name = "titleauthor")
-@Data
-@Builder
 @IdClass(TitleAuthor.TitleAuthorId.class)
 public class TitleAuthor {
 
@@ -22,16 +19,12 @@ public class TitleAuthor {
     @Column(name = "title_id", length = 10)
     private String titleId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "au_id", insertable = false, updatable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Author author;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "title_id", insertable = false, updatable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Title title;
 
     @Column(name = "au_ord")
@@ -40,13 +33,10 @@ public class TitleAuthor {
     @Column(name = "royaltyper")
     private Integer royaltyper;
 
-    // ================= MANUAL CONSTRUCTORS =================
+    // ===== Constructors =====
 
-    // No-Args Constructor (Required by JPA)
-    public TitleAuthor() {
-    }
+    public TitleAuthor() {}
 
-    // Constructor WITHOUT relationships (Recommended)
     public TitleAuthor(String auId, String titleId,
                        Short auOrd, Integer royaltyper) {
         this.auId = auId;
@@ -55,37 +45,41 @@ public class TitleAuthor {
         this.royaltyper = royaltyper;
     }
 
-    // Optional: Full constructor (NOT recommended for regular use)
-    public TitleAuthor(String auId, String titleId,
-                       Author author, Title title,
-                       Short auOrd, Integer royaltyper) {
-        this.auId = auId;
-        this.titleId = titleId;
-        this.author = author;
-        this.title = title;
-        this.auOrd = auOrd;
+    // ===== Getters & Setters =====
+
+    public String getAuId() { return auId; }
+    public void setAuId(String auId) { this.auId = auId; }
+
+    public String getTitleId() { return titleId; }
+    public void setTitleId(String titleId) { this.titleId = titleId; }
+
+    public Author getAuthor() { return author; }
+    public void setAuthor(Author author) { this.author = author; }
+
+    public Title getTitle() { return title; }
+    public void setTitle(Title title) { this.title = title; }
+
+    public Short getAuOrd() { return auOrd; }
+    public void setAuOrd(Short auOrd) { this.auOrd = auOrd; }
+
+    public Integer getRoyaltyper() { return royaltyper; }
+    public void setRoyaltyper(Integer royaltyper) {
         this.royaltyper = royaltyper;
     }
 
-    // ================= COMPOSITE KEY CLASS =================
+    // ===== Composite Key Class =====
 
-    @Data
     public static class TitleAuthorId implements Serializable {
 
         private String auId;
         private String titleId;
 
-        // No-Args Constructor
-        public TitleAuthorId() {
-        }
+        public TitleAuthorId() {}
 
-        // All-Args Constructor
         public TitleAuthorId(String auId, String titleId) {
             this.auId = auId;
             this.titleId = titleId;
         }
-
-        // Explicit equals & hashCode (Best Practice for IdClass)
 
         @Override
         public boolean equals(Object o) {
@@ -100,53 +94,5 @@ public class TitleAuthor {
         public int hashCode() {
             return Objects.hash(auId, titleId);
         }
-    }
-
-    public String getAuId() {
-        return auId;
-    }
-
-    public void setAuId(String auId) {
-        this.auId = auId;
-    }
-
-    public String getTitleId() {
-        return titleId;
-    }
-
-    public void setTitleId(String titleId) {
-        this.titleId = titleId;
-    }
-
-    public Author getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(Author author) {
-        this.author = author;
-    }
-
-    public Title getTitle() {
-        return title;
-    }
-
-    public void setTitle(Title title) {
-        this.title = title;
-    }
-
-    public Short getAuOrd() {
-        return auOrd;
-    }
-
-    public void setAuOrd(Short auOrd) {
-        this.auOrd = auOrd;
-    }
-
-    public Integer getRoyaltyper() {
-        return royaltyper;
-    }
-
-    public void setRoyaltyper(Integer royaltyper) {
-        this.royaltyper = royaltyper;
     }
 }

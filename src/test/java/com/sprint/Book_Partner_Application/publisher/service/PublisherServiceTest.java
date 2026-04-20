@@ -126,7 +126,7 @@ class PublisherServiceTest {
         when(publisherRepository.findById("1389")).thenReturn(Optional.of(publisher));
         when(employeeRepository.findByPublisher_PubId("1389")).thenReturn(List.of(emp));
 
-        var list = publisherService.getEmployeesByPartner("1389");
+        var list = publisherService.getEmployeesByPublisher("1389");
 
         assertEquals(1, list.size());
     }
@@ -141,7 +141,7 @@ class PublisherServiceTest {
         when(titleRepository.findByPublisher_PubId(eq("1389"), any()))
                 .thenReturn(new PageImpl<>(List.of(title)));
 
-        List<TitleResponse> list = publisherService.getProductsByPartner("1389");
+        List<TitleResponse> list = publisherService.getProductsByPublisher("1389");
 
         assertEquals(1, list.size());
     }
@@ -221,6 +221,6 @@ class PublisherServiceTest {
         when(publisherRepository.findById("9999")).thenReturn(Optional.empty());
 
         assertThrows(PublisherNotFoundException.class,
-                () -> publisherService.getEmployeesByPartner("9999"));
+                () -> publisherService.getEmployeesByPublisher("9999"));
     }
 }

@@ -277,7 +277,7 @@ class EmployeeServiceTest {
         when(publisherRepository.findById("9999")).thenReturn(Optional.empty());
 
         assertThrows(PublisherNotFoundException.class,
-                () -> employeeService.getEmployeesByPartner("9999"));
+                () -> employeeService.getEmployeesByPublisher("9999"));
     }
 
     @Test

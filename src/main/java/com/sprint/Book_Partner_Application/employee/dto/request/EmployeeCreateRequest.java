@@ -1,9 +1,9 @@
 package com.sprint.Book_Partner_Application.employee.dto.request;
 import jakarta.validation.constraints.*;
-import lombok.*;
+
 
 import java.time.LocalDateTime;
-@Builder
+
 public class EmployeeCreateRequest {
     @NotBlank(message = "Employee ID is required")
     @Pattern(

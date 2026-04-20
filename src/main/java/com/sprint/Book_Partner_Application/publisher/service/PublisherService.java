@@ -25,7 +25,7 @@ public interface PublisherService {
 
     void deletePublisher(String pubId);
 
-    List<EmployeeResponse> getEmployeesByPartner(String pubId);
+    List<EmployeeResponse> getEmployeesByPublisher(String pubId);
 
-    List<TitleResponse> getProductsByPartner(String pubId);
+    List<TitleResponse> getProductsByPublisher(String pubId);
 }

@@ -1,11 +1,9 @@
 package com.sprint.Book_Partner_Application.book.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 @Entity
 @Table(name = "roysched")
-@Builder
 public class RoySched {
 
     @Id
@@ -15,8 +13,6 @@ public class RoySched {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "title_id")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Title title;
 
     @Column(name = "lorange")
@@ -28,13 +24,11 @@ public class RoySched {
     @Column(name = "royalty")
     private Integer royalty;
 
-    // ================= MANUAL CONSTRUCTORS =================
+    // ================= CONSTRUCTORS =================
 
-    // No-Args Constructor (Required by JPA)
     public RoySched() {
     }
 
-    // Constructor WITHOUT relationship (Recommended)
     public RoySched(Long roySchedId, Integer lorange, Integer hirange, Integer royalty) {
         this.roySchedId = roySchedId;
         this.lorange = lorange;
@@ -42,7 +36,6 @@ public class RoySched {
         this.royalty = royalty;
     }
 
-    // Optional: Constructor WITH relationship (use carefully)
     public RoySched(Long roySchedId, Title title,
                     Integer lorange, Integer hirange, Integer royalty) {
         this.roySchedId = roySchedId;
@@ -51,6 +44,8 @@ public class RoySched {
         this.hirange = hirange;
         this.royalty = royalty;
     }
+
+    // ================= GETTERS & SETTERS =================
 
     public Long getRoySchedId() {
         return roySchedId;
@@ -90,5 +85,34 @@ public class RoySched {
 
     public void setRoyalty(Integer royalty) {
         this.royalty = royalty;
+    }
+
+    // ================= toString =================
+
+    @Override
+    public String toString() {
+        return "RoySched{" +
+                "roySchedId=" + roySchedId +
+                ", lorange=" + lorange +
+                ", hirange=" + hirange +
+                ", royalty=" + royalty +
+                '}';
+    }
+
+    // ================= equals =================
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RoySched that)) return false;
+
+        return roySchedId != null && roySchedId.equals(that.roySchedId);
+    }
+
+    // ================= hashCode =================
+
+    @Override
+    public int hashCode() {
+        return roySchedId != null ? roySchedId.hashCode() : 0;
     }
 }

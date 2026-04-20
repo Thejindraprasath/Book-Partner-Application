@@ -2,7 +2,6 @@ package com.sprint.Book_Partner_Application.book.dto.response;
 
 import lombok.*;
 
-@Builder
 public class RoySchedResponse {
     private Long roySchedId;
     private String titleId;

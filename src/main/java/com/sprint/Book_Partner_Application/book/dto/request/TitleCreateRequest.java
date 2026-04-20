@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Builder
 public class TitleCreateRequest {
 
     @NotBlank(message = "Title ID is required")

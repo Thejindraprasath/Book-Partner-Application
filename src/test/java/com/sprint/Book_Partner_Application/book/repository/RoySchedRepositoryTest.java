@@ -40,17 +40,18 @@ class RoySchedRepositoryTest {
         title.setType("Fiction");
         title.setPubdate(LocalDateTime.now());
 
-        savedTitle = titleRepository.save(title); // ✅ MUST SAVE FIRST
+        savedTitle = titleRepository.save(title);
     }
 
     // ================= HELPER =================
     private RoySched createAndFlush() {
-        RoySched roy = RoySched.builder()
-                .title(savedTitle) // ✅ USE SAVED ENTITY
-                .lorange(100)
-                .hirange(200)
-                .royalty(10)
-                .build();
+
+        RoySched roy = new RoySched();
+
+        roy.setTitle(savedTitle);
+        roy.setLorange(100);
+        roy.setHirange(200);
+        roy.setRoyalty(10);
 
         return roySchedRepository.saveAndFlush(roy);
     }
@@ -69,7 +70,9 @@ class RoySchedRepositoryTest {
     void testRead() {
         RoySched roy = createAndFlush();
 
-        RoySched found = roySchedRepository.findById(roy.getRoySchedId()).orElse(null);
+        RoySched found = roySchedRepository
+                .findById(roy.getRoySchedId())
+                .orElse(null);
 
         assertNotNull(found);
         assertEquals(100, found.getLorange());
@@ -93,7 +96,9 @@ class RoySchedRepositoryTest {
 
         roySchedRepository.deleteById(roy.getRoySchedId());
 
-        assertFalse(roySchedRepository.findById(roy.getRoySchedId()).isPresent());
+        assertFalse(
+                roySchedRepository.findById(roy.getRoySchedId()).isPresent()
+        );
     }
 
     // ================= FIND ALL =================
@@ -113,7 +118,6 @@ class RoySchedRepositoryTest {
 
         var violations = validator.validate(roy);
 
-        // ✅ No validation annotations → expect NO violations
         assertTrue(violations.isEmpty());
     }
 }

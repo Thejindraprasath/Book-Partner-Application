@@ -3,7 +3,6 @@ package com.sprint.Book_Partner_Application.book.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-@Builder
 public class RoySchedCreateRequest {
 
     @NotBlank(message = "Title ID is required")

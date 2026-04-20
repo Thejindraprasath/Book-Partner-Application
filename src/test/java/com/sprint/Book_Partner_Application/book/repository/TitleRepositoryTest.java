@@ -26,14 +26,14 @@ class TitleRepositoryTest {
 
     // ================= HELPER =================
     private Title createAndFlush() {
-        Title title = Title.builder()
-                .titleId("T001")
-                .title("Test Book")
-                .type("Fiction")
-                .price(100.0)
-                .pubdate(LocalDateTime.now())
-                .publisher(null) // 🔥 IMPORTANT: avoid dependency
-                .build();
+
+        Title title = new Title();
+        title.setTitleId("T001");
+        title.setTitle("Test Book");
+        title.setType("Fiction");
+        title.setPrice(100.0);
+        title.setPubdate(LocalDateTime.now());
+        title.setPublisher(null); // avoid dependency
 
         return titleRepository.saveAndFlush(title);
     }

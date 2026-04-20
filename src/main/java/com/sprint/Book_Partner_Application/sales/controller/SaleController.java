@@ -9,6 +9,7 @@ import com.sprint.Book_Partner_Application.sales.service.SaleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,13 +23,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/transactions")
-@RequiredArgsConstructor
 public class SaleController {
 
-    private final SaleService saleService;
+    @Autowired
+    private SaleService saleService;
 
     // ─── CREATE ─────────────────────────────────────────
-    @PostMapping("/postSale")
+    @PostMapping
     public ResponseEntity<ApiResponse<SaleResponse>> createSale(
             @Valid @RequestBody SaleCreateRequest request) {
 

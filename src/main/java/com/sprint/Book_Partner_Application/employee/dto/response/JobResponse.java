@@ -1,7 +1,6 @@
 package com.sprint.Book_Partner_Application.employee.dto.response;
-import lombok.*;
 
-@Builder
+
 public class JobResponse {
     private Short jobId;
     private String jobDesc;

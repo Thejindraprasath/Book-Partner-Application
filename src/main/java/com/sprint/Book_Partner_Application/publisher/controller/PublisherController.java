@@ -9,12 +9,11 @@ import com.sprint.Book_Partner_Application.publisher.dto.request.PublisherUpdate
 import com.sprint.Book_Partner_Application.publisher.dto.response.PublisherResponse;
 import com.sprint.Book_Partner_Application.publisher.service.PublisherService;
 
-
-
-import lombok.RequiredArgsConstructor;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -23,24 +22,26 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/publishers")
-@RequiredArgsConstructor
 public class PublisherController {
 
-    private final PublisherService publisherService;
+    @Autowired
+    private PublisherService publisherService;
 
     // ───────────── CREATE ─────────────
     @PostMapping
-    public ApiResponse<PublisherResponse> createPublisher(
+    public ResponseEntity<ApiResponse<PublisherResponse>> createPublisher(
             @Valid @RequestBody PublisherCreateRequest request) {
 
         PublisherResponse response = publisherService.createPublisher(request);
 
-        return ApiResponse.success("Publisher created successfully", response);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Publisher created successfully", response));
     }
 
-    // ───────────── GET ALL (FILTER + PAGINATION) ─────────────
+    // ───────────── GET ALL ─────────────
     @GetMapping
-    public ApiResponse<PageResponse<PublisherResponse>> getAllPublishers(
+    public ResponseEntity<ApiResponse<PageResponse<PublisherResponse>>> getAllPublishers(
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String state,
             @RequestParam(required = false) String country,
@@ -49,58 +50,64 @@ public class PublisherController {
         PageResponse<PublisherResponse> response =
                 publisherService.getAllPublishers(city, state, country, pageable);
 
-        return ApiResponse.success(response);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     // ───────────── GET BY ID ─────────────
     @GetMapping("/{pubId}")
-    public ApiResponse<PublisherResponse> getPublisherById(@PathVariable String pubId) {
+    public ResponseEntity<ApiResponse<PublisherResponse>> getPublisherById(
+            @PathVariable String pubId) {
 
         PublisherResponse response = publisherService.getPublisherById(pubId);
 
-        return ApiResponse.success(response);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     // ───────────── UPDATE ─────────────
     @PutMapping("/{pubId}")
-    public ApiResponse<PublisherResponse> updatePublisher(
+    public ResponseEntity<ApiResponse<PublisherResponse>> updatePublisher(
             @PathVariable String pubId,
             @Valid @RequestBody PublisherUpdateRequest request) {
 
         PublisherResponse response =
                 publisherService.updatePublisher(pubId, request);
 
-        return ApiResponse.success("Publisher updated successfully", response);
+        return ResponseEntity.ok(
+                ApiResponse.success("Publisher updated successfully", response)
+        );
     }
 
     // ───────────── DELETE ─────────────
     @DeleteMapping("/{pubId}")
-    public ApiResponse<Void> deletePublisher(@PathVariable String pubId) {
+    public ResponseEntity<ApiResponse<Void>> deletePublisher(
+            @PathVariable String pubId) {
 
         publisherService.deletePublisher(pubId);
 
-        return ApiResponse.successMessage("Publisher deleted successfully");
+        return ResponseEntity.ok(
+                ApiResponse.successMessage("Publisher deleted successfully")
+        );
     }
 
-    // ───────────── GET EMPLOYEES BY PUBLISHER ─────────────
+    // ───────────── GET EMPLOYEES ─────────────
     @GetMapping("/{pubId}/employees")
-    public ApiResponse<List<EmployeeResponse>> getEmployeesByPublisher(
+    public ResponseEntity<ApiResponse<List<EmployeeResponse>>> getEmployeesByPublisher(
             @PathVariable String pubId) {
 
         List<EmployeeResponse> employees =
-                publisherService.getEmployeesByPartner(pubId);
+                publisherService.getEmployeesByPublisher(pubId);
 
-        return ApiResponse.success(employees);
+        return ResponseEntity.ok(ApiResponse.success(employees));
     }
 
-    // ───────────── GET TITLES BY PUBLISHER ─────────────
+    // ───────────── GET TITLES ─────────────
     @GetMapping("/{pubId}/titles")
-    public ApiResponse<List<TitleResponse>> getTitlesByPublisher(
+    public ResponseEntity<ApiResponse<List<TitleResponse>>> getTitlesByPublisher(
             @PathVariable String pubId) {
 
         List<TitleResponse> titles =
-                publisherService.getProductsByPartner(pubId);
+                publisherService.getProductsByPublisher(pubId);
 
-        return ApiResponse.success(titles);
+        return ResponseEntity.ok(ApiResponse.success(titles));
     }
 }

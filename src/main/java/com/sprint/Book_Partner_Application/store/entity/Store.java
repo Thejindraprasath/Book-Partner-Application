@@ -3,13 +3,11 @@ package com.sprint.Book_Partner_Application.store.entity;
 import com.sprint.Book_Partner_Application.sales.entity.Sale;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "stores")
-@Builder
 public class Store {
 
     @Id
@@ -33,14 +31,10 @@ public class Store {
     @Pattern(regexp = "^[0-9]{5}$", message = "Zip must be 5 digits")
     private String zip;
 
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     private List<Sale> sales = new ArrayList<>();
 
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     private List<Discount> discounts = new ArrayList<>();
 
     public String getStorId() {

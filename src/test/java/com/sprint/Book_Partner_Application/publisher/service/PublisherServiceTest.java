@@ -46,13 +46,12 @@ class PublisherServiceTest {
 
     @BeforeEach
     void setup() {
-        publisher = Publisher.builder()
-                .pubId("1389")
-                .pubName("Test Pub")
-                .city("NY")
-                .state("NY")
-                .country("USA")
-                .build();
+        publisher = new Publisher();
+        publisher.setPubId("1389");
+        publisher.setPubName("Test Pub");
+        publisher.setCity("NY");
+        publisher.setState("NY");
+        publisher.setCountry("USA");
     }
 
     // ================= POSITIVE =================
@@ -62,12 +61,11 @@ class PublisherServiceTest {
         when(publisherRepository.existsById("1389")).thenReturn(false);
         when(publisherRepository.save(any())).thenReturn(publisher);
 
-        var response = publisherService.createPublisher(
-                PublisherCreateRequest.builder()
-                        .pubId("1389")
-                        .pubName("Test Pub")
-                        .build()
-        );
+        PublisherCreateRequest req = new PublisherCreateRequest();
+        req.setPubId("1389");
+        req.setPubName("Test Pub");
+
+        var response = publisherService.createPublisher(req);
 
         assertEquals("1389", response.getPubId());
     }
@@ -99,8 +97,10 @@ class PublisherServiceTest {
         when(publisherRepository.findById("1389")).thenReturn(Optional.of(publisher));
         when(publisherRepository.save(any())).thenReturn(publisher);
 
-        var response = publisherService.updatePublisher("1389",
-                PublisherUpdateRequest.builder().pubName("Updated").build());
+        PublisherUpdateRequest req = new PublisherUpdateRequest();
+        req.setPubName("Updated");
+
+        var response = publisherService.updatePublisher("1389", req);
 
         assertEquals("Updated", response.getPubName());
     }
@@ -126,7 +126,7 @@ class PublisherServiceTest {
         when(publisherRepository.findById("1389")).thenReturn(Optional.of(publisher));
         when(employeeRepository.findByPublisher_PubId("1389")).thenReturn(List.of(emp));
 
-        var list = publisherService.getEmployeesByPartner("1389");
+        var list = publisherService.getEmployeesByPublisher("1389");
 
         assertEquals(1, list.size());
     }
@@ -141,7 +141,7 @@ class PublisherServiceTest {
         when(titleRepository.findByPublisher_PubId(eq("1389"), any()))
                 .thenReturn(new PageImpl<>(List.of(title)));
 
-        List<TitleResponse> list = publisherService.getProductsByPartner("1389");
+        List<TitleResponse> list = publisherService.getProductsByPublisher("1389");
 
         assertEquals(1, list.size());
     }
@@ -152,20 +152,22 @@ class PublisherServiceTest {
     void createPublisher_duplicate() {
         when(publisherRepository.existsById("1389")).thenReturn(true);
 
+        PublisherCreateRequest req = new PublisherCreateRequest();
+        req.setPubId("1389");
+
         assertThrows(PublisherAlreadyExistsException.class,
-                () -> publisherService.createPublisher(
-                        PublisherCreateRequest.builder().pubId("1389").build()
-                ));
+                () -> publisherService.createPublisher(req));
     }
 
     @Test
     void createPublisher_invalidId() {
         when(publisherRepository.existsById("1111")).thenReturn(false);
 
+        PublisherCreateRequest req = new PublisherCreateRequest();
+        req.setPubId("1111");
+
         assertThrows(InvalidPublisherIdException.class,
-                () -> publisherService.createPublisher(
-                        PublisherCreateRequest.builder().pubId("1111").build()
-                ));
+                () -> publisherService.createPublisher(req));
     }
 
     @Test
@@ -219,6 +221,6 @@ class PublisherServiceTest {
         when(publisherRepository.findById("9999")).thenReturn(Optional.empty());
 
         assertThrows(PublisherNotFoundException.class,
-                () -> publisherService.getEmployeesByPartner("9999"));
+                () -> publisherService.getEmployeesByPublisher("9999"));
     }
 }

@@ -9,8 +9,8 @@ import com.sprint.Book_Partner_Application.employee.dto.response.EmployeeRespons
 import com.sprint.Book_Partner_Application.employee.dto.response.JobResponse;
 import com.sprint.Book_Partner_Application.employee.service.EmployeeService;
 
-import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +19,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/employees")
-@RequiredArgsConstructor
+
 public class EmployeeController {
 
-    private final EmployeeService employeeService;
+    @Autowired
+    private EmployeeService employeeService;
 
     // ───────────── JOB APIs ─────────────
 
@@ -99,6 +100,6 @@ public class EmployeeController {
     public ApiResponse<List<EmployeeResponse>> getEmployeesByPublisher(
             @PathVariable String pubId) {
 
-        return ApiResponse.success(employeeService.getEmployeesByPartner(pubId));
+        return ApiResponse.success(employeeService.getEmployeesByPublisher(pubId));
     }
 }

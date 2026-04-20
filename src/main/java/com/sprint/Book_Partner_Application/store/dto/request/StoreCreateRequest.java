@@ -1,9 +1,7 @@
 package com.sprint.Book_Partner_Application.store.dto.request;
 
 import jakarta.validation.constraints.*;
-import lombok.*;
 
-@Builder
 public class StoreCreateRequest {
 
     @NotBlank(message = "Store ID is required")

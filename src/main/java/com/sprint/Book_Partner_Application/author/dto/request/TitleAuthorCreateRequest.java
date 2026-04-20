@@ -1,11 +1,6 @@
 package com.sprint.Book_Partner_Application.author.dto.request;
 
-
-
-
-
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
 
 public class TitleAuthorCreateRequest {
 
@@ -18,9 +13,10 @@ public class TitleAuthorCreateRequest {
     private Short auOrd;
     private Integer royaltyper;
 
+    // ✅ No-args constructor (needed for Spring)
     public TitleAuthorCreateRequest() {}
 
-    @Builder
+    // ✅ all-args constructor
     public TitleAuthorCreateRequest(String auId, String titleId,
                                     Short auOrd, Integer royaltyper) {
         this.auId = auId;
@@ -30,6 +26,7 @@ public class TitleAuthorCreateRequest {
     }
 
     // Getters and Setters
+
     public String getAuId() { return auId; }
     public void setAuId(String auId) { this.auId = auId; }
 
@@ -40,5 +37,7 @@ public class TitleAuthorCreateRequest {
     public void setAuOrd(Short auOrd) { this.auOrd = auOrd; }
 
     public Integer getRoyaltyper() { return royaltyper; }
-    public void setRoyaltyper(Integer royaltyper) { this.royaltyper = royaltyper; }
+    public void setRoyaltyper(Integer royaltyper) {
+        this.royaltyper = royaltyper;
+    }
 }

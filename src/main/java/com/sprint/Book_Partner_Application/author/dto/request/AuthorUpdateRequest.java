@@ -1,10 +1,6 @@
 package com.sprint.Book_Partner_Application.author.dto.request;
 
-
-
-
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
 
 public class AuthorUpdateRequest {
 
@@ -20,9 +16,10 @@ public class AuthorUpdateRequest {
 
     private Integer contract;
 
+    // ✅ No-args constructor (required for Spring)
     public AuthorUpdateRequest() {}
 
-    @Builder
+    // ✅  all-args constructor
     public AuthorUpdateRequest(String auLname, String auFname, String phone,
                                String address, String city, String state,
                                String zip, Integer contract) {
@@ -37,6 +34,7 @@ public class AuthorUpdateRequest {
     }
 
     // Getters and Setters
+
     public String getAuLname() { return auLname; }
     public void setAuLname(String auLname) { this.auLname = auLname; }
 

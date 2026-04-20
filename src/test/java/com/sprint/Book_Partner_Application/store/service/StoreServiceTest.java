@@ -40,13 +40,12 @@ class StoreServiceTest {
 
     @BeforeEach
     void setup() {
-        store = Store.builder()
-                .storId("S001")
-                .storName("Test Store")
-                .city("Chennai")
-                .state("TN")
-                .zip("600001")
-                .build();
+        store = new Store();
+        store.setStorId("S001");
+        store.setStorName("Test Store");
+        store.setCity("Chennai");
+        store.setState("TN");
+        store.setZip("600001");
     }
 
     // ================= POSITIVE TESTS =================
@@ -105,7 +104,8 @@ class StoreServiceTest {
 
     @Test
     void getDiscountByType_success() {
-        Discount d = Discount.builder().discounttype("Festival").build();
+        Discount d = new Discount();
+        d.setDiscounttype("Festival");
 
         when(discountRepository.findByDiscounttype("Festival"))
                 .thenReturn(Optional.of(d));
@@ -132,13 +132,14 @@ class StoreServiceTest {
 
     @Test
     void updateDiscount_success() {
-        Discount d = Discount.builder().discountId(1L).build();
+        Discount discount = new Discount();
+        discount.setDiscountId(1L);
 
-        DiscountCreateRequest req = new DiscountCreateRequest();
+        DiscountUpdateRequest req = new DiscountUpdateRequest();
         req.setDiscount(new BigDecimal("20"));
 
-        when(discountRepository.findById(1L)).thenReturn(Optional.of(d));
-        when(discountRepository.save(any())).thenReturn(d);
+        when(discountRepository.findById(1L)).thenReturn(Optional.of(discount));
+        when(discountRepository.save(any())).thenReturn(discount);
 
         assertNotNull(service.updateDiscount(1L, req));
     }

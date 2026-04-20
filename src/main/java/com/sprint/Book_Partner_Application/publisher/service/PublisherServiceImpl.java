@@ -1,9 +1,11 @@
 package com.sprint.Book_Partner_Application.publisher.service;
 
 import com.sprint.Book_Partner_Application.book.dto.response.TitleResponse;
+import com.sprint.Book_Partner_Application.book.entity.Title;
 import com.sprint.Book_Partner_Application.book.repository.TitleRepository;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 import com.sprint.Book_Partner_Application.employee.dto.response.EmployeeResponse;
+import com.sprint.Book_Partner_Application.employee.entity.Employee;
 import com.sprint.Book_Partner_Application.employee.repository.EmployeeRepository;
 import com.sprint.Book_Partner_Application.publisher.dto.request.PublisherCreateRequest;
 import com.sprint.Book_Partner_Application.publisher.dto.request.PublisherUpdateRequest;
@@ -15,23 +17,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-@Slf4j
+
+
 @Service
 @Transactional
 public class PublisherServiceImpl implements PublisherService {
-
     private static final Set<String> STANDARD_PUB_IDS =
             Set.of("1389", "0736", "0877", "1622", "1756");
+
     @Autowired
     private PublisherRepository publisherRepository;
+
     @Autowired
     private EmployeeRepository employeeRepository;
+
     @Autowired
     private TitleRepository titleRepository;
 
@@ -39,7 +44,6 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     public PublisherResponse createPublisher(PublisherCreateRequest request) {
-        log.debug("Creating publisher: {}", request.getPubId());
 
         if (publisherRepository.existsById(request.getPubId())) {
             throw new PublisherAlreadyExistsException(request.getPubId());
@@ -52,17 +56,15 @@ public class PublisherServiceImpl implements PublisherService {
             throw new InvalidPublisherIdException(request.getPubId());
         }
 
-        Publisher publisher = Publisher.builder()
-                .pubId(request.getPubId())
-                .pubName(request.getPubName())
-                .city(request.getCity())
-                .state(request.getState())
-                .country(request.getCountry() != null ? request.getCountry() : "USA")
-                .build();
+        Publisher publisher = new Publisher();
+        publisher.setPubId(request.getPubId());
+        publisher.setPubName(request.getPubName());
+        publisher.setCity(request.getCity());
+        publisher.setState(request.getState());
+        publisher.setCountry(request.getCountry() != null ? request.getCountry() : "USA");
 
         Publisher saved = publisherRepository.save(publisher);
 
-        log.info("Publisher created: {}", saved.getPubId());
         return mapToResponse(saved);
     }
 
@@ -88,6 +90,7 @@ public class PublisherServiceImpl implements PublisherService {
     @Override
     @Transactional(readOnly = true)
     public PublisherResponse getPublisherById(String pubId) {
+
         Publisher publisher = publisherRepository.findById(pubId)
                 .orElseThrow(() -> new PublisherNotFoundException(pubId));
 
@@ -98,6 +101,7 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     public PublisherResponse updatePublisher(String pubId, PublisherUpdateRequest request) {
+
         Publisher publisher = publisherRepository.findById(pubId)
                 .orElseThrow(() -> new PublisherNotFoundException(pubId));
 
@@ -116,7 +120,6 @@ public class PublisherServiceImpl implements PublisherService {
 
         Publisher updated = publisherRepository.save(publisher);
 
-        log.info("Publisher updated: {}", pubId);
         return mapToResponse(updated);
     }
 
@@ -124,6 +127,7 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     public void deletePublisher(String pubId) {
+
         Publisher publisher = publisherRepository.findById(pubId)
                 .orElseThrow(() -> new PublisherNotFoundException(pubId));
 
@@ -141,71 +145,119 @@ public class PublisherServiceImpl implements PublisherService {
         }
 
         publisherRepository.delete(publisher);
-        log.info("Publisher deleted: {}", pubId);
     }
 
-    // ─── EMPLOYEES BY PARTNER ─────────────────────────────
+    // ─── EMPLOYEES ─────────────────────────────────────────────
 
     @Override
     @Transactional(readOnly = true)
-    public List<EmployeeResponse> getEmployeesByPartner(String pubId) {
+    public List<EmployeeResponse> getEmployeesByPublisher(String pubId) {
+
+        // Step 1: Validate publisher
         publisherRepository.findById(pubId)
                 .orElseThrow(() -> new PublisherNotFoundException(pubId));
 
-        return employeeRepository.findByPublisher_PubId(pubId)
-                .stream()
-                .map(e -> EmployeeResponse.builder()
-                        .empId(e.getEmpId())
-                        .fname(e.getFname())
-                        .minit(e.getMinit())
-                        .lname(e.getLname())
-                        .jobId(e.getJob() != null ? e.getJob().getJobId() : null)
-                        .jobDesc(e.getJob() != null ? e.getJob().getJobDesc() : null)
-                        .jobLvl(e.getJobLvl())
-                        .pubId(e.getPublisher() != null ? e.getPublisher().getPubId() : null)
-                        .pubName(e.getPublisher() != null ? e.getPublisher().getPubName() : null)
-                        .hireDate(e.getHireDate())
-                        .build())
-                .collect(Collectors.toList());
+        // Step 2: Fetch employees
+        List<Employee> employees =
+                employeeRepository.findByPublisher_PubId(pubId);
+
+        // Step 3: Convert to DTO
+        List<EmployeeResponse> responseList = new ArrayList<>();
+
+        for (Employee e : employees) {
+
+            EmployeeResponse res = new EmployeeResponse();
+
+            res.setEmpId(e.getEmpId());
+            res.setFname(e.getFname());
+            res.setMinit(e.getMinit());
+            res.setLname(e.getLname());
+
+            if (e.getJob() != null) {
+                res.setJobId(e.getJob().getJobId());
+                res.setJobDesc(e.getJob().getJobDesc());
+            } else {
+                res.setJobId(null);
+                res.setJobDesc(null);
+            }
+
+            res.setJobLvl(e.getJobLvl());
+
+            if (e.getPublisher() != null) {
+                res.setPubId(e.getPublisher().getPubId());
+                res.setPubName(e.getPublisher().getPubName());
+            } else {
+                res.setPubId(null);
+                res.setPubName(null);
+            }
+
+            res.setHireDate(e.getHireDate());
+
+            responseList.add(res);
+        }
+
+        return responseList;
     }
 
-    // ─── PRODUCTS BY PARTNER ─────────────────────────────
+    // ─── TITLES ─────────────────────────────────────────────
 
     @Override
     @Transactional(readOnly = true)
-    public List<TitleResponse> getProductsByPartner(String pubId) {
+    public List<TitleResponse> getProductsByPublisher(String pubId) {
+
+        // Step 1: Validate publisher
         publisherRepository.findById(pubId)
                 .orElseThrow(() -> new PublisherNotFoundException(pubId));
 
-        return titleRepository
-                .findByPublisher_PubId(pubId, Pageable.unpaged())
-                .getContent()
-                .stream()
-                .map(t -> TitleResponse.builder()
-                        .titleId(t.getTitleId())
-                        .title(t.getTitle())
-                        .type(t.getType())
-                        .pubId(t.getPublisher() != null ? t.getPublisher().getPubId() : null)
-                        .pubName(t.getPublisher() != null ? t.getPublisher().getPubName() : null)
-                        .price(t.getPrice())
-                        .advance(t.getAdvance())
-                        .royalty(t.getRoyalty())
-                        .ytdSales(t.getYtdSales())
-                        .notes(t.getNotes())
-                        .pubdate(t.getPubdate())
-                        .build())
-                .collect(Collectors.toList());
+        // Step 2: Fetch titles
+        List<Title> titles =
+                titleRepository
+                        .findByPublisher_PubId(pubId, Pageable.unpaged())
+                        .getContent();
+
+        // Step 3: Convert to DTO
+        List<TitleResponse> responseList = new ArrayList<>();
+
+        for (Title t : titles) {
+
+            TitleResponse res = new TitleResponse();
+
+            res.setTitleId(t.getTitleId());
+            res.setTitle(t.getTitle());
+            res.setType(t.getType());
+
+            if (t.getPublisher() != null) {
+                res.setPubId(t.getPublisher().getPubId());
+                res.setPubName(t.getPublisher().getPubName());
+            } else {
+                res.setPubId(null);
+                res.setPubName(null);
+            }
+
+            res.setPrice(t.getPrice());
+            res.setAdvance(t.getAdvance());
+            res.setRoyalty(t.getRoyalty());
+            res.setYtdSales(t.getYtdSales());
+            res.setNotes(t.getNotes());
+            res.setPubdate(t.getPubdate());
+
+            responseList.add(res);
+        }
+
+        return responseList;
     }
 
     // ─── MAPPER ─────────────────────────────────────────────
 
     private PublisherResponse mapToResponse(Publisher publisher) {
-        return PublisherResponse.builder()
-                .pubId(publisher.getPubId())
-                .pubName(publisher.getPubName())
-                .city(publisher.getCity())
-                .state(publisher.getState())
-                .country(publisher.getCountry())
-                .build();
+
+        PublisherResponse response = new PublisherResponse();
+        response.setPubId(publisher.getPubId());
+        response.setPubName(publisher.getPubName());
+        response.setCity(publisher.getCity());
+        response.setState(publisher.getState());
+        response.setCountry(publisher.getCountry());
+
+        return response;
     }
 }

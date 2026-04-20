@@ -18,7 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -47,43 +47,37 @@ class EmployeeServiceTest {
 
     @BeforeEach
     void setup() {
-        job = Job.builder()
-                .jobId((short) 1)
-                .jobDesc("Developer")
-                .minLvl(10)
-                .maxLvl(100)
-                .build();
+        job = new Job();
+        job.setJobId((short) 1);
+        job.setJobDesc("Developer");
+        job.setMinLvl(10);
+        job.setMaxLvl(100);
 
-        publisher = Publisher.builder()
-                .pubId("1389")
-                .pubName("Test Pub")
-                .build();
+        publisher = new Publisher();
+        publisher.setPubId("1389");
+        publisher.setPubName("Test Pub");
 
-        employee = Employee.builder()
-                .empId("E1")
-                .fname("John")
-                .job(job)
-                .jobLvl(20)
-                .publisher(publisher)
-                .hireDate(LocalDateTime.now())
-                .build();
+        employee = new Employee();
+        employee.setEmpId("E1");
+        employee.setFname("John");
+        employee.setJob(job);
+        employee.setJobLvl(20);
+        employee.setPublisher(publisher);
+        employee.setHireDate(LocalDateTime.now());
     }
 
-    // =====================================================
-    //                POSITIVE TEST CASES
-    // =====================================================
+    // ================= POSITIVE =================
 
     @Test
     void createJob_success() {
         when(jobRepository.save(any())).thenReturn(job);
 
-        var res = employeeService.createJob(
-                JobCreateRequest.builder()
-                        .jobDesc("Developer")
-                        .minLvl(10)
-                        .maxLvl(100)
-                        .build()
-        );
+        JobCreateRequest req = new JobCreateRequest();
+        req.setJobDesc("Developer");
+        req.setMinLvl(10);
+        req.setMaxLvl(100);
+
+        var res = employeeService.createJob(req);
 
         assertEquals("Developer", res.getJobDesc());
     }
@@ -103,12 +97,12 @@ class EmployeeServiceTest {
         when(employeeRepository.findByJob_JobId((short) 1)).thenReturn(Collections.emptyList());
         when(jobRepository.save(any())).thenReturn(job);
 
-        var res = employeeService.updateJob((short) 1,
-                JobCreateRequest.builder()
-                        .jobDesc("Updated")
-                        .minLvl(10)
-                        .maxLvl(120)
-                        .build());
+        JobCreateRequest req = new JobCreateRequest();
+        req.setJobDesc("Updated");
+        req.setMinLvl(10);
+        req.setMaxLvl(120);
+
+        var res = employeeService.updateJob((short) 1, req);
 
         assertEquals("Updated", res.getJobDesc());
     }
@@ -120,14 +114,13 @@ class EmployeeServiceTest {
         when(publisherRepository.findById("1389")).thenReturn(Optional.of(publisher));
         when(employeeRepository.save(any())).thenReturn(employee);
 
-        var res = employeeService.createEmployee(
-                EmployeeCreateRequest.builder()
-                        .empId("E1")
-                        .jobId((short) 1)
-                        .jobLvl(20)
-                        .pubId("1389")
-                        .build()
-        );
+        EmployeeCreateRequest req = new EmployeeCreateRequest();
+        req.setEmpId("E1");
+        req.setJobId((short) 1);
+        req.setJobLvl(20);
+        req.setPubId("1389");
+
+        var res = employeeService.createEmployee(req);
 
         assertEquals("E1", res.getEmpId());
     }
@@ -146,8 +139,10 @@ class EmployeeServiceTest {
         when(employeeRepository.findById("E1")).thenReturn(Optional.of(employee));
         when(employeeRepository.save(any())).thenReturn(employee);
 
-        var res = employeeService.updateEmployee("E1",
-                EmployeeUpdateRequest.builder().fname("Updated").build());
+        EmployeeUpdateRequest req = new EmployeeUpdateRequest();
+        req.setFname("Updated");
+
+        var res = employeeService.updateEmployee("E1", req);
 
         assertEquals("Updated", res.getFname());
     }
@@ -161,19 +156,16 @@ class EmployeeServiceTest {
         verify(employeeRepository).delete(employee);
     }
 
-    // =====================================================
-    //               NEGATIVE TEST CASES
-    // =====================================================
+    // ================= NEGATIVE =================
 
     @Test
     void createJob_invalidRange() {
+        JobCreateRequest req = new JobCreateRequest();
+        req.setMinLvl(100);
+        req.setMaxLvl(50);
+
         assertThrows(InvalidJobLevelRangeException.class,
-                () -> employeeService.createJob(
-                        JobCreateRequest.builder()
-                                .minLvl(100)
-                                .maxLvl(50)
-                                .build()
-                ));
+                () -> employeeService.createJob(req));
     }
 
     @Test
@@ -190,22 +182,23 @@ class EmployeeServiceTest {
         when(employeeRepository.findByJob_JobId((short) 1))
                 .thenReturn(List.of(employee));
 
+        JobCreateRequest req = new JobCreateRequest();
+        req.setMinLvl(50);
+        req.setMaxLvl(60);
+
         assertThrows(JobLevelUpdateBreaksEmployeesException.class,
-                () -> employeeService.updateJob((short) 1,
-                        JobCreateRequest.builder()
-                                .minLvl(50)
-                                .maxLvl(60)
-                                .build()));
+                () -> employeeService.updateJob((short) 1, req));
     }
 
     @Test
     void createEmployee_duplicate() {
         when(employeeRepository.existsById("E1")).thenReturn(true);
 
+        EmployeeCreateRequest req = new EmployeeCreateRequest();
+        req.setEmpId("E1");
+
         assertThrows(EmployeeAlreadyExistsException.class,
-                () -> employeeService.createEmployee(
-                        EmployeeCreateRequest.builder().empId("E1").build()
-                ));
+                () -> employeeService.createEmployee(req));
     }
 
     @Test
@@ -213,13 +206,12 @@ class EmployeeServiceTest {
         when(employeeRepository.existsById("E1")).thenReturn(false);
         when(jobRepository.findById((short) 1)).thenReturn(Optional.empty());
 
+        EmployeeCreateRequest req = new EmployeeCreateRequest();
+        req.setEmpId("E1");
+        req.setJobId((short) 1);
+
         assertThrows(JobNotFoundException.class,
-                () -> employeeService.createEmployee(
-                        EmployeeCreateRequest.builder()
-                                .empId("E1")
-                                .jobId((short) 1)
-                                .build()
-                ));
+                () -> employeeService.createEmployee(req));
     }
 
     @Test
@@ -228,14 +220,13 @@ class EmployeeServiceTest {
         when(jobRepository.findById((short) 1)).thenReturn(Optional.of(job));
         when(publisherRepository.findById("1389")).thenReturn(Optional.empty());
 
+        EmployeeCreateRequest req = new EmployeeCreateRequest();
+        req.setEmpId("E1");
+        req.setJobId((short) 1);
+        req.setPubId("1389");
+
         assertThrows(PublisherNotFoundException.class,
-                () -> employeeService.createEmployee(
-                        EmployeeCreateRequest.builder()
-                                .empId("E1")
-                                .jobId((short) 1)
-                                .pubId("1389")
-                                .build()
-                ));
+                () -> employeeService.createEmployee(req));
     }
 
     @Test
@@ -244,15 +235,14 @@ class EmployeeServiceTest {
         when(jobRepository.findById((short) 1)).thenReturn(Optional.of(job));
         when(publisherRepository.findById("1389")).thenReturn(Optional.of(publisher));
 
+        EmployeeCreateRequest req = new EmployeeCreateRequest();
+        req.setEmpId("E1");
+        req.setJobId((short) 1);
+        req.setJobLvl(200);
+        req.setPubId("1389");
+
         assertThrows(EmployeeJobLevelMismatchException.class,
-                () -> employeeService.createEmployee(
-                        EmployeeCreateRequest.builder()
-                                .empId("E1")
-                                .jobId((short) 1)
-                                .jobLvl(200)
-                                .pubId("1389")
-                                .build()
-                ));
+                () -> employeeService.createEmployee(req));
     }
 
     @Test
@@ -267,9 +257,11 @@ class EmployeeServiceTest {
     void updateEmployee_jobMismatch() {
         when(employeeRepository.findById("E1")).thenReturn(Optional.of(employee));
 
+        EmployeeUpdateRequest req = new EmployeeUpdateRequest();
+        req.setJobLvl(500);
+
         assertThrows(EmployeeJobLevelMismatchException.class,
-                () -> employeeService.updateEmployee("E1",
-                        EmployeeUpdateRequest.builder().jobLvl(500).build()));
+                () -> employeeService.updateEmployee("E1", req));
     }
 
     @Test
@@ -285,7 +277,7 @@ class EmployeeServiceTest {
         when(publisherRepository.findById("9999")).thenReturn(Optional.empty());
 
         assertThrows(PublisherNotFoundException.class,
-                () -> employeeService.getEmployeesByPartner("9999"));
+                () -> employeeService.getEmployeesByPublisher("9999"));
     }
 
     @Test

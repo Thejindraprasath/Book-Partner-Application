@@ -32,5 +32,5 @@ public interface EmployeeService {
 
     void deleteEmployee(String empId);
 
-    List<EmployeeResponse> getEmployeesByPartner(String pubId);
+    List<EmployeeResponse> getEmployeesByPublisher(String pubId);
 }

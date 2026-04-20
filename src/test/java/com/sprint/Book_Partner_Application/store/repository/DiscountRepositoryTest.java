@@ -25,23 +25,23 @@ class DiscountRepositoryTest {
     // ================= HELPER METHODS =================
 
     private Store createStore(String id) {
-        return Store.builder()
-                .storId(id)
-                .storName("ABC Books")
-                .city("Chennai")
-                .state("TN")
-                .zip("60001")
-                .build();
+        Store store = new Store();
+        store.setStorId(id);
+        store.setStorName("ABC Books");
+        store.setCity("Chennai");
+        store.setState("TN");
+        store.setZip("60001");
+        return store;
     }
 
     private Discount createDiscount(Store store, String type) {
-        return Discount.builder()
-                .discounttype(type)
-                .store(store)
-                .lowqty((short) 10)
-                .highqty((short) 50)
-                .discount(new BigDecimal("10.50"))
-                .build();
+        Discount d = new Discount();
+        d.setDiscounttype(type);
+        d.setStore(store);
+        d.setLowqty((short) 10);
+        d.setHighqty((short) 50);
+        d.setDiscount(new BigDecimal("10.50"));
+        return d;
     }
 
     // ================= CREATE =================
@@ -101,12 +101,11 @@ class DiscountRepositoryTest {
 
     @Test
     void testFindByStoreIsNull() {
-        Discount discount = Discount.builder()
-                .discounttype("NoStore")
-                .lowqty((short) 5)
-                .highqty((short) 20)
-                .discount(new BigDecimal("5.00"))
-                .build();
+        Discount discount = new Discount();
+        discount.setDiscounttype("NoStore");
+        discount.setLowqty((short) 5);
+        discount.setHighqty((short) 20);
+        discount.setDiscount(new BigDecimal("5.00"));
 
         discountRepository.save(discount);
 
@@ -145,10 +144,9 @@ class DiscountRepositoryTest {
 
     @Test
     void testValidationFail() {
-        Discount discount = Discount.builder()
-                .discounttype("") // invalid
-                .discount(null)   // invalid
-                .build();
+        Discount discount = new Discount();
+        discount.setDiscounttype("");   // invalid
+        discount.setDiscount(null);
 
         assertThrows(ConstraintViolationException.class, () -> {
             discountRepository.saveAndFlush(discount);

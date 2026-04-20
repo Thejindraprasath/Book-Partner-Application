@@ -1,9 +1,8 @@
 package com.sprint.Book_Partner_Application.publisher.dto.response;
 
-import lombok.*;
 
 
-@Builder
+
 public class PublisherResponse {
     private String pubId;
     private String pubName;

@@ -1,8 +1,5 @@
 package com.sprint.Book_Partner_Application.store.dto.response;
 
-import lombok.*;
-
-@Builder
 public class StoreResponse {
 
     private String storId;

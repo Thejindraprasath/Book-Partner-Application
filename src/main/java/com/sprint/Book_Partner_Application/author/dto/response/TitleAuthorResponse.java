@@ -1,10 +1,5 @@
 package com.sprint.Book_Partner_Application.author.dto.response;
 
-
-
-
-import lombok.Builder;
-
 public class TitleAuthorResponse {
 
     private String auId;
@@ -14,9 +9,10 @@ public class TitleAuthorResponse {
     private Short auOrd;
     private Integer royaltyper;
 
+    // ✅ No-args constructor
     public TitleAuthorResponse() {}
 
-    @Builder
+    // ✅ all-args constructor
     public TitleAuthorResponse(String auId, String authorName,
                                String titleId, String titleName,
                                Short auOrd, Integer royaltyper) {
@@ -29,6 +25,7 @@ public class TitleAuthorResponse {
     }
 
     // Getters and Setters
+
     public String getAuId() { return auId; }
     public void setAuId(String auId) { this.auId = auId; }
 
@@ -45,5 +42,7 @@ public class TitleAuthorResponse {
     public void setAuOrd(Short auOrd) { this.auOrd = auOrd; }
 
     public Integer getRoyaltyper() { return royaltyper; }
-    public void setRoyaltyper(Integer royaltyper) { this.royaltyper = royaltyper; }
+    public void setRoyaltyper(Integer royaltyper) {
+        this.royaltyper = royaltyper;
+    }
 }

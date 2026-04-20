@@ -1,7 +1,5 @@
 package com.sprint.Book_Partner_Application.author.repository;
 
-
-
 import com.sprint.Book_Partner_Application.author.entity.Author;
 import com.sprint.Book_Partner_Application.author.entity.TitleAuthor;
 import com.sprint.Book_Partner_Application.author.entity.TitleAuthor.TitleAuthorId;
@@ -34,33 +32,36 @@ class TitleAuthorRepositoryTest {
     @BeforeEach
     void setup() {
 
-        // Save Author
-        authorRepository.save(Author.builder()
-                .auId("111-11-1111")
-                .auFname("John")
-                .auLname("Doe")
-                .phone("1234567890")
-                .city("Chennai")
-                .state("TN")
-                .zip("60001")
-                .contract(1)
-                .build());
+        // ===== SAVE AUTHOR =====
+        Author author = new Author();
+        author.setAuId("111-11-1111");
+        author.setAuFname("John");
+        author.setAuLname("Doe");
+        author.setPhone("1234567890");
+        author.setCity("Chennai");
+        author.setState("TN");
+        author.setZip("60001");
+        author.setContract(1);
 
-        // Save Title
-        titleRepository.save(Title.builder()
-                .titleId("T001")
-                .title("Test Book")
-                .type("Fiction")
-                .pubdate(LocalDateTime.now())
-                .build());
+        authorRepository.save(author);
 
-        // Save Mapping
-        titleAuthorRepository.save(TitleAuthor.builder()
-                .auId("111-11-1111")
-                .titleId("T001")
-                .auOrd((short) 1)
-                .royaltyper(10)
-                .build());
+        // ===== SAVE TITLE =====
+        Title title = new Title();
+        title.setTitleId("T001");
+        title.setTitle("Test Book");
+        title.setType("Fiction");
+        title.setPubdate(LocalDateTime.now());
+
+        titleRepository.save(title);
+
+        // ===== SAVE MAPPING =====
+        TitleAuthor ta = new TitleAuthor();
+        ta.setAuId("111-11-1111");
+        ta.setTitleId("T001");
+        ta.setAuOrd((short) 1);
+        ta.setRoyaltyper(10);
+
+        titleAuthorRepository.save(ta);
     }
 
     // ================= FIND BY AUTHOR =================

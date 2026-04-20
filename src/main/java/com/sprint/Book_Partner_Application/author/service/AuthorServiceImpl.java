@@ -19,8 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -45,19 +45,21 @@ public class AuthorServiceImpl implements AuthorService {
             throw new BusinessValidationException("contract", "must be 0 or 1");
         }
 
-        Author author = Author.builder()
-                .auId(request.getAuId())
-                .auLname(request.getAuLname())
-                .auFname(request.getAuFname())
-                .phone(request.getPhone())
-                .address(request.getAddress())
-                .city(request.getCity())
-                .state(request.getState())
-                .zip(request.getZip())
-                .contract(request.getContract())
-                .build();
+        // SIMPLE OBJECT CREATION (no builder)
+        Author author = new Author();
+        author.setAuId(request.getAuId());
+        author.setAuLname(request.getAuLname());
+        author.setAuFname(request.getAuFname());
+        author.setPhone(request.getPhone());
+        author.setAddress(request.getAddress());
+        author.setCity(request.getCity());
+        author.setState(request.getState());
+        author.setZip(request.getZip());
+        author.setContract(request.getContract());
 
-        return mapToResponse(authorRepository.save(author));
+        Author saved = authorRepository.save(author);
+
+        return mapToResponse(saved);
     }
 
     // ─── GET ALL AUTHORS ───────────────────────────────
@@ -77,7 +79,22 @@ public class AuthorServiceImpl implements AuthorService {
         Page<Author> page =
                 authorRepository.findWithFilters(city, state, contract, pageable);
 
-        return PageResponse.from(page.map(this::mapToResponse));
+        // convert manually (no stream)
+        List<AuthorResponse> responseList = new ArrayList<>();
+
+        for (Author a : page.getContent()) {
+            responseList.add(mapToResponse(a));
+        }
+
+        PageResponse<AuthorResponse> response = new PageResponse<>();
+
+        response.setContent(responseList);
+        response.setPageNumber(page.getNumber());
+        response.setPageSize(page.getSize());
+        response.setTotalElements(page.getTotalElements());
+        response.setTotalPages(page.getTotalPages());
+
+        return response;
     }
 
     // ─── GET AUTHOR BY ID ───────────────────────────────
@@ -116,7 +133,9 @@ public class AuthorServiceImpl implements AuthorService {
         if (request.getZip() != null) author.setZip(request.getZip());
         if (request.getContract() != null) author.setContract(request.getContract());
 
-        return mapToResponse(authorRepository.save(author));
+        Author updated = authorRepository.save(author);
+
+        return mapToResponse(updated);
     }
 
     // ─── DELETE AUTHOR ───────────────────────────────
@@ -149,44 +168,58 @@ public class AuthorServiceImpl implements AuthorService {
             throw new InvalidOperationException("No titles found for Author '" + auId + "'");
         }
 
-        return list.stream()
-                .map(this::mapTitleAuthorToResponse)
-                .collect(Collectors.toList());
+        // manual conversion (no stream)
+        List<TitleAuthorResponse> responseList = new ArrayList<>();
+
+        for (TitleAuthor ta : list) {
+            responseList.add(mapTitleAuthorToResponse(ta));
+        }
+
+        return responseList;
     }
 
     // ─── MAPPERS ───────────────────────────────
+
     private AuthorResponse mapToResponse(Author a) {
 
-        return AuthorResponse.builder()
-                .auId(a.getAuId())
-                .auLname(a.getAuLname())
-                .auFname(a.getAuFname())
-                .phone(a.getPhone())
-                .address(a.getAddress())
-                .city(a.getCity())
-                .state(a.getState())
-                .zip(a.getZip())
-                .contract(a.getContract())
-                .build();
+        AuthorResponse res = new AuthorResponse();
+        res.setAuId(a.getAuId());
+        res.setAuLname(a.getAuLname());
+        res.setAuFname(a.getAuFname());
+        res.setPhone(a.getPhone());
+        res.setAddress(a.getAddress());
+        res.setCity(a.getCity());
+        res.setState(a.getState());
+        res.setZip(a.getZip());
+        res.setContract(a.getContract());
+
+        return res;
     }
 
     private TitleAuthorResponse mapTitleAuthorToResponse(TitleAuthor ta) {
 
-        String authorName = (ta.getAuthor() != null)
-                ? ta.getAuthor().getAuFname() + " " + ta.getAuthor().getAuLname()
-                : ta.getAuId();
+        String authorName;
+        if (ta.getAuthor() != null) {
+            authorName = ta.getAuthor().getAuFname() + " " + ta.getAuthor().getAuLname();
+        } else {
+            authorName = ta.getAuId();
+        }
 
-        String titleName = (ta.getTitle() != null)
-                ? ta.getTitle().getTitle()
-                : ta.getTitleId();
+        String titleName;
+        if (ta.getTitle() != null) {
+            titleName = ta.getTitle().getTitle();
+        } else {
+            titleName = ta.getTitleId();
+        }
 
-        return TitleAuthorResponse.builder()
-                .auId(ta.getAuId())
-                .authorName(authorName)
-                .titleId(ta.getTitleId())
-                .titleName(titleName)
-                .auOrd(ta.getAuOrd())
-                .royaltyper(ta.getRoyaltyper())
-                .build();
+        TitleAuthorResponse res = new TitleAuthorResponse();
+        res.setAuId(ta.getAuId());
+        res.setAuthorName(authorName);
+        res.setTitleId(ta.getTitleId());
+        res.setTitleName(titleName);
+        res.setAuOrd(ta.getAuOrd());
+        res.setRoyaltyper(ta.getRoyaltyper());
+
+        return res;
     }
 }

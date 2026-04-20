@@ -1,13 +1,8 @@
 package com.sprint.Book_Partner_Application.author.dto.request;
 
-
-
-
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
 
 public class AuthorCreateRequest {
 
@@ -35,11 +30,10 @@ public class AuthorCreateRequest {
     @NotNull(message = "Contract is required")
     private Integer contract;
 
-    // No-args constructor
+    // ✅ No-args constructor (needed for JSON deserialization)
     public AuthorCreateRequest() {}
 
-    // All-args constructor with Builder
-    @Builder
+    // ✅ All-args constructor (manual, no builder)
     public AuthorCreateRequest(String auId, String auLname, String auFname, String phone,
                                String address, String city, String state,
                                String zip, Integer contract) {
@@ -55,6 +49,7 @@ public class AuthorCreateRequest {
     }
 
     // Getters and Setters
+
     public String getAuId() { return auId; }
     public void setAuId(String auId) { this.auId = auId; }
 

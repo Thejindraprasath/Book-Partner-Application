@@ -1,8 +1,8 @@
 package com.sprint.Book_Partner_Application.employee.dto.request;
 
 import jakarta.validation.constraints.*;
-import lombok.*;
-@Builder
+
+
 public class JobCreateRequest {
 
     @NotBlank(message = "Job description is required")

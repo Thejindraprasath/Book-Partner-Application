@@ -1,11 +1,10 @@
 package com.sprint.Book_Partner_Application.employee.dto.request;
 
-import lombok.*;
+
 
 import java.time.LocalDateTime;
 
-@Data
-@Builder
+
 public class EmployeeUpdateRequest {
     private String fname;
     private String minit;

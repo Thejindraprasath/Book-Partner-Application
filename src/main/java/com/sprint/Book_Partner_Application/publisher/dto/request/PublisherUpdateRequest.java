@@ -1,9 +1,9 @@
 package com.sprint.Book_Partner_Application.publisher.dto.request;
 
-import lombok.*;
 
 
-@Builder
+
+
 public class PublisherUpdateRequest {
     private String pubName;
     private String city;

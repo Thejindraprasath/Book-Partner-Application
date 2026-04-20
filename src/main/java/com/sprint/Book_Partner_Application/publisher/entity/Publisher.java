@@ -10,8 +10,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "publishers")
-@Data
-@Builder
 
 public class Publisher {
     @Id
@@ -38,17 +36,13 @@ public class Publisher {
 
     @Column(name = "country", length = 30)
     @Size(max = 30, message = "Country must not exceed 30 characters")
-    @Builder.Default
+
     private String country = "USA";
 
-    @OneToMany(mappedBy = "publisher", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "publisher", cascade = CascadeType.ALL)
     private List<Title> titles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "publisher", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "publisher", cascade = CascadeType.ALL)
     private List<Employee> employees = new ArrayList<>();
 
     public Publisher() {

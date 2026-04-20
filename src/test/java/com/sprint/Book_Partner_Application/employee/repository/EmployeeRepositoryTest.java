@@ -1,4 +1,5 @@
 package com.sprint.Book_Partner_Application.employee.repository;
+
 import com.sprint.Book_Partner_Application.employee.entity.Employee;
 import com.sprint.Book_Partner_Application.employee.entity.Job;
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
@@ -13,8 +14,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-
 public class EmployeeRepositoryTest {
+
     @Autowired
     private EmployeeRepository employeeRepository;
 
@@ -27,37 +28,34 @@ public class EmployeeRepositoryTest {
     @Test
     void testCreateEmployee() {
 
-        // ✅ Create Publisher first
-        Publisher publisher = Publisher.builder()
-                .pubId("0736")
-                .pubName("XYZ Publishers")
-                .city("Chennai")
-                .state("TN")
-                .country("India")
-                .build();
+        // ✅ Create Publisher
+        Publisher publisher = new Publisher();
+        publisher.setPubId("0736");
+        publisher.setPubName("XYZ Publishers");
+        publisher.setCity("Chennai");
+        publisher.setState("TN");
+        publisher.setCountry("India");
 
         publisherRepository.save(publisher);
 
         // ✅ Create Job
-        Job job = Job.builder()
-                .jobDesc("Tester")
-                .minLvl(50)
-                .maxLvl(200)
-                .build();
+        Job job = new Job();
+        job.setJobDesc("Tester");
+        job.setMinLvl(50);
+        job.setMaxLvl(200);
 
         Job savedJob = jobRepository.save(job);
 
         // ✅ Create Employee
-        Employee emp = Employee.builder()
-                .empId("ABC12345M")
-                .fname("Sanjai")
-                .lname("Karthick")
-                .minit("K")
-                .job(savedJob)
-                .jobLvl(100)
-                .publisher(publisher)
-                .hireDate(LocalDateTime.now())
-                .build();
+        Employee emp = new Employee();
+        emp.setEmpId("ABC12345M");
+        emp.setFname("Sanjai");
+        emp.setLname("Karthick");
+        emp.setMinit("K");
+        emp.setJob(savedJob);
+        emp.setJobLvl(100);
+        emp.setPublisher(publisher);
+        emp.setHireDate(LocalDateTime.now());
 
         Employee saved = employeeRepository.save(emp);
 
@@ -74,6 +72,7 @@ public class EmployeeRepositoryTest {
     @Test
     void testFindByJob() {
         Job job = jobRepository.findAll().stream().findFirst().orElse(null);
+
         if (job != null) {
             List<Employee> list = employeeRepository.findByJob_JobId(job.getJobId());
             assertNotNull(list);
@@ -83,6 +82,7 @@ public class EmployeeRepositoryTest {
     @Test
     void testDeleteEmployee() {
         Employee emp = employeeRepository.findAll().stream().findFirst().orElse(null);
+
         if (emp != null) {
             employeeRepository.deleteById(emp.getEmpId());
             assertFalse(employeeRepository.findById(emp.getEmpId()).isPresent());

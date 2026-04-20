@@ -1,9 +1,9 @@
 package com.sprint.Book_Partner_Application.publisher.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
 
-@Builder
+
+
 public class PublisherCreateRequest {
 
     @NotBlank(message = "Publisher ID is required")

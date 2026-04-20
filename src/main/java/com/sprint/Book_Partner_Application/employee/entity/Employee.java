@@ -3,14 +3,13 @@ package com.sprint.Book_Partner_Application.employee.entity;
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.*;
+
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "employee")
 
-@Builder
 public class Employee {
 
     @Id
@@ -39,8 +38,6 @@ public class Employee {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_id", nullable = false)
     @NotNull(message = "Job is required")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Job job;
 
     @Column(name = "job_lvl")
@@ -49,8 +46,6 @@ public class Employee {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pub_id", nullable = false)
     @NotNull(message = "Publisher is required")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Publisher publisher;
 
     @Column(name = "hire_date", nullable = false)

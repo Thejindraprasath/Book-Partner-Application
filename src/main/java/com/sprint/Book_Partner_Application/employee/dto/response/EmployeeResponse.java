@@ -1,11 +1,11 @@
 package com.sprint.Book_Partner_Application.employee.dto.response;
 
-import lombok.*;
+
 
 import java.time.LocalDateTime;
 
 
-@Builder
+
 public class EmployeeResponse {
     private String empId;
     private String fname;

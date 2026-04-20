@@ -1,9 +1,7 @@
 package com.sprint.Book_Partner_Application.store.dto.request;
 
 import jakarta.validation.constraints.Pattern;
-import lombok.*;
 
-@Builder
 public class StoreUpdateRequest {
 
     private String storName;

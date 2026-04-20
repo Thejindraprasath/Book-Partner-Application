@@ -26,5 +26,4 @@ public interface StoreService {
     List<DiscountResponse> getDiscountsByBranchId(String storId);
     DiscountResponse updateDiscount(Long discountId, DiscountUpdateRequest request);
 
-    DiscountResponse updateDiscount(Long discountId, DiscountCreateRequest request);
 }

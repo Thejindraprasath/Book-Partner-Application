@@ -1,9 +1,7 @@
 package com.sprint.Book_Partner_Application.store.dto.response;
 
-import lombok.*;
 import java.math.BigDecimal;
 
-@Builder
 public class DiscountResponse {
 
     private Long discountId;

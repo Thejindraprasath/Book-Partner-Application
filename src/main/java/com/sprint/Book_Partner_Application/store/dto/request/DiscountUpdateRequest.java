@@ -1,11 +1,8 @@
 package com.sprint.Book_Partner_Application.store.dto.request;
 
 import jakarta.validation.constraints.*;
-import lombok.*;
-
 import java.math.BigDecimal;
 
-@Builder
 public class DiscountUpdateRequest {
 
     private String discounttype;

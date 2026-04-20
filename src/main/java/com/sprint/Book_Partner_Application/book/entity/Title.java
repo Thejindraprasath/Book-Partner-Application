@@ -5,7 +5,6 @@ import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import com.sprint.Book_Partner_Application.sales.entity.Sale;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "titles")
-@Builder
 public class Title {
 
     @Id
@@ -31,8 +29,6 @@ public class Title {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pub_id")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Publisher publisher;
 
     @Column(name = "price")
@@ -55,24 +51,25 @@ public class Title {
     private LocalDateTime pubdate;
 
     @OneToMany(mappedBy = "title", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<TitleAuthor> titleAuthors = new ArrayList<>();
 
     @OneToMany(mappedBy = "title", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<RoySched> royScheds = new ArrayList<>();
 
     @OneToMany(mappedBy = "title", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<Sale> sales = new ArrayList<>();
+
+    // ================= CONSTRUCTORS =================
 
     public Title() {
     }
 
-    public Title(String titleId, String title, String type, Publisher publisher, Double price, Double advance, Integer royalty, Integer ytdSales, String notes, LocalDateTime pubdate, List<TitleAuthor> titleAuthors, List<RoySched> royScheds, List<Sale> sales) {
+    public Title(String titleId, String title, String type, Publisher publisher,
+                 Double price, Double advance, Integer royalty, Integer ytdSales,
+                 String notes, LocalDateTime pubdate,
+                 List<TitleAuthor> titleAuthors,
+                 List<RoySched> royScheds,
+                 List<Sale> sales) {
         this.titleId = titleId;
         this.title = title;
         this.type = type;
@@ -87,6 +84,8 @@ public class Title {
         this.royScheds = royScheds;
         this.sales = sales;
     }
+
+    // ================= GETTERS & SETTERS =================
 
     public String getTitleId() {
         return titleId;
@@ -190,5 +189,39 @@ public class Title {
 
     public void setSales(List<Sale> sales) {
         this.sales = sales;
+    }
+
+    // ================= toString =================
+
+    @Override
+    public String toString() {
+        return "Title{" +
+                "titleId='" + titleId + '\'' +
+                ", title='" + title + '\'' +
+                ", type='" + type + '\'' +
+                ", price=" + price +
+                ", advance=" + advance +
+                ", royalty=" + royalty +
+                ", ytdSales=" + ytdSales +
+                ", notes='" + notes + '\'' +
+                ", pubdate=" + pubdate +
+                '}';
+    }
+
+    // ================= equals =================
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Title title1)) return false;
+
+        return titleId != null && titleId.equals(title1.titleId);
+    }
+
+    // ================= hashCode =================
+
+    @Override
+    public int hashCode() {
+        return titleId != null ? titleId.hashCode() : 0;
     }
 }

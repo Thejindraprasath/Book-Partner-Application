@@ -15,18 +15,16 @@ import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import com.sprint.Book_Partner_Application.publisher.exception.PublisherNotFoundException;
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
 import com.sprint.Book_Partner_Application.sales.repository.SaleRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class TitleServiceImpl implements TitleService {
 
@@ -36,8 +34,19 @@ public class TitleServiceImpl implements TitleService {
     private final RoySchedRepository roySchedRepository;
     private final SaleRepository saleRepository;
 
-    // ─────────────── CREATE ───────────────
+    public TitleServiceImpl(TitleRepository titleRepository,
+                            PublisherRepository publisherRepository,
+                            TitleAuthorRepository titleAuthorRepository,
+                            RoySchedRepository roySchedRepository,
+                            SaleRepository saleRepository) {
+        this.titleRepository = titleRepository;
+        this.publisherRepository = publisherRepository;
+        this.titleAuthorRepository = titleAuthorRepository;
+        this.roySchedRepository = roySchedRepository;
+        this.saleRepository = saleRepository;
+    }
 
+    // ================= CREATE =================
     @Override
     public TitleResponse createTitle(TitleCreateRequest request) {
 
@@ -56,28 +65,29 @@ public class TitleServiceImpl implements TitleService {
             throw new InvalidRoyaltyException(request.getRoyalty());
 
         Publisher publisher = null;
-        if (request.getPubId() != null)
+        if (request.getPubId() != null) {
             publisher = publisherRepository.findById(request.getPubId())
                     .orElseThrow(() -> new PublisherNotFoundException(request.getPubId()));
+        }
 
-        Title saved = titleRepository.save(Title.builder()
-                .titleId(request.getTitleId())
-                .title(request.getTitle())
-                .type(request.getType())
-                .publisher(publisher)
-                .price(request.getPrice())
-                .advance(request.getAdvance())
-                .royalty(request.getRoyalty())
-                .ytdSales(request.getYtdSales())
-                .notes(request.getNotes())
-                .pubdate(request.getPubdate())
-                .build());
+        Title title = new Title();
+        title.setTitleId(request.getTitleId());
+        title.setTitle(request.getTitle());
+        title.setType(request.getType());
+        title.setPublisher(publisher);
+        title.setPrice(request.getPrice());
+        title.setAdvance(request.getAdvance());
+        title.setRoyalty(request.getRoyalty());
+        title.setYtdSales(request.getYtdSales());
+        title.setNotes(request.getNotes());
+        title.setPubdate(request.getPubdate());
+
+        Title saved = titleRepository.save(title);
 
         return mapToResponse(saved);
     }
 
-    // ─────────────── READ ALL ───────────────
-
+    // ================= READ ALL =================
     @Override
     @Transactional(readOnly = true)
     public PageResponse<TitleResponse> getAllTitles(
@@ -88,30 +98,34 @@ public class TitleServiceImpl implements TitleService {
             throw new InvalidTitleTypeException(type);
 
         if (minPrice != null && maxPrice != null && minPrice > maxPrice)
-            throw new RuntimeException("minPrice cannot be greater than maxPrice"); // FIXED
+            throw new RuntimeException("minPrice cannot be greater than maxPrice");
 
         if (pubId != null && !publisherRepository.existsById(pubId))
             throw new PublisherNotFoundException(pubId);
 
-        return PageResponse.from(
-                titleRepository.findWithFilters(type, pubId, minPrice, maxPrice, pageable)
-                        .map(this::mapToResponse)
-        );
+        Page<Title> page = titleRepository.findWithFilters(type, pubId, minPrice, maxPrice, pageable);
+
+        List<TitleResponse> responseList = new ArrayList<>();
+
+        for (Title t : page.getContent()) {
+            responseList.add(mapToResponse(t));
+        }
+
+        return PageResponse.from(page.map(this::mapToResponse));
     }
 
-    // ─────────────── READ ONE ───────────────
-
+    // ================= READ ONE =================
     @Override
     @Transactional(readOnly = true)
     public TitleResponse getTitleById(String titleId) {
-        return mapToResponse(
-                titleRepository.findById(titleId)
-                        .orElseThrow(() -> new TitleNotFoundException(titleId))
-        );
+
+        Title title = titleRepository.findById(titleId)
+                .orElseThrow(() -> new TitleNotFoundException(titleId));
+
+        return mapToResponse(title);
     }
 
-    // ─────────────── UPDATE ───────────────
-
+    // ================= UPDATE =================
     @Override
     public TitleResponse updateTitle(String titleId, TitleUpdateRequest request) {
 
@@ -147,8 +161,7 @@ public class TitleServiceImpl implements TitleService {
         return mapToResponse(titleRepository.save(title));
     }
 
-    // ─────────────── DELETE ───────────────
-
+    // ================= DELETE =================
     @Override
     public void deleteTitle(String titleId) {
 
@@ -166,34 +179,41 @@ public class TitleServiceImpl implements TitleService {
         titleRepository.delete(title);
     }
 
-    // ─────────────── AUTHORS ───────────────
-
+    // ================= AUTHORS =================
     @Override
     public List<AuthorResponse> getAuthorsByTitle(String titleId) {
 
         titleRepository.findById(titleId)
                 .orElseThrow(() -> new TitleNotFoundException(titleId));
 
-        return titleAuthorRepository.findByTitleId(titleId).stream()
-                .filter(ta -> ta.getAuthor() != null)
-                .map(ta -> {
-                    var a = ta.getAuthor();
-                    return AuthorResponse.builder()
-                            .auId(a.getAuId())
-                            .auLname(a.getAuLname())
-                            .auFname(a.getAuFname())
-                            .phone(a.getPhone())
-                            .address(a.getAddress())
-                            .city(a.getCity())
-                            .state(a.getState())
-                            .zip(a.getZip())
-                            .contract(a.getContract())
-                            .build();
-                }).collect(Collectors.toList());
+        List<TitleAuthor> list = titleAuthorRepository.findByTitleId(titleId);
+        List<AuthorResponse> result = new ArrayList<>();
+
+        for (TitleAuthor ta : list) {
+
+            if (ta.getAuthor() != null) {
+
+                var a = ta.getAuthor();
+
+                AuthorResponse res = new AuthorResponse();
+                res.setAuId(a.getAuId());
+                res.setAuLname(a.getAuLname());
+                res.setAuFname(a.getAuFname());
+                res.setPhone(a.getPhone());
+                res.setAddress(a.getAddress());
+                res.setCity(a.getCity());
+                res.setState(a.getState());
+                res.setZip(a.getZip());
+                res.setContract(a.getContract());
+
+                result.add(res);
+            }
+        }
+
+        return result;
     }
 
-    // ─────────────── ROYSCHED ───────────────
-
+    // ================= CREATE ROYSCHED =================
     @Override
     public RoySchedResponse createRoySched(RoySchedCreateRequest request) {
 
@@ -206,16 +226,18 @@ public class TitleServiceImpl implements TitleService {
                 (request.getRoyalty() < 0 || request.getRoyalty() > 100))
             throw new InvalidRoyaltyException(request.getRoyalty());
 
-        RoySched saved = roySchedRepository.save(RoySched.builder()
-                .title(title)
-                .lorange(request.getLorange())
-                .hirange(request.getHirange())
-                .royalty(request.getRoyalty())
-                .build());
+        RoySched rs = new RoySched();
+        rs.setTitle(title);
+        rs.setLorange(request.getLorange());
+        rs.setHirange(request.getHirange());
+        rs.setRoyalty(request.getRoyalty());
+
+        RoySched saved = roySchedRepository.save(rs);
 
         return mapRoySchedToResponse(saved);
     }
 
+    // ================= UPDATE ROYSCHED =================
     @Override
     public RoySchedResponse updateRoySched(Long roySchedId, RoySchedUpdateRequest request) {
 
@@ -238,50 +260,60 @@ public class TitleServiceImpl implements TitleService {
         return mapRoySchedToResponse(roySchedRepository.save(rs));
     }
 
-    // ─────────────── VALIDATION HELPER ───────────────
-
+    // ================= VALIDATION =================
     private void validateRange(Integer lo, Integer hi, String titleId, Long currentId) {
 
         if (lo != null && hi != null) {
+
             if (lo >= hi)
                 throw new InvalidRoySchedRangeException(lo, hi);
 
-            boolean overlaps = roySchedRepository.findByTitle_TitleId(titleId)
-                    .stream()
-                    .filter(e -> currentId == null || !e.getRoySchedId().equals(currentId))
-                    .anyMatch(e -> lo <= e.getHirange() && hi >= e.getLorange());
+            List<RoySched> list = roySchedRepository.findByTitle_TitleId(titleId);
 
-            if (overlaps)
-                throw new RoySchedRangeOverlapException(titleId, lo, hi);
+            for (RoySched e : list) {
+
+                if (e.getRoySchedId().equals(currentId)) {
+                    continue;
+                }
+
+                if (lo <= e.getHirange() && hi >= e.getLorange()) {
+                    throw new RoySchedRangeOverlapException(titleId, lo, hi);
+                }
+            }
         }
     }
 
-    // ─────────────── MAPPERS ───────────────
-
+    // ================= MAPPERS =================
     private TitleResponse mapToResponse(Title t) {
-        return TitleResponse.builder()
-                .titleId(t.getTitleId())
-                .title(t.getTitle())
-                .type(t.getType())
-                .pubId(t.getPublisher() != null ? t.getPublisher().getPubId() : null)
-                .pubName(t.getPublisher() != null ? t.getPublisher().getPubName() : null)
-                .price(t.getPrice())
-                .advance(t.getAdvance())
-                .royalty(t.getRoyalty())
-                .ytdSales(t.getYtdSales())
-                .notes(t.getNotes())
-                .pubdate(t.getPubdate())
-                .build();
+
+        TitleResponse res = new TitleResponse();
+
+        res.setTitleId(t.getTitleId());
+        res.setTitle(t.getTitle());
+        res.setType(t.getType());
+        res.setPubId(t.getPublisher() != null ? t.getPublisher().getPubId() : null);
+        res.setPubName(t.getPublisher() != null ? t.getPublisher().getPubName() : null);
+        res.setPrice(t.getPrice());
+        res.setAdvance(t.getAdvance());
+        res.setRoyalty(t.getRoyalty());
+        res.setYtdSales(t.getYtdSales());
+        res.setNotes(t.getNotes());
+        res.setPubdate(t.getPubdate());
+
+        return res;
     }
 
     private RoySchedResponse mapRoySchedToResponse(RoySched rs) {
-        return RoySchedResponse.builder()
-                .roySchedId(rs.getRoySchedId())
-                .titleId(rs.getTitle() != null ? rs.getTitle().getTitleId() : null)
-                .titleName(rs.getTitle() != null ? rs.getTitle().getTitle() : null)
-                .lorange(rs.getLorange())
-                .hirange(rs.getHirange())
-                .royalty(rs.getRoyalty())
-                .build();
+
+        RoySchedResponse res = new RoySchedResponse();
+
+        res.setRoySchedId(rs.getRoySchedId());
+        res.setTitleId(rs.getTitle() != null ? rs.getTitle().getTitleId() : null);
+        res.setTitleName(rs.getTitle() != null ? rs.getTitle().getTitle() : null);
+        res.setLorange(rs.getLorange());
+        res.setHirange(rs.getHirange());
+        res.setRoyalty(rs.getRoyalty());
+
+        return res;
     }
 }

@@ -4,7 +4,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Builder
 public class TitleUpdateRequest {
     private String title;
     private String type;

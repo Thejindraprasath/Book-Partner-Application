@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.data.domain.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,16 +38,28 @@ class TitleServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    // ================= HELPER =================
+    private Title createTitle() {
+        Title t = new Title();
+        t.setTitleId("T1");
+        t.setTitle("Test");
+        t.setType("business");
+        t.setPubdate(LocalDateTime.now());
+        return t;
+    }
+
     // ================= POSITIVE =================
 
     @Test
     void createTitle_success() {
         TitleCreateRequest req = new TitleCreateRequest();
         req.setTitleId("T1");
+        req.setTitle("Book");
         req.setType("business");
+        req.setPubdate(LocalDateTime.now());
 
         when(titleRepository.existsById("T1")).thenReturn(false);
-        when(titleRepository.save(any())).thenReturn(new Title());
+        when(titleRepository.save(any())).thenReturn(createTitle());
 
         assertNotNull(service.createTitle(req));
     }
@@ -54,21 +67,21 @@ class TitleServiceImplTest {
     @Test
     void getAllTitles_success() {
         when(titleRepository.findWithFilters(any(), any(), any(), any(), any()))
-                .thenReturn(new PageImpl<>(List.of(new Title())));
+                .thenReturn(new PageImpl<>(List.of(createTitle())));
 
         assertNotNull(service.getAllTitles(null, null, null, null, Pageable.unpaged()));
     }
 
     @Test
     void getTitleById_success() {
-        when(titleRepository.findById("T1")).thenReturn(Optional.of(new Title()));
+        when(titleRepository.findById("T1")).thenReturn(Optional.of(createTitle()));
 
         assertNotNull(service.getTitleById("T1"));
     }
 
     @Test
     void updateTitle_success() {
-        Title title = new Title();
+        Title title = createTitle();
 
         when(titleRepository.findById("T1")).thenReturn(Optional.of(title));
         when(titleRepository.save(any())).thenReturn(title);
@@ -78,7 +91,7 @@ class TitleServiceImplTest {
 
     @Test
     void deleteTitle_success() {
-        when(titleRepository.findById("T1")).thenReturn(Optional.of(new Title()));
+        when(titleRepository.findById("T1")).thenReturn(Optional.of(createTitle()));
         when(saleRepository.findByTitleId("T1")).thenReturn(List.of());
         when(titleAuthorRepository.findByTitleId("T1")).thenReturn(List.of());
 
@@ -92,7 +105,7 @@ class TitleServiceImplTest {
         req.setLorange(1);
         req.setHirange(10);
 
-        when(titleRepository.findById("T1")).thenReturn(Optional.of(new Title()));
+        when(titleRepository.findById("T1")).thenReturn(Optional.of(createTitle()));
         when(roySchedRepository.findByTitle_TitleId("T1")).thenReturn(List.of());
         when(roySchedRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
@@ -101,8 +114,7 @@ class TitleServiceImplTest {
 
     @Test
     void updateRoySched_success() {
-        Title title = new Title();
-        title.setTitleId("T1");
+        Title title = createTitle();
 
         RoySched rs = new RoySched();
         rs.setLorange(1);
@@ -153,7 +165,6 @@ class TitleServiceImplTest {
                 () -> service.createTitle(req));
     }
 
-    // ✅ FIXED HERE
     @Test
     void getAllTitles_invalidRange() {
         assertThrows(RuntimeException.class,
@@ -170,7 +181,7 @@ class TitleServiceImplTest {
 
     @Test
     void deleteTitle_hasSales() {
-        when(titleRepository.findById("T1")).thenReturn(Optional.of(new Title()));
+        when(titleRepository.findById("T1")).thenReturn(Optional.of(createTitle()));
         when(saleRepository.findByTitleId("T1")).thenReturn(List.of(new Sale()));
 
         assertThrows(TitleHasActiveSalesException.class,
@@ -179,7 +190,7 @@ class TitleServiceImplTest {
 
     @Test
     void deleteTitle_hasAuthors() {
-        when(titleRepository.findById("T1")).thenReturn(Optional.of(new Title()));
+        when(titleRepository.findById("T1")).thenReturn(Optional.of(createTitle()));
         when(saleRepository.findByTitleId("T1")).thenReturn(List.of());
         when(titleAuthorRepository.findByTitleId("T1")).thenReturn(List.of(new TitleAuthor()));
 
@@ -194,7 +205,7 @@ class TitleServiceImplTest {
         req.setLorange(10);
         req.setHirange(5);
 
-        when(titleRepository.findById("T1")).thenReturn(Optional.of(new Title()));
+        when(titleRepository.findById("T1")).thenReturn(Optional.of(createTitle()));
 
         assertThrows(InvalidRoySchedRangeException.class,
                 () -> service.createRoySched(req));
@@ -211,7 +222,7 @@ class TitleServiceImplTest {
         existing.setLorange(5);
         existing.setHirange(15);
 
-        when(titleRepository.findById("T1")).thenReturn(Optional.of(new Title()));
+        when(titleRepository.findById("T1")).thenReturn(Optional.of(createTitle()));
         when(roySchedRepository.findByTitle_TitleId("T1")).thenReturn(List.of(existing));
 
         assertThrows(RoySchedRangeOverlapException.class,

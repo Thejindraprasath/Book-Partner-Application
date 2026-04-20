@@ -30,16 +30,12 @@ public class Sale {
 
     // ================= RELATIONSHIPS =================
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "stor_id", insertable = false, updatable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Store store;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "title_id", insertable = false, updatable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Title title;
 
     // ================= FIELDS =================

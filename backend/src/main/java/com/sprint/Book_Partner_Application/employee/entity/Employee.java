@@ -35,7 +35,7 @@ public class Employee {
     @Size(max = 30, message = "Last name must not exceed 30 characters")
     private String lname;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "job_id", nullable = false)
     @NotNull(message = "Job is required")
     private Job job;
@@ -43,7 +43,7 @@ public class Employee {
     @Column(name = "job_lvl")
     private Integer jobLvl = 10;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "pub_id", nullable = false)
     @NotNull(message = "Publisher is required")
     private Publisher publisher;

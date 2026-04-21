@@ -12,7 +12,6 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "sales")
-@Builder
 @IdClass(Sale.SaleId.class)
 public class Sale {
 

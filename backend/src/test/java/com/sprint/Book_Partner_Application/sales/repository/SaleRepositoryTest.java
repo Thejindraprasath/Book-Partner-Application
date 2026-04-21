@@ -10,6 +10,7 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @ActiveProfiles("test")
-@Import(org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration.class)
+@Import(ValidationAutoConfiguration.class)
 class SaleRepositoryTest {
 
     @Autowired
@@ -34,9 +35,9 @@ class SaleRepositoryTest {
     private TitleRepository titleRepository;
 
     @Autowired
-    private jakarta.validation.Validator validator;
+    private Validator validator;
 
-    // ================= SETUP (RUNS BEFORE EACH TEST) =================
+    // ================= SETUP =================
 
     @BeforeEach
     void init() {
@@ -58,15 +59,15 @@ class SaleRepositoryTest {
     // ================= HELPER =================
 
     private Sale createSaleAndFlush() {
-        Sale sale = Sale.builder()
-                .storId("S001")
-                .ordNum("O001")
-                .titleId("T001")
-                .ordDate(LocalDateTime.now())
-                .qty((short) 5)
-                .payterms("CASH")
-                .build();
-        return saleRepository.saveAndFlush(sale); // Flush to DB immediately
+        Sale sale = new Sale();
+        sale.setStorId("S001");
+        sale.setOrdNum("O001");
+        sale.setTitleId("T001");
+        sale.setOrdDate(LocalDateTime.now());
+        sale.setQty((short) 5);
+        sale.setPayterms("CASH");
+
+        return saleRepository.saveAndFlush(sale);
     }
 
     // ================= CREATE =================
@@ -86,7 +87,6 @@ class SaleRepositoryTest {
     @Test
     void testReadSale() {
         Sale sale = createSaleAndFlush();
-        saleRepository.save(sale);
 
         SaleId id = new SaleId("S001", "O001", "T001");
 
@@ -101,7 +101,6 @@ class SaleRepositoryTest {
     @Test
     void testUpdateSale() {
         Sale sale = createSaleAndFlush();
-        saleRepository.save(sale);
 
         SaleId id = new SaleId("S001", "O001", "T001");
 
@@ -118,7 +117,6 @@ class SaleRepositoryTest {
     @Test
     void testDeleteSale() {
         Sale sale = createSaleAndFlush();
-        saleRepository.save(sale);
 
         SaleId id = new SaleId("S001", "O001", "T001");
 
@@ -127,9 +125,11 @@ class SaleRepositoryTest {
         assertFalse(saleRepository.findById(id).isPresent());
     }
 
+    // ================= FIND BY STORE =================
+
     @Test
     void testFindByStorId() {
-        createSaleAndFlush(); // not createSale() + separate save
+        createSaleAndFlush();
 
         List<Sale> result = saleRepository.findByStorId("S001");
 
@@ -137,7 +137,7 @@ class SaleRepositoryTest {
         assertEquals("S001", result.get(0).getStorId());
     }
 
-    // ================= FIND BY TITLE ID =================
+    // ================= FIND BY TITLE =================
 
     @Test
     void testFindByTitleId() {
@@ -149,8 +149,8 @@ class SaleRepositoryTest {
         assertEquals("T001", result.get(0).getTitleId());
     }
 
-//    // ================= DATE RANGE =================
-//
+    // ================= DATE RANGE =================
+
     @Test
     void testFindByDateRange() {
         createSaleAndFlush();
@@ -186,11 +186,10 @@ class SaleRepositoryTest {
 
     @Test
     void testValidationFail() {
-        Sale sale = Sale.builder().build();
+        Sale sale = new Sale(); // no builder
 
         var violations = validator.validate(sale);
 
         assertFalse(violations.isEmpty());
     }
-
 }

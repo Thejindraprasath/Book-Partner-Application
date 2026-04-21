@@ -48,6 +48,8 @@ class SaleServiceTest {
 
     @BeforeEach
     void setup() {
+
+        // DTO can still use builder
         request = SaleCreateRequest.builder()
                 .storId("S1")
                 .ordNum("O1")
@@ -57,14 +59,14 @@ class SaleServiceTest {
                 .payterms("Net 30")
                 .build();
 
-        sale = Sale.builder()
-                .storId("S1")
-                .ordNum("O1")
-                .titleId("T1")
-                .qty((short) 5)
-                .ordDate(LocalDateTime.now().minusDays(1))
-                .payterms("Net 30")
-                .build();
+        // ❌ Removed builder → ✅ Use setters
+        sale = new Sale();
+        sale.setStorId("S1");
+        sale.setOrdNum("O1");
+        sale.setTitleId("T1");
+        sale.setQty((short) 5);
+        sale.setOrdDate(LocalDateTime.now().minusDays(1));
+        sale.setPayterms("Net 30");
     }
 
     // ================= POSITIVE =================

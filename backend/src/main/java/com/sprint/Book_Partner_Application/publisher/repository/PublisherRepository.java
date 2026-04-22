@@ -15,13 +15,6 @@ public interface PublisherRepository extends JpaRepository<Publisher, String> {
 
     Page<Publisher> findByCountryIgnoreCase(String country, Pageable pageable);
 
-    @Query("SELECT p FROM Publisher p WHERE " +
-            "(:city IS NULL OR LOWER(p.city) = LOWER(:city)) AND " +
-            "(:state IS NULL OR LOWER(p.state) = LOWER(:state)) AND " +
-            "(:country IS NULL OR LOWER(p.country) = LOWER(:country))")
-    Page<Publisher> findWithFilters(
-            @Param("city") String city,
-            @Param("state") String state,
-            @Param("country") String country,
-            Pageable pageable);
+    @Query("SELECT p FROM Publisher p")
+    Page<Publisher> findWithFilters(Pageable pageable);
 }

@@ -12,7 +12,7 @@ import java.util.List;
 public interface StoreService {
 
     StoreResponse createStore(StoreCreateRequest request);
-    PageResponse<StoreResponse> getAllStores(String city, String state, Pageable pageable);
+    PageResponse<StoreResponse> getAllStores(Pageable pageable);
     StoreResponse getStoreById(String storId);
     StoreResponse updateStore(String storId, StoreUpdateRequest request);
     void deleteStore(String storId);

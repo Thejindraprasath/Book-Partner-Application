@@ -90,20 +90,9 @@ public class TitleServiceImpl implements TitleService {
     // ================= READ ALL =================
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<TitleResponse> getAllTitles(
-            String type, String pubId, Double minPrice, Double maxPrice, Pageable pageable) {
+    public PageResponse<TitleResponse> getAllTitles(Pageable pageable) {
 
-        if (type != null &&
-                !InvalidTitleTypeException.VALID_TYPES.contains(type))
-            throw new InvalidTitleTypeException(type);
-
-        if (minPrice != null && maxPrice != null && minPrice > maxPrice)
-            throw new RuntimeException("minPrice cannot be greater than maxPrice");
-
-        if (pubId != null && !publisherRepository.existsById(pubId))
-            throw new PublisherNotFoundException(pubId);
-
-        Page<Title> page = titleRepository.findWithFilters(type, pubId, minPrice, maxPrice, pageable);
+        Page<Title> page = titleRepository.findWithFilters(pageable);
 
         List<TitleResponse> responseList = new ArrayList<>();
 

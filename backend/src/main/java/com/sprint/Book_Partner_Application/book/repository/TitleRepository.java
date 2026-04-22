@@ -19,16 +19,8 @@ public interface TitleRepository extends JpaRepository<Title, String> {
 
     Page<Title> findByPriceBetween(Double minPrice, Double maxPrice, Pageable pageable);
 
-    @Query("SELECT t FROM Title t WHERE " +
-            "(:type IS NULL OR LOWER(t.type) = LOWER(:type)) AND " +
-            "(:pubId IS NULL OR t.publisher.pubId = :pubId) AND " +
-            "(:minPrice IS NULL OR t.price >= :minPrice) AND " +
-            "(:maxPrice IS NULL OR t.price <= :maxPrice)")
+    @Query("SELECT t FROM Title t")
     Page<Title> findWithFilters(
-            @Param("type") String type,
-            @Param("pubId") String pubId,
-            @Param("minPrice") Double minPrice,
-            @Param("maxPrice") Double maxPrice,
             Pageable pageable);
 
     List<Title> findByTitleContainingIgnoreCase(String keyword);

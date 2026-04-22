@@ -15,9 +15,7 @@ public interface PublisherService {
 
     PublisherResponse createPublisher(PublisherCreateRequest request);
 
-    PageResponse<PublisherResponse> getAllPublishers(
-            String city, String state, String country, Pageable pageable
-    );
+    PageResponse<PublisherResponse> getAllPublishers(Pageable pageable);
 
     PublisherResponse getPublisherById(String pubId);
 

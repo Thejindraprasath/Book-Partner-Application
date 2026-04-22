@@ -115,8 +115,7 @@ class StoreRepositoryTest {
         storeRepository.save(createStore("S007", "Chennai", "TN"));
 
         Page<Store> result = storeRepository.findWithFilters(
-                "Chennai",
-                "TN",
+
                 PageRequest.of(0, 10)
         );
 
@@ -130,8 +129,7 @@ class StoreRepositoryTest {
         storeRepository.save(createStore("S008", "Chennai", "TN"));
 
         Page<Store> result = storeRepository.findWithFilters(
-                "Chennai",
-                null,
+
                 PageRequest.of(0, 10)
         );
 
@@ -145,8 +143,7 @@ class StoreRepositoryTest {
         storeRepository.save(createStore("S009", "Chennai", "TN"));
 
         Page<Store> result = storeRepository.findWithFilters(
-                null,
-                "TN",
+
                 PageRequest.of(0, 10)
         );
 

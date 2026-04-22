@@ -285,7 +285,7 @@ class EmployeeServiceTest {
         when(publisherRepository.existsById("9999")).thenReturn(false);
 
         assertThrows(PublisherNotFoundException.class,
-                () -> employeeService.getAllEmployees("9999", null, Pageable.unpaged()));
+                () -> employeeService.getAllEmployees(Pageable.unpaged()));
     }
 
     @Test
@@ -294,6 +294,6 @@ class EmployeeServiceTest {
         when(jobRepository.existsById((short) 5)).thenReturn(false);
 
         assertThrows(JobNotFoundException.class,
-                () -> employeeService.getAllEmployees("1389", (short) 5, Pageable.unpaged()));
+                () -> employeeService.getAllEmployees(Pageable.unpaged()));
     }
 }

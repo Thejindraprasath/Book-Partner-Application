@@ -2,7 +2,6 @@ package com.sprint.Book_Partner_Application.store.service;
 
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 
-import com.sprint.Book_Partner_Application.exception.*;
 import com.sprint.Book_Partner_Application.sales.dto.response.SaleResponse;
 import com.sprint.Book_Partner_Application.sales.entity.Sale;
 import com.sprint.Book_Partner_Application.sales.repository.SaleRepository;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class StoreServiceImpl implements StoreService {
@@ -69,13 +67,10 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public PageResponse<StoreResponse> getAllStores(String city, String state, Pageable pageable) {
-        if (state != null && state.length() != 2) {
-            throw new InvalidStateCodeException(state);
-        }
+    public PageResponse<StoreResponse> getAllStores(Pageable pageable) {
 
         return PageResponse.from(
-                storeRepository.findWithFilters(city, state, pageable)
+                storeRepository.findWithFilters(pageable)
                         .map(this::mapToResponse)
         );
     }

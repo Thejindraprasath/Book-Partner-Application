@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, String> {
 
     Page<Employee> findByPublisher_PubId(String pubId, Pageable pageable);
 
-   
+    @Query("SELECT e FROM Employee e")
     Page<Employee> findWithFilters( Pageable pageable);
 
     List<Employee> findByLnameContainingIgnoreCaseOrFnameContainingIgnoreCase(String lname, String fname);

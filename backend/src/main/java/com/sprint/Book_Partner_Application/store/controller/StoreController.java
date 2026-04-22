@@ -37,8 +37,6 @@ public class StoreController {
 
     @GetMapping("/stores")
     public ResponseEntity<ApiResponse<PageResponse<StoreResponse>>> getAllStores(
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) String state,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "storName") String sortBy,
@@ -53,7 +51,7 @@ public class StoreController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         "Stores fetched successfully",
-                        storeService.getAllStores(city, state, pageable)
+                        storeService.getAllStores(pageable)
                 )
         );
     }

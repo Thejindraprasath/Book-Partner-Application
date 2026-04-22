@@ -1,0 +1,81 @@
+<aside class="flex h-full w-full flex-col gap-6 rounded-none bg-slate-950 px-5 py-6 text-slate-100">
+  <div>
+    <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Book Partner</p>
+    <h2 class="mt-2 text-xl font-semibold">Frontend Console</h2>
+  </div>
+
+  @if (currentModuleDetails(); as moduleItem) {
+  <div class="rounded-2xl bg-slate-900 p-4">
+    <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Current Module</p>
+    <h3 class="mt-2 text-lg font-semibold">{{ moduleItem.label }}</h3>
+  </div>
+
+  <nav class="flex flex-col gap-2">
+    <a
+      [attr.href]="homeRoute"
+      [class.bg-white]="isRouteActive(homeRoute)"
+      [class.text-slate-950]="isRouteActive(homeRoute)"
+      class="rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800"
+    >
+      Home
+    </a>
+
+    <a
+      [attr.href]="moduleItem.route"
+      [class.bg-white]="isRouteActive(moduleItem.route)"
+      [class.text-slate-950]="isRouteActive(moduleItem.route)"
+      class="rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800"
+    >
+      Dashboard
+    </a>
+
+    @if (moduleItem.id === 'sanjai') {
+    <a
+      href="/sanjai/publishers"
+      [class.bg-white]="isRouteActiveOrInside('/sanjai/publishers')"
+      [class.text-slate-950]="isRouteActiveOrInside('/sanjai/publishers')"
+      class="rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800"
+    >
+      Publisher Module
+    </a>
+    <a
+      href="/sanjai/employees"
+      [class.bg-white]="isRouteActiveOrInside('/sanjai/employees')"
+      [class.text-slate-950]="isRouteActiveOrInside('/sanjai/employees')"
+      class="rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800"
+    >
+      Employee Module
+    </a>
+
+    @if (activeSanjaiSection(); as section) {
+    <div class="mt-3 border-t border-slate-800 pt-3">
+      <p class="px-3 pb-2 text-xs uppercase tracking-[0.2em] text-slate-500">{{ section.label }}</p>
+      <div class="flex flex-col gap-2">
+        @for (endpoint of section.endpoints; track endpoint.id) {
+        <a
+          [attr.href]="endpointRoute(section.route, endpoint.route)"
+          [class.bg-white]="isRouteActive(endpointRoute(section.route, endpoint.route))"
+          [class.text-slate-950]="isRouteActive(endpointRoute(section.route, endpoint.route))"
+          class="rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800"
+        >
+          {{ endpoint.title }}
+        </a>
+        }
+      </div>
+    </div>
+    }
+    } @else {
+    @for (endpoint of currentEndpoints(); track endpoint.id) {
+    <a
+      [attr.href]="endpointRoute(moduleItem.route, endpoint.route)"
+      [class.bg-white]="isRouteActive(endpointRoute(moduleItem.route, endpoint.route))"
+      [class.text-slate-950]="isRouteActive(endpointRoute(moduleItem.route, endpoint.route))"
+      class="rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800"
+    >
+      {{ endpoint.title }}
+    </a>
+    }
+    }
+  </nav>
+  }
+</aside>

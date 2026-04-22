@@ -66,18 +66,11 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public PageResponse<AuthorResponse> getAllAuthors(
-            String city,
-            String state,
-            Integer contract,
             Pageable pageable
     ) {
 
-        if (contract != null && !(contract == 0 || contract == 1)) {
-            throw new InvalidOperationException("Contract filter must be 0 or 1");
-        }
-
         Page<Author> page =
-                authorRepository.findWithFilters(city, state, contract, pageable);
+                authorRepository.findWithFilters(pageable);
 
         // convert manually (no stream)
         List<AuthorResponse> responseList = new ArrayList<>();

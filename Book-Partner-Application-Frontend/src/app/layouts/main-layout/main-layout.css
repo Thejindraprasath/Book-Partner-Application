@@ -1,0 +1,4 @@
+/* main-layout styles */
+:host {
+  display: block;
+}

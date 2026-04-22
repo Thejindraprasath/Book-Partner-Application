@@ -83,11 +83,11 @@ class PublisherServiceTest {
     void getAllPublishers_success() {
         Page<Publisher> page = new PageImpl<>(List.of(publisher));
 
-        when(publisherRepository.findWithFilters(any(), any(), any(), any()))
+        when(publisherRepository.findWithFilters(any()))
                 .thenReturn(page);
 
         PageResponse<?> response =
-                publisherService.getAllPublishers(null, null, null, Pageable.unpaged());
+                publisherService.getAllPublishers(Pageable.unpaged());
 
         assertEquals(1, response.getTotalElements());
     }

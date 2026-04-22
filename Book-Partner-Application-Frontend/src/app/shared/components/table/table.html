@@ -1,0 +1,40 @@
+@if (rows().length && columns().length) {
+<div class="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-sm">
+  <div class="border-b border-slate-200 bg-slate-50 px-5 py-4">
+    <div class="flex flex-wrap items-center justify-end gap-3">
+        <span class="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
+          {{ rows().length }} {{ rows().length === 1 ? 'record' : 'records' }}
+        </span>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+      <thead class="bg-slate-950">
+      <tr>
+        @for (column of columns(); track column) {
+        <th class="whitespace-nowrap px-5 py-4 text-left text-xs font-bold uppercase tracking-[0.16em] text-slate-200">
+          {{ column }}
+        </th>
+        }
+      </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 bg-white">
+      @for (row of rows(); track $index) {
+      <tr class="transition hover:bg-slate-50">
+        @for (column of columns(); track column) {
+        <td class="max-w-[24rem] break-words px-5 py-4 text-sm leading-6 text-slate-700">
+          {{ formatValue($any(row)[column]) }}
+        </td>
+        }
+      </tr>
+      }
+      </tbody>
+    </table>
+  </div>
+</div>
+} @else {
+<div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-5 py-6 text-sm font-medium text-slate-500">
+  {{ emptyMessage() }}
+</div>
+}

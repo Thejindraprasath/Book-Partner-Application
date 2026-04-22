@@ -18,10 +18,6 @@ public interface TitleService {
     TitleResponse createTitle(TitleCreateRequest request);
 
     PageResponse<TitleResponse> getAllTitles(
-            String type,
-            String pubId,
-            Double minPrice,
-            Double maxPrice,
             Pageable pageable
     );
 

@@ -1,0 +1,28 @@
+<header class="flex flex-col gap-3 rounded-3xl border border-slate-200 bg-white px-5 py-4 shadow-sm md:flex-row md:items-center md:justify-between">
+  <div>
+    <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Secured Workspace</p>
+    <h1 class="mt-1 text-2xl font-semibold text-slate-900">Book Partner Application</h1>
+  </div>
+
+  @if (user(); as currentUser) {
+  <div class="flex items-center gap-3">
+    <div class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-700">
+      <span class="font-semibold">{{ currentUser.username }}</span>
+      <span class="text-slate-500"> | {{ currentUser.roles.join(', ') }}</span>
+    </div>
+    <a
+      [routerLink]="homeRoute"
+      class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+    >
+      Home
+    </a>
+    <button
+      type="button"
+      (click)="logout()"
+      class="rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+    >
+      Logout
+    </button>
+  </div>
+  }
+</header>

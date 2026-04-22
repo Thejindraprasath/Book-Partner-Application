@@ -25,7 +25,7 @@ public class AuthorController {
 
     private AuthorService authorService;
 
-    // ✅ MANUAL CONSTRUCTOR (replaces @RequiredArgsConstructor)
+    //  MANUAL CONSTRUCTOR (replaces @RequiredArgsConstructor)
     public AuthorController(AuthorService authorService) {
         this.authorService = authorService;
     }
@@ -44,9 +44,7 @@ public class AuthorController {
     // ─── GET ALL AUTHORS ───────────────────────────
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<AuthorResponse>>> getAllAuthors(
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) String state,
-            @RequestParam(required = false) Integer contract,
+
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "auLname") String sortBy,
@@ -62,7 +60,7 @@ public class AuthorController {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         PageResponse<AuthorResponse> result =
-                authorService.getAllAuthors(city, state, contract, pageable);
+                authorService.getAllAuthors(pageable);
 
         return ResponseEntity.ok(ApiResponse.success(result));
     }

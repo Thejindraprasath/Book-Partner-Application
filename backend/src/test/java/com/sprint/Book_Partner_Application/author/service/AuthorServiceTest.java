@@ -120,7 +120,7 @@ class AuthorServiceTest {
         when(authorRepository.findWithFilters(any(), any(), any(), any()))
                 .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(new Author())));
 
-        assertNotNull(authorService.getAllAuthors(null, null, null, org.springframework.data.domain.PageRequest.of(0, 10)));
+        assertNotNull(authorService.getAllAuthors(org.springframework.data.domain.PageRequest.of(0, 10)));
     }
 
     @Test
@@ -181,7 +181,7 @@ class AuthorServiceTest {
     @Test
     void testInvalidContractFilter() {
         assertThrows(InvalidOperationException.class,
-                () -> authorService.getAllAuthors(null, null, 5,
+                () -> authorService.getAllAuthors(
                         org.springframework.data.domain.PageRequest.of(0, 10)));
     }
 

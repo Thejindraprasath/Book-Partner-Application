@@ -66,9 +66,6 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public PageResponse<AuthorResponse> getAllAuthors(
-            String city,
-            String state,
-            Integer contract,
             Pageable pageable
     ) {
 

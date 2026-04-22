@@ -15,9 +15,6 @@ public interface AuthorService {
     AuthorResponse createAuthor(AuthorCreateRequest request);
 
     PageResponse<AuthorResponse> getAllAuthors(
-            String city,
-            String state,
-            Integer contract,
             Pageable pageable
     );
 

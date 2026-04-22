@@ -169,22 +169,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<EmployeeResponse> getAllEmployees(
-            String pubId,
-            Short jobId,
-            Pageable pageable) {
+    public PageResponse<EmployeeResponse> getAllEmployees( Pageable pageable) {
 
-        if (pubId != null && !publisherRepository.existsById(pubId)) {
-            throw new PublisherNotFoundException(pubId);
-        }
-
-        if (jobId != null && !jobRepository.existsById(jobId)) {
-            throw new JobNotFoundException(jobId);
-        }
+        
 
         return PageResponse.from(
                 employeeRepository
-                        .findWithFilters(pubId, jobId, pageable)
+                        .findWithFilters( pageable)
                         .map(this::mapEmpToResponse)
         );
     }

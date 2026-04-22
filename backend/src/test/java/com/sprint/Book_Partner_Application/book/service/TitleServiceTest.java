@@ -2,28 +2,32 @@ package com.sprint.Book_Partner_Application.book.service;
 
 import com.sprint.Book_Partner_Application.author.entity.TitleAuthor;
 import com.sprint.Book_Partner_Application.author.repository.TitleAuthorRepository;
-import com.sprint.Book_Partner_Application.book.dto.request.*;
+import com.sprint.Book_Partner_Application.book.dto.request.RoySchedCreateRequest;
+import com.sprint.Book_Partner_Application.book.dto.request.RoySchedUpdateRequest;
+import com.sprint.Book_Partner_Application.book.dto.request.TitleCreateRequest;
+import com.sprint.Book_Partner_Application.book.dto.request.TitleUpdateRequest;
 import com.sprint.Book_Partner_Application.book.entity.RoySched;
 import com.sprint.Book_Partner_Application.book.entity.Title;
 import com.sprint.Book_Partner_Application.book.exception.*;
-import com.sprint.Book_Partner_Application.book.repository.*;
+import com.sprint.Book_Partner_Application.book.repository.RoySchedRepository;
+import com.sprint.Book_Partner_Application.book.repository.TitleRepository;
+
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
 import com.sprint.Book_Partner_Application.sales.entity.Sale;
 import com.sprint.Book_Partner_Application.sales.repository.SaleRepository;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class TitleServiceImplTest {
 
     @InjectMocks
@@ -35,11 +39,6 @@ class TitleServiceImplTest {
     @Mock private RoySchedRepository roySchedRepository;
     @Mock private SaleRepository saleRepository;
 
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     // ================= HELPER =================
     public Title createTitle() {
         Title t = new Title();
@@ -47,8 +46,7 @@ class TitleServiceImplTest {
         t.setTitle("Test");
         t.setType("business");
         t.setPubdate(LocalDateTime.now());
-        Title t1 = t;
-        return t1;
+        return t;
     }
 
     // ================= POSITIVE =================
@@ -69,16 +67,13 @@ class TitleServiceImplTest {
 
     @Test
     void getAllTitles_success() {
-
-        List<Title> list = new ArrayList<>();
-        list.add(createTitle());
-
+        List<Title> list = List.of(createTitle());
         Page<Title> page = new PageImpl<>(list);
 
-        when(titleRepository.findWithFilters(any(), any(), any(), any(), any()))
+        when(titleRepository.findWithFilters(any(Pageable.class)))
                 .thenReturn(page);
 
-        assertNotNull(service.getAllTitles(null, null, null, null, Pageable.unpaged()));
+        assertNotNull(service.getAllTitles(Pageable.unpaged()));
     }
 
     @Test
@@ -93,15 +88,17 @@ class TitleServiceImplTest {
     void updateTitle_success() {
         Title title = createTitle();
 
+        TitleUpdateRequest req = new TitleUpdateRequest();
+        req.setTitle("Updated");
+
         when(titleRepository.findById("T1")).thenReturn(Optional.of(title));
         when(titleRepository.save(any())).thenReturn(title);
 
-        assertNotNull(service.updateTitle("T1", new TitleUpdateRequest()));
+        assertNotNull(service.updateTitle("T1", req));
     }
 
     @Test
     void deleteTitle_success() {
-
         when(titleRepository.findById("T1"))
                 .thenReturn(Optional.of(createTitle()));
 
@@ -135,13 +132,16 @@ class TitleServiceImplTest {
 
     @Test
     void updateRoySched_success() {
-
         Title title = createTitle();
 
         RoySched rs = new RoySched();
         rs.setLorange(1);
         rs.setHirange(10);
         rs.setTitle(title);
+
+        RoySchedUpdateRequest req = new RoySchedUpdateRequest();
+        req.setLorange(2);
+        req.setHirange(20);
 
         when(roySchedRepository.findById(1L))
                 .thenReturn(Optional.of(rs));
@@ -152,14 +152,13 @@ class TitleServiceImplTest {
         when(roySchedRepository.save(any()))
                 .thenReturn(rs);
 
-        assertNotNull(service.updateRoySched(1L, new RoySchedUpdateRequest()));
+        assertNotNull(service.updateRoySched(1L, req));
     }
 
     // ================= NEGATIVE =================
 
     @Test
     void createTitle_duplicate() {
-
         when(titleRepository.existsById("T1")).thenReturn(true);
 
         TitleCreateRequest req = new TitleCreateRequest();
@@ -171,7 +170,6 @@ class TitleServiceImplTest {
 
     @Test
     void createTitle_invalidType() {
-
         TitleCreateRequest req = new TitleCreateRequest();
         req.setTitleId("T1");
         req.setType("wrong");
@@ -184,7 +182,6 @@ class TitleServiceImplTest {
 
     @Test
     void createTitle_invalidPrice() {
-
         TitleCreateRequest req = new TitleCreateRequest();
         req.setTitleId("T1");
         req.setPrice(-10.0);
@@ -198,12 +195,11 @@ class TitleServiceImplTest {
     @Test
     void getAllTitles_invalidRange() {
         assertThrows(RuntimeException.class,
-                () -> service.getAllTitles(null, null, 100.0, 10.0, Pageable.unpaged()));
+                () -> service.getAllTitles(Pageable.unpaged()));
     }
 
     @Test
     void getTitle_notFound() {
-
         when(titleRepository.findById("T1"))
                 .thenReturn(Optional.empty());
 
@@ -213,15 +209,11 @@ class TitleServiceImplTest {
 
     @Test
     void deleteTitle_hasSales() {
-
-        List<Sale> sales = new ArrayList<>();
-        sales.add(new Sale());
-
         when(titleRepository.findById("T1"))
                 .thenReturn(Optional.of(createTitle()));
 
         when(saleRepository.findByTitleId("T1"))
-                .thenReturn(sales);
+                .thenReturn(List.of(new Sale()));
 
         assertThrows(TitleHasActiveSalesException.class,
                 () -> service.deleteTitle("T1"));
@@ -229,10 +221,6 @@ class TitleServiceImplTest {
 
     @Test
     void deleteTitle_hasAuthors() {
-
-        List<TitleAuthor> authors = new ArrayList<>();
-        authors.add(new TitleAuthor());
-
         when(titleRepository.findById("T1"))
                 .thenReturn(Optional.of(createTitle()));
 
@@ -240,7 +228,7 @@ class TitleServiceImplTest {
                 .thenReturn(new ArrayList<>());
 
         when(titleAuthorRepository.findByTitleId("T1"))
-                .thenReturn(authors);
+                .thenReturn(List.of(new TitleAuthor()));
 
         assertThrows(TitleHasActiveAuthorsException.class,
                 () -> service.deleteTitle("T1"));
@@ -248,7 +236,6 @@ class TitleServiceImplTest {
 
     @Test
     void createRoySched_invalidRange() {
-
         RoySchedCreateRequest req = new RoySchedCreateRequest();
         req.setTitleId("T1");
         req.setLorange(10);
@@ -263,7 +250,6 @@ class TitleServiceImplTest {
 
     @Test
     void updateRoySched_notFound() {
-
         when(roySchedRepository.findById(1L))
                 .thenReturn(Optional.empty());
 

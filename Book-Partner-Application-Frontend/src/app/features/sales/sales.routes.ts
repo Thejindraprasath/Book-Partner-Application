@@ -2,18 +2,18 @@ import { Routes } from '@angular/router';
 
 import { getEndpointsForModule } from '../../config/api.config';
 
-const endpointRoutes: Routes = getEndpointsForModule('author').map((endpoint) => ({
+const endpointRoutes: Routes = getEndpointsForModule('sales').map((endpoint) => ({
   path: endpoint.route,
   loadComponent: () =>
     import('../../shared/components/endpoint-runner/endpoint-runner').then((m) => m.EndpointRunner),
-  data: { moduleId: 'author', moduleRoute: '/author', endpoint },
+  data: { moduleId: 'sales', moduleRoute: '/sales', endpoint },
 }));
 
-export const authorsRoutes: Routes = [
+export const salesRoutes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/authors-page/authors-page').then((m) => m.AuthorsPage),
+      import('./pages/sales-page/sales-page').then((m) => m.SalesPage),
   },
   ...endpointRoutes,
 ];

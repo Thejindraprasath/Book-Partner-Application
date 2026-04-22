@@ -10,6 +10,7 @@ import com.sprint.Book_Partner_Application.dto.PageResponse;
 
 import jakarta.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,9 +24,10 @@ import java.util.List;
 @RequestMapping("/api/v1/authors")
 public class AuthorController {
 
+    @Autowired
     private AuthorService authorService;
 
-    // ✅ MANUAL CONSTRUCTOR (replaces @RequiredArgsConstructor)
+    //  MANUAL CONSTRUCTOR (replaces @RequiredArgsConstructor)
     public AuthorController(AuthorService authorService) {
         this.authorService = authorService;
     }
@@ -44,9 +46,7 @@ public class AuthorController {
     // ─── GET ALL AUTHORS ───────────────────────────
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<AuthorResponse>>> getAllAuthors(
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) String state,
-            @RequestParam(required = false) Integer contract,
+
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "auLname") String sortBy,
@@ -62,7 +62,7 @@ public class AuthorController {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         PageResponse<AuthorResponse> result =
-                authorService.getAllAuthors(city, state, contract, pageable);
+                authorService.getAllAuthors(pageable);
 
         return ResponseEntity.ok(ApiResponse.success(result));
     }

@@ -15,11 +15,6 @@ public interface StoreRepository extends JpaRepository<Store, String> {
 
     Page<Store> findByStateIgnoreCase(String state, Pageable pageable);
 
-    @Query("SELECT s FROM Store s WHERE " +
-            "(:city IS NULL OR LOWER(s.city) = LOWER(:city)) AND " +
-            "(:state IS NULL OR LOWER(s.state) = LOWER(:state))")
-    Page<Store> findWithFilters(
-            @Param("city") String city,
-            @Param("state") String state,
-            Pageable pageable);
+    @Query("SELECT s FROM Store s")
+    Page<Store> findWithFilters(Pageable pageable);
 }

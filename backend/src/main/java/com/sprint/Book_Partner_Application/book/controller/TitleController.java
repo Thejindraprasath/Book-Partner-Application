@@ -36,15 +36,11 @@ public class TitleController {
     // GET ALL
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<TitleResponse>>> getAllTitles(
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String pubId,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice,
             Pageable pageable) {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Titles fetched",
-                        titleService.getAllTitles(type, pubId, minPrice, maxPrice, pageable))
+                        titleService.getAllTitles(pageable))
         );
     }
 

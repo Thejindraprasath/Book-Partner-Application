@@ -1,0 +1,51 @@
+@if (pageNumber() !== null && totalPages() !== null) {
+<div class="rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm">
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div class="text-sm text-slate-600">
+      Page <span class="font-semibold text-slate-950">{{ pageNumber()! + 1 }}</span>
+      of <span class="font-semibold text-slate-950">{{ totalPages() }}</span>
+      @if (totalElements() !== null) {
+      <span class="ml-2 text-slate-400">Total records: {{ totalElements() }}</span>
+      }
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        (click)="previousPage.emit()"
+        [disabled]="isFirstPage() || disabled()"
+        class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        Previous
+      </button>
+
+      @for (page of visiblePages(); track $index) {
+      @if (page === 'ellipsis') {
+      <span class="px-2 text-sm font-semibold text-slate-400">...</span>
+      } @else {
+      <button
+        type="button"
+        (click)="selectPage(page)"
+        [disabled]="disabled()"
+        [class.bg-slate-950]="page === pageNumber()"
+        [class.text-white]="page === pageNumber()"
+        [class.border-slate-950]="page === pageNumber()"
+        class="min-w-10 rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {{ page + 1 }}
+      </button>
+      }
+      }
+
+      <button
+        type="button"
+        (click)="nextPage.emit()"
+        [disabled]="isLastPage() || disabled()"
+        class="rounded-xl bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>
+}

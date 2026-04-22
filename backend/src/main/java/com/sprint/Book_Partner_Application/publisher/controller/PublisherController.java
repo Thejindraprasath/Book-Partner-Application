@@ -41,14 +41,10 @@ public class PublisherController {
 
     // ───────────── GET ALL ─────────────
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<PublisherResponse>>> getAllPublishers(
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) String state,
-            @RequestParam(required = false) String country,
-            @PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<ApiResponse<PageResponse<PublisherResponse>>> getAllPublishers(@PageableDefault(size = 10) Pageable pageable) {
 
         PageResponse<PublisherResponse> response =
-                publisherService.getAllPublishers(city, state, country, pageable);
+                publisherService.getAllPublishers(pageable);
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }

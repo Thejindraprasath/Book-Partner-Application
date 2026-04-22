@@ -72,15 +72,11 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<PublisherResponse> getAllPublishers(
-            String city,
-            String state,
-            String country,
-            Pageable pageable) {
+    public PageResponse<PublisherResponse> getAllPublishers(Pageable pageable) {
 
         return PageResponse.from(
                 publisherRepository
-                        .findWithFilters(city, state, country, pageable)
+                        .findWithFilters(pageable)
                         .map(this::mapToResponse)
         );
     }

@@ -19,6 +19,7 @@ public interface TitleRepository extends JpaRepository<Title, String> {
 
     Page<Title> findByPriceBetween(Double minPrice, Double maxPrice, Pageable pageable);
 
+    @Query("SELECT t FROM Title t")
     Page<Title> findWithFilters(
             Pageable pageable);
 

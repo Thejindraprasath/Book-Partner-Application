@@ -66,12 +66,11 @@ public class EmployeeController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<EmployeeResponse>>> getAllEmployees(
-            @RequestParam(required = false) String pubId,
-            @RequestParam(required = false) Short jobId,
+           
             @PageableDefault(size = 10) Pageable pageable) {
 
         PageResponse<EmployeeResponse> response =
-                employeeService.getAllEmployees(pubId, jobId, pageable);
+                employeeService.getAllEmployees( pageable);
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }

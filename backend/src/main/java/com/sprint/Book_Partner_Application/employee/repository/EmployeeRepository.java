@@ -4,8 +4,7 @@ import com.sprint.Book_Partner_Application.employee.entity.Employee;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,13 +18,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, String> {
 
     Page<Employee> findByPublisher_PubId(String pubId, Pageable pageable);
 
-    @Query("SELECT e FROM Employee e WHERE " +
-            "(:pubId IS NULL OR e.publisher.pubId = :pubId) AND " +
-            "(:jobId IS NULL OR e.job.jobId = :jobId)")
-    Page<Employee> findWithFilters(
-            @Param("pubId") String pubId,
-            @Param("jobId") Short jobId,
-            Pageable pageable);
+   
+    Page<Employee> findWithFilters( Pageable pageable);
 
     List<Employee> findByLnameContainingIgnoreCaseOrFnameContainingIgnoreCase(String lname, String fname);
     boolean existsByPublisher_PubId(String pubId);

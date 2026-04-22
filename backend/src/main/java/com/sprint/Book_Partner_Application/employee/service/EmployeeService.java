@@ -24,7 +24,7 @@ public interface EmployeeService {
     // ───────────── EMPLOYEE ─────────────
     EmployeeResponse createEmployee(EmployeeCreateRequest request);
 
-    PageResponse<EmployeeResponse> getAllEmployees(String pubId, Short jobId, Pageable pageable);
+    PageResponse<EmployeeResponse> getAllEmployees( Pageable pageable);
 
     EmployeeResponse getEmployeeById(String empId);
 

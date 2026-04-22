@@ -68,12 +68,9 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public PageResponse<StoreResponse> getAllStores(Pageable pageable) {
-        if (state != null && state.length() != 2) {
-            throw new InvalidStateCodeException(state);
-        }
 
         return PageResponse.from(
-                storeRepository.findWithFilters(city, state, pageable)
+                storeRepository.findWithFilters(pageable)
                         .map(this::mapToResponse)
         );
     }

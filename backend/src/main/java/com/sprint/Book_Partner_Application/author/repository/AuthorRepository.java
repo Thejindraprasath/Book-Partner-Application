@@ -21,15 +21,8 @@ public interface AuthorRepository extends JpaRepository<Author, String> {
 
     Page<Author> findByContract(int contract, Pageable pageable);
 
-    @Query("SELECT a FROM Author a WHERE " +
-            "(:city IS NULL OR LOWER(a.city) = LOWER(:city)) AND " +
-            "(:state IS NULL OR LOWER(a.state) = LOWER(:state)) AND " +
-            "(:contract IS NULL OR a.contract = :contract)")
-    Page<Author> findWithFilters(
-            @Param("city") String city,
-            @Param("state") String state,
-            @Param("contract") Integer contract,
-            Pageable pageable);
+    @Query("SELECT a FROM Author a")
+    Page<Author> findWithFilters(Pageable pageable);
 
     List<Author> findByAuLnameContainingIgnoreCaseOrAuFnameContainingIgnoreCase(String lname, String fname);
 }

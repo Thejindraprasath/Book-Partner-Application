@@ -8,6 +8,7 @@ export const sanjaiRoutes: Routes = [
     loadComponent: () =>
       import('./pages/sanjai-page/sanjai-page').then((m) => m.SanjaiPage),
   },
+  // Publisher endpoints live under /sanjai/publishers.
   {
     path: 'publishers',
     canActivate: [roleGuard],
@@ -15,6 +16,7 @@ export const sanjaiRoutes: Routes = [
     loadChildren: () =>
       import('../publishers/publishers.routes').then((m) => m.publishersRoutes),
   },
+  // Employee endpoints live under /sanjai/employees.
   {
     path: 'employees',
     canActivate: [roleGuard],

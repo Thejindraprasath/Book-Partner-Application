@@ -16,6 +16,7 @@ import com.sprint.Book_Partner_Application.publisher.exception.PublisherNotFound
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -70,12 +70,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<JobResponse> responseList = new ArrayList<>();
 
         for (Job j : jobs) {
-            JobResponse res = mapJobToResponse(j);
-            responseList.add(res);
+            responseList.add(mapJobToResponse(j));
         }
 
         return responseList;
     }
+
     @Override
     @Transactional(readOnly = true)
     public JobResponse getJobById(Short jobId) {
@@ -100,7 +100,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             );
         }
 
-        employeeRepository.findByJob_JobId(jobId).forEach(emp -> {
+        List<Employee> employees = employeeRepository.findByJob_JobId(jobId);
+
+        for (Employee emp : employees) {
             if (emp.getJobLvl() < request.getMinLvl()
                     || emp.getJobLvl() > request.getMaxLvl()) {
 
@@ -111,7 +113,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                         request.getMaxLvl()
                 );
             }
-        });
+        }
 
         job.setJobDesc(request.getJobDesc());
         job.setMinLvl(request.getMinLvl());
@@ -169,15 +171,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<EmployeeResponse> getAllEmployees( Pageable pageable) {
+    public PageResponse<EmployeeResponse> getAllEmployees(Pageable pageable) {
 
-        
+        Page<Employee> page = employeeRepository.findWithFilters(pageable);
 
-        return PageResponse.from(
-                employeeRepository
-                        .findWithFilters( pageable)
-                        .map(this::mapEmpToResponse)
-        );
+        List<EmployeeResponse> responseList = new ArrayList<>();
+
+        for (Employee e : page.getContent()) {
+            responseList.add(mapEmpToResponse(e));
+        }
+
+        return PageResponse.from(page, responseList);
     }
 
     @Override
@@ -254,8 +258,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<EmployeeResponse> responseList = new ArrayList<>();
 
         for (Employee e : employees) {
-            EmployeeResponse res = mapEmpToResponse(e);
-            responseList.add(res);
+            responseList.add(mapEmpToResponse(e));
         }
 
         return responseList;

@@ -37,7 +37,13 @@ public class JobRepositoryTest {
     @Test
     void testDeleteJob() {
 
-        Job job = jobRepository.findAll().stream().findFirst().orElse(null);
+        List<Job> jobs = jobRepository.findAll();
+        Job job = null;
+
+        for (Job j : jobs) {
+            job = j;
+            break; // get first element
+        }
 
         if (job != null) {
             jobRepository.deleteById(job.getJobId());

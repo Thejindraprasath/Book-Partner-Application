@@ -28,7 +28,7 @@ public class EmployeeRepositoryTest {
     @Test
     void testCreateEmployee() {
 
-        // ✅ Create Publisher
+        // Create Publisher
         Publisher publisher = new Publisher();
         publisher.setPubId("0736");
         publisher.setPubName("XYZ Publishers");
@@ -38,7 +38,7 @@ public class EmployeeRepositoryTest {
 
         publisherRepository.save(publisher);
 
-        // ✅ Create Job
+        // Create Job
         Job job = new Job();
         job.setJobDesc("Tester");
         job.setMinLvl(50);
@@ -46,7 +46,7 @@ public class EmployeeRepositoryTest {
 
         Job savedJob = jobRepository.save(job);
 
-        // ✅ Create Employee
+        // Create Employee
         Employee emp = new Employee();
         emp.setEmpId("ABC12345M");
         emp.setFname("Sanjai");
@@ -71,7 +71,14 @@ public class EmployeeRepositoryTest {
 
     @Test
     void testFindByJob() {
-        Job job = jobRepository.findAll().stream().findFirst().orElse(null);
+
+        List<Job> jobs = jobRepository.findAll();
+        Job job = null;
+
+        for (Job j : jobs) {
+            job = j;
+            break;
+        }
 
         if (job != null) {
             List<Employee> list = employeeRepository.findByJob_JobId(job.getJobId());
@@ -81,7 +88,14 @@ public class EmployeeRepositoryTest {
 
     @Test
     void testDeleteEmployee() {
-        Employee emp = employeeRepository.findAll().stream().findFirst().orElse(null);
+
+        List<Employee> employees = employeeRepository.findAll();
+        Employee emp = null;
+
+        for (Employee e : employees) {
+            emp = e;
+            break;
+        }
 
         if (emp != null) {
             employeeRepository.deleteById(emp.getEmpId());

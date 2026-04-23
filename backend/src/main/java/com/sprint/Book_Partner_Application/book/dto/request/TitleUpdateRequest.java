@@ -1,18 +1,36 @@
 package com.sprint.Book_Partner_Application.book.dto.request;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 public class TitleUpdateRequest {
     private String title;
+
     private String type;
+
     private String pubId;
+
+    @Positive(message = "Price must be greater than 0")
     private Double price;
+
+    @Positive(message = "Advance must be greater than 0")
     private Double advance;
+
+    @Min(value = 0, message = "Royalty cannot be less than 0")
+    @Max(value = 100, message = "Royalty cannot exceed 100")
     private Integer royalty;
+
+    @Min(value = 0, message = "YTD Sales cannot be negative")
     private Integer ytdSales;
+
+    @Size(max = 200, message = "Notes must not exceed 200 characters")
     private String notes;
+
     private LocalDateTime pubdate;
 
     public TitleUpdateRequest() {

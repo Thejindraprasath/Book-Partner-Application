@@ -4,10 +4,12 @@ import com.sprint.Book_Partner_Application.book.dto.response.TitleResponse;
 import com.sprint.Book_Partner_Application.book.entity.Title;
 import com.sprint.Book_Partner_Application.book.repository.TitleRepository;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
+import com.sprint.Book_Partner_Application.employee.dto.response.EmployeeResponse;
 import com.sprint.Book_Partner_Application.employee.entity.Employee;
 import com.sprint.Book_Partner_Application.employee.repository.EmployeeRepository;
 import com.sprint.Book_Partner_Application.publisher.dto.request.PublisherCreateRequest;
 import com.sprint.Book_Partner_Application.publisher.dto.request.PublisherUpdateRequest;
+import com.sprint.Book_Partner_Application.publisher.dto.response.PublisherResponse;
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import com.sprint.Book_Partner_Application.publisher.exception.*;
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
@@ -65,7 +67,7 @@ class PublisherServiceTest {
         req.setPubId("1389");
         req.setPubName("Test Pub");
 
-        var response = publisherService.createPublisher(req);
+        PublisherResponse response = publisherService.createPublisher(req);
 
         assertEquals("1389", response.getPubId());
     }
@@ -74,20 +76,24 @@ class PublisherServiceTest {
     void getPublisher_success() {
         when(publisherRepository.findById("1389")).thenReturn(Optional.of(publisher));
 
-        var response = publisherService.getPublisherById("1389");
+        PublisherResponse response = publisherService.getPublisherById("1389");
 
         assertEquals("Test Pub", response.getPubName());
     }
 
     @Test
     void getAllPublishers_success() {
-        Page<Publisher> page = new PageImpl<>(List.of(publisher));
 
-        when(publisherRepository.findWithFilters(any(), any(), any(), any()))
+        List<Publisher> list = new ArrayList<>();
+        list.add(publisher);
+
+        Page<Publisher> page = new PageImpl<>(list);
+
+        when(publisherRepository.findWithFilters(any()))
                 .thenReturn(page);
 
-        PageResponse<?> response =
-                publisherService.getAllPublishers(null, null, null, Pageable.unpaged());
+        PageResponse<PublisherResponse> response =
+                publisherService.getAllPublishers(Pageable.unpaged());
 
         assertEquals(1, response.getTotalElements());
     }
@@ -100,7 +106,7 @@ class PublisherServiceTest {
         PublisherUpdateRequest req = new PublisherUpdateRequest();
         req.setPubName("Updated");
 
-        var response = publisherService.updatePublisher("1389", req);
+        PublisherResponse response = publisherService.updatePublisher("1389", req);
 
         assertEquals("Updated", response.getPubName());
     }
@@ -108,7 +114,7 @@ class PublisherServiceTest {
     @Test
     void deletePublisher_success() {
         when(publisherRepository.findById("1389")).thenReturn(Optional.of(publisher));
-        when(employeeRepository.findByPublisher_PubId("1389")).thenReturn(Collections.emptyList());
+        when(employeeRepository.findByPublisher_PubId("1389")).thenReturn(new ArrayList<Employee>());
         when(titleRepository.findByPublisher_PubId(eq("1389"), any()))
                 .thenReturn(Page.empty());
 
@@ -119,31 +125,39 @@ class PublisherServiceTest {
 
     @Test
     void getEmployeesByPartner_success() {
+
         Employee emp = new Employee();
         emp.setEmpId("E1");
         emp.setPublisher(publisher);
 
+        List<Employee> list = new ArrayList<>();
+        list.add(emp);
+
         when(publisherRepository.findById("1389")).thenReturn(Optional.of(publisher));
-        when(employeeRepository.findByPublisher_PubId("1389")).thenReturn(List.of(emp));
+        when(employeeRepository.findByPublisher_PubId("1389")).thenReturn(list);
 
-        var list = publisherService.getEmployeesByPublisher("1389");
+        List<EmployeeResponse> result = publisherService.getEmployeesByPublisher("1389");
 
-        assertEquals(1, list.size());
+        assertEquals(1, result.size());
     }
 
     @Test
     void getProductsByPartner_success() {
+
         Title title = new Title();
         title.setTitleId("T1");
         title.setPublisher(publisher);
 
+        List<Title> list = new ArrayList<>();
+        list.add(title);
+
         when(publisherRepository.findById("1389")).thenReturn(Optional.of(publisher));
         when(titleRepository.findByPublisher_PubId(eq("1389"), any()))
-                .thenReturn(new PageImpl<>(List.of(title)));
+                .thenReturn(new PageImpl<>(list));
 
-        List<TitleResponse> list = publisherService.getProductsByPublisher("1389");
+        List<TitleResponse> result = publisherService.getProductsByPublisher("1389");
 
-        assertEquals(1, list.size());
+        assertEquals(1, result.size());
     }
 
     // ================= NEGATIVE =================
@@ -197,8 +211,12 @@ class PublisherServiceTest {
     @Test
     void deletePublisher_hasEmployees() {
         when(publisherRepository.findById("1389")).thenReturn(Optional.of(publisher));
+
+        List<Employee> list = new ArrayList<>();
+        list.add(new Employee());
+
         when(employeeRepository.findByPublisher_PubId("1389"))
-                .thenReturn(List.of(new Employee()));
+                .thenReturn(list);
 
         assertThrows(PublisherHasActiveEmployeesException.class,
                 () -> publisherService.deletePublisher("1389"));
@@ -208,9 +226,13 @@ class PublisherServiceTest {
     void deletePublisher_hasTitles() {
         when(publisherRepository.findById("1389")).thenReturn(Optional.of(publisher));
         when(employeeRepository.findByPublisher_PubId("1389"))
-                .thenReturn(Collections.emptyList());
+                .thenReturn(new ArrayList<Employee>());
+
+        List<Title> list = new ArrayList<>();
+        list.add(new Title());
+
         when(titleRepository.findByPublisher_PubId(eq("1389"), any()))
-                .thenReturn(new PageImpl<>(List.of(new Title())));
+                .thenReturn(new PageImpl<>(list));
 
         assertThrows(PublisherHasActiveTitlesException.class,
                 () -> publisherService.deletePublisher("1389"));

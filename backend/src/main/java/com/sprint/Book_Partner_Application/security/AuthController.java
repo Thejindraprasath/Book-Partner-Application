@@ -1,5 +1,6 @@
 package com.sprint.Book_Partner_Application.security;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.core.Authentication;
@@ -14,11 +15,16 @@ public class AuthController {
 
     @GetMapping("/auth/me")
     public AuthUserResponse getCurrentUser(Authentication authentication) {
-        List<String> roles = authentication.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
 
+        // Store roles as String
+        List<String> roles = new ArrayList<>();
+
+        // Loop through authorities directly (no streams, no extra list)
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            roles.add(authority.getAuthority());
+        }
+
+        // Return response
         return new AuthUserResponse(authentication.getName(), roles, true);
     }
 }

@@ -13,6 +13,7 @@ import com.sprint.Book_Partner_Application.exception.InvalidOperationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.data.domain.Pageable;
 
 import org.springframework.data.domain.*;
 
@@ -120,7 +121,7 @@ class AuthorServiceTest {
     @Test
     void testGetAllAuthorsSuccess() {
         when(authorRepository.findWithFilters(any(Pageable.class)))
-                .thenReturn(new PageImpl<>(List.of(new Author())));
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(new Author())));
 
         assertNotNull(authorService.getAllAuthors(PageRequest.of(0, 10)));
     }

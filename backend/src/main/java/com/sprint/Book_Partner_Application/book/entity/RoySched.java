@@ -1,27 +1,44 @@
 package com.sprint.Book_Partner_Application.book.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "roysched")
 public class RoySched {
+
+    // ================= PRIMARY KEY =================
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "roysched_id")
     private Long roySchedId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "title_id")
+    // ================= RELATIONSHIP =================
+
+    /**
+     * Many royalty schedule entries can belong to one title.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "title_id", nullable = false)
+    @NotNull(message = "Title is required")
     private Title title;
 
-    @Column(name = "lorange")
+    @Column(name = "lorange", nullable = false)
+    @NotNull(message = "Lower range is required")
+    @Min(value = 0, message = "Lower range cannot be negative")
     private Integer lorange;
 
-    @Column(name = "hirange")
+    @Column(name = "hirange", nullable = false)
+    @NotNull(message = "Higher range is required")
+    @Min(value = 0, message = "Higher range cannot be negative")
     private Integer hirange;
 
     @Column(name = "royalty")
+    @Min(value = 0, message = "Royalty cannot be less than 0")
+    @Max(value = 100, message = "Royalty cannot exceed 100")
     private Integer royalty;
 
     // ================= CONSTRUCTORS =================
@@ -104,8 +121,9 @@ public class RoySched {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof RoySched that)) return false;
+        if (!(o instanceof RoySched)) return false;
 
+        RoySched that = (RoySched) o;
         return roySchedId != null && roySchedId.equals(that.roySchedId);
     }
 
@@ -113,6 +131,7 @@ public class RoySched {
 
     @Override
     public int hashCode() {
+
         return roySchedId != null ? roySchedId.hashCode() : 0;
     }
 }

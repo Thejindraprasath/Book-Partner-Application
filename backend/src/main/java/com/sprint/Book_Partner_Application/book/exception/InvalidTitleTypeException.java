@@ -4,6 +4,9 @@ import com.sprint.Book_Partner_Application.exception.BusinessValidationException
 
 import java.util.Set;
 
+/**
+ * Thrown when the given title type is not one of the allowed values.
+ */
 public class InvalidTitleTypeException extends BusinessValidationException {
 
     public static final Set<String> VALID_TYPES = Set.of(
@@ -16,6 +19,6 @@ public class InvalidTitleTypeException extends BusinessValidationException {
     );
 
     public InvalidTitleTypeException(String type) {
-        super("type", "invalid value '" + type + "'. Allowed: " + VALID_TYPES);
+        super("type", "invalid value '" + type + "'. Allowed values are: " + VALID_TYPES);
     }
 }

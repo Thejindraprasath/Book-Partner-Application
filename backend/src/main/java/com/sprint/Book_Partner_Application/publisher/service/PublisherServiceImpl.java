@@ -50,7 +50,7 @@ public class PublisherServiceImpl implements PublisherService {
         }
 
         boolean isStandard = STANDARD_PUB_IDS.contains(request.getPubId());
-        boolean isNinetyNineX = request.getPubId().matches("^99[0-9]{2}$");
+        boolean isNinetyNineX = request.getPubId().matches("^99[0-9]{2}$+");
 
         if (!isStandard && !isNinetyNineX) {
             throw new InvalidPublisherIdException(request.getPubId());

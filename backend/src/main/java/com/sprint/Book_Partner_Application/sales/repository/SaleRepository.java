@@ -18,8 +18,6 @@ public interface SaleRepository extends JpaRepository<Sale, Sale.SaleId> {
 
     List<Sale> findByTitleId(String titleId);
 
-    Page<Sale> findByStorId(String storId, Pageable pageable);
-
     @Query("SELECT s FROM Sale s WHERE s.ordDate BETWEEN :from AND :to")
     List<Sale> findByDateRange(
             @Param("from") LocalDateTime from,
@@ -30,8 +28,4 @@ public interface SaleRepository extends JpaRepository<Sale, Sale.SaleId> {
             @Param("storId") String storId,
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to);
-
-    boolean existsByStorId(String storId);
-
-//    void deleteById(String id);
 }

@@ -18,6 +18,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
@@ -156,6 +158,21 @@ class EmployeeServiceTest {
         verify(employeeRepository).delete(employee);
     }
 
+    @Test
+    void getAllEmployees_success() {
+        List<Employee> list = new ArrayList<>();
+        list.add(employee);
+
+        Page<Employee> page = new PageImpl<>(list);
+
+        when(employeeRepository.findWithFilters(any())).thenReturn(page);
+
+        var res = employeeService.getAllEmployees(Pageable.unpaged());
+
+        assertNotNull(res);
+        assertEquals(1, res.getContent().size());
+    }
+
     // ================= NEGATIVE =================
 
     @Test
@@ -278,22 +295,5 @@ class EmployeeServiceTest {
 
         assertThrows(PublisherNotFoundException.class,
                 () -> employeeService.getEmployeesByPublisher("9999"));
-    }
-
-    @Test
-    void getAllEmployees_invalidPublisher() {
-        when(publisherRepository.existsById("9999")).thenReturn(false);
-
-        assertThrows(PublisherNotFoundException.class,
-                () -> employeeService.getAllEmployees("9999", null, Pageable.unpaged()));
-    }
-
-    @Test
-    void getAllEmployees_invalidJob() {
-        when(publisherRepository.existsById("1389")).thenReturn(true);
-        when(jobRepository.existsById((short) 5)).thenReturn(false);
-
-        assertThrows(JobNotFoundException.class,
-                () -> employeeService.getAllEmployees("1389", (short) 5, Pageable.unpaged()));
     }
 }

@@ -8,6 +8,8 @@ import java.util.List;
 
 @Repository
 public interface RoySchedRepository extends JpaRepository<RoySched, Long> {
+
     List<RoySched> findByTitle_TitleId(String titleId);
+
     void deleteByTitle_TitleId(String titleId);
 }

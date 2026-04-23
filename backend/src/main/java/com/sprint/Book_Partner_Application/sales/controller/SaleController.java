@@ -47,9 +47,7 @@ public class SaleController {
             @RequestParam(defaultValue = "ordDate") String sortBy,
             @RequestParam(defaultValue = "desc") String direction) {
 
-        Sort sort = direction.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+        Sort sort = Sort.by(sortBy).descending();
 
         Pageable pageable = PageRequest.of(page, size, sort);
 

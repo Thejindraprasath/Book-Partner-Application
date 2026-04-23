@@ -23,7 +23,7 @@ public class StoreController {
     private StoreService storeService;
 
     // ================= STORES =================
-
+    // create store
     @PostMapping("/stores")
     public ResponseEntity<ApiResponse<StoreResponse>> createStore(
             @Valid @RequestBody StoreCreateRequest request) {
@@ -35,6 +35,7 @@ public class StoreController {
                 ));
     }
 
+    //get all the stores
     @GetMapping("/stores")
     public ResponseEntity<ApiResponse<PageResponse<StoreResponse>>> getAllStores(
             @RequestParam(defaultValue = "0") int page,
@@ -56,6 +57,7 @@ public class StoreController {
         );
     }
 
+    // get the store by using store id
     @GetMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponse<StoreResponse>> getStoreById(
             @PathVariable String storeId) {
@@ -68,6 +70,7 @@ public class StoreController {
         );
     }
 
+    //update the store
     @PutMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponse<StoreResponse>> updateStore(
             @PathVariable String storeId,
@@ -81,6 +84,7 @@ public class StoreController {
         );
     }
 
+    //delete the store by using store id
     @DeleteMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponse<Void>> deleteStore(
             @PathVariable String storeId) {
@@ -104,6 +108,7 @@ public class StoreController {
         );
     }
 
+    //get the discount by using store id
     @GetMapping("/stores/{storeId}/discounts")
     public ResponseEntity<ApiResponse<List<DiscountResponse>>> getDiscountsByBranch(
             @PathVariable String storeId) {
@@ -117,7 +122,7 @@ public class StoreController {
     }
 
     // ================= DISCOUNTS =================
-
+    //create the discount
     @PostMapping("/discounts")
     public ResponseEntity<ApiResponse<DiscountResponse>> createDiscount(
             @Valid @RequestBody DiscountCreateRequest request) {
@@ -129,6 +134,7 @@ public class StoreController {
                 ));
     }
 
+    //get all the discounts
     @GetMapping("/discounts")
     public ResponseEntity<ApiResponse<List<DiscountResponse>>> getAllDiscounts() {
 
@@ -140,6 +146,7 @@ public class StoreController {
         );
     }
 
+    //get the discount by using discount type
     @GetMapping("/discounts/{discountType}")
     public ResponseEntity<ApiResponse<DiscountResponse>> getDiscountByType(
             @PathVariable String discountType) {
@@ -152,6 +159,7 @@ public class StoreController {
         );
     }
 
+    //get the discounts by using store id
     @GetMapping("/discounts/branch/{storeId}")
     public ResponseEntity<ApiResponse<List<DiscountResponse>>> getDiscountsByBranchId(
             @PathVariable String storeId) {
@@ -164,6 +172,7 @@ public class StoreController {
         );
     }
 
+    //update the discount
     @PutMapping("/discounts/{discountId}")
     public ResponseEntity<ApiResponse<DiscountResponse>> updateDiscount(
             @PathVariable Long discountId,

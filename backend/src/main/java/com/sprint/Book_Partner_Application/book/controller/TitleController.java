@@ -8,9 +8,9 @@ import com.sprint.Book_Partner_Application.dto.ApiResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/titles")
 public class TitleController {
 
-    // Constructor Injection (Best Practice)
     private final TitleService titleService;
 
     public TitleController(TitleService titleService) {
@@ -31,18 +30,28 @@ public class TitleController {
             @Valid @RequestBody TitleCreateRequest request) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Title created",
+                .body(ApiResponse.success("Title created successfully",
                         titleService.createTitle(request)));
     }
 
-    // ================= GET ALL =================
+    // ================= GET ALL WITH PAGINATION =================
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<TitleResponse>>> getAllTitles(
-            Pageable pageable) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        PageResponse<TitleResponse> result = titleService.getAllTitles(pageable);
 
         return ResponseEntity.ok(
-                ApiResponse.success("Titles fetched",
-                        titleService.getAllTitles(pageable))
+                ApiResponse.success("Titles fetched successfully", result)
         );
     }
 
@@ -51,7 +60,7 @@ public class TitleController {
     public ResponseEntity<ApiResponse<TitleResponse>> getTitleById(@PathVariable String id) {
 
         return ResponseEntity.ok(
-                ApiResponse.success("Title fetched",
+                ApiResponse.success("Title fetched successfully",
                         titleService.getTitleById(id))
         );
     }
@@ -60,10 +69,10 @@ public class TitleController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<TitleResponse>> updateTitle(
             @PathVariable String id,
-            @RequestBody TitleUpdateRequest request) {
+            @Valid @RequestBody TitleUpdateRequest request) {
 
         return ResponseEntity.ok(
-                ApiResponse.success("Title updated",
+                ApiResponse.success("Title updated successfully",
                         titleService.updateTitle(id, request))
         );
     }
@@ -75,6 +84,6 @@ public class TitleController {
         titleService.deleteTitle(id);
 
         return ResponseEntity.ok(
-                ApiResponse.successMessage("Title deleted"));
+                ApiResponse.successMessage("Title deleted successfully"));
     }
 }

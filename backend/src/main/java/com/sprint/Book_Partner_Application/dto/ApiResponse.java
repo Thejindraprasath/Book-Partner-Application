@@ -64,20 +64,4 @@ public class ApiResponse<T> {
                 LocalDateTime.now()
         );
     }
-
-    // ================= FAILURE =================
-
-    public static <T> ApiResponse<T> failure(String message, Object errors) {
-        return new ApiResponse<>(
-                false,
-                message,
-                null,
-                errors,
-                LocalDateTime.now()
-        );
-    }
-
-    public static <T> ApiResponse<T> failure(String message) {
-        return failure(message, null);
-    }
 }

@@ -4,27 +4,28 @@ import com.sprint.Book_Partner_Application.book.dto.request.TitleCreateRequest;
 import com.sprint.Book_Partner_Application.book.dto.request.TitleUpdateRequest;
 import com.sprint.Book_Partner_Application.book.dto.response.TitleResponse;
 import com.sprint.Book_Partner_Application.book.service.TitleService;
-
-
 import com.sprint.Book_Partner_Application.dto.ApiResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/titles")
 public class TitleController {
 
-    @Autowired
-    private TitleService titleService;
+    // Constructor Injection (Best Practice)
+    private final TitleService titleService;
 
-    // CREATE
+    public TitleController(TitleService titleService) {
+        this.titleService = titleService;
+    }
+
+    // ================= CREATE =================
     @PostMapping
     public ResponseEntity<ApiResponse<TitleResponse>> createTitle(
             @Valid @RequestBody TitleCreateRequest request) {
@@ -34,7 +35,7 @@ public class TitleController {
                         titleService.createTitle(request)));
     }
 
-    // GET ALL
+    // ================= GET ALL =================
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<TitleResponse>>> getAllTitles(
             Pageable pageable) {
@@ -45,7 +46,7 @@ public class TitleController {
         );
     }
 
-    // GET BY ID
+    // ================= GET BY ID =================
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<TitleResponse>> getTitleById(@PathVariable String id) {
 
@@ -55,7 +56,7 @@ public class TitleController {
         );
     }
 
-    // UPDATE
+    // ================= UPDATE =================
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<TitleResponse>> updateTitle(
             @PathVariable String id,
@@ -67,7 +68,7 @@ public class TitleController {
         );
     }
 
-    // DELETE
+    // ================= DELETE =================
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteTitle(@PathVariable String id) {
 

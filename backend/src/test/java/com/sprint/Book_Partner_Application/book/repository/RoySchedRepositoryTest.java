@@ -6,6 +6,7 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
@@ -15,9 +16,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Repository test class for RoySchedRepository.
+ */
 @DataJpaTest
 @ActiveProfiles("test")
-@Import(org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration.class)
+@Import(ValidationAutoConfiguration.class)
 class RoySchedRepositoryTest {
 
     @Autowired
@@ -37,17 +41,15 @@ class RoySchedRepositoryTest {
         Title title = new Title();
         title.setTitleId("T001");
         title.setTitle("Test Book");
-        title.setType("Fiction");
+        title.setType("business");
         title.setPubdate(LocalDateTime.now());
 
-        savedTitle = titleRepository.save(title);
+        savedTitle = titleRepository.saveAndFlush(title);
     }
 
     // ================= HELPER =================
     private RoySched createAndFlush() {
-
         RoySched roy = new RoySched();
-
         roy.setTitle(savedTitle);
         roy.setLorange(100);
         roy.setHirange(200);
@@ -70,12 +72,12 @@ class RoySchedRepositoryTest {
     void testRead() {
         RoySched roy = createAndFlush();
 
-        RoySched found = roySchedRepository
-                .findById(roy.getRoySchedId())
-                .orElse(null);
+        RoySched found = roySchedRepository.findById(roy.getRoySchedId()).orElse(null);
 
         assertNotNull(found);
         assertEquals(100, found.getLorange());
+        assertEquals(200, found.getHirange());
+        assertEquals(10, found.getRoyalty());
     }
 
     // ================= UPDATE =================
@@ -84,7 +86,7 @@ class RoySchedRepositoryTest {
         RoySched roy = createAndFlush();
 
         roy.setRoyalty(20);
-        RoySched updated = roySchedRepository.save(roy);
+        RoySched updated = roySchedRepository.saveAndFlush(roy);
 
         assertEquals(20, updated.getRoyalty());
     }
@@ -96,9 +98,7 @@ class RoySchedRepositoryTest {
 
         roySchedRepository.deleteById(roy.getRoySchedId());
 
-        assertFalse(
-                roySchedRepository.findById(roy.getRoySchedId()).isPresent()
-        );
+        assertFalse(roySchedRepository.findById(roy.getRoySchedId()).isPresent());
     }
 
     // ================= FIND ALL =================
@@ -111,13 +111,35 @@ class RoySchedRepositoryTest {
         assertFalse(list.isEmpty());
     }
 
+    // ================= FIND BY TITLE ID =================
+    @Test
+    void testFindByTitleTitleId() {
+        createAndFlush();
+
+        List<RoySched> list = roySchedRepository.findByTitle_TitleId("T001");
+
+        assertFalse(list.isEmpty());
+        assertEquals("T001", list.get(0).getTitle().getTitleId());
+    }
+
+    // ================= DELETE BY TITLE ID =================
+    @Test
+    void testDeleteByTitleTitleId() {
+        createAndFlush();
+
+        roySchedRepository.deleteByTitle_TitleId("T001");
+
+        List<RoySched> list = roySchedRepository.findByTitle_TitleId("T001");
+        assertTrue(list.isEmpty());
+    }
+
     // ================= VALIDATION =================
     @Test
     void testValidationFail() {
-        RoySched roy = new RoySched(); // empty object
+        RoySched roy = new RoySched(); // missing required fields
 
         var violations = validator.validate(roy);
 
-        assertTrue(violations.isEmpty());
+        assertFalse(violations.isEmpty());
     }
 }

@@ -14,41 +14,62 @@ import java.util.List;
 @Table(name = "titles")
 public class Title {
 
+    // ================= PRIMARY KEY =================
+
     @Id
-    @Column(name = "title_id", length = 10)
+    @Column(name = "title_id", length = 10, nullable = false, unique = true)
     @NotBlank(message = "Title ID is required")
+    @Size(max = 10, message = "Title ID must not exceed 10 characters")
     private String titleId;
+
+    // ================= BASIC DETAILS =================
 
     @Column(name = "title", nullable = false, length = 80)
     @NotBlank(message = "Title is required")
+    @Size(max = 80, message = "Title must not exceed 80 characters")
     private String title;
 
     @Column(name = "type", nullable = false, length = 12)
     @NotBlank(message = "Type is required")
+    @Size(max = 12, message = "Type must not exceed 12 characters")
     private String type;
+
+    // ================= RELATIONSHIPS =================
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pub_id")
     private Publisher publisher;
 
+    // ================= NUMERIC FIELDS =================
+
     @Column(name = "price")
+    @Positive(message = "Price must be greater than 0")
     private Double price;
 
     @Column(name = "advance")
+    @PositiveOrZero(message = "Advance cannot be negative")
     private Double advance;
 
     @Column(name = "royalty")
+    @Min(value = 0, message = "Royalty cannot be less than 0")
+    @Max(value = 100, message = "Royalty cannot exceed 100")
     private Integer royalty;
 
     @Column(name = "ytd_sales")
+    @Min(value = 0, message = "YTD sales cannot be negative")
     private Integer ytdSales;
 
+    // ================= EXTRA DETAILS =================
+
     @Column(name = "notes", length = 200)
+    @Size(max = 200, message = "Notes must not exceed 200 characters")
     private String notes;
 
     @Column(name = "pubdate", nullable = false)
     @NotNull(message = "Publish date is required")
     private LocalDateTime pubdate;
+
+    // ================= CHILD RELATIONSHIPS =================
 
     @OneToMany(mappedBy = "title", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TitleAuthor> titleAuthors = new ArrayList<>();
@@ -213,9 +234,9 @@ public class Title {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Title title1)) return false;
-
-        return titleId != null && titleId.equals(title1.titleId);
+        if (!(o instanceof Title)) return false;
+        Title other = (Title) o;
+        return titleId != null && titleId.equals(other.titleId);
     }
 
     // ================= hashCode =================

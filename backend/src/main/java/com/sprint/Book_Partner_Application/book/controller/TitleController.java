@@ -7,6 +7,7 @@ import com.sprint.Book_Partner_Application.book.service.TitleService;
 import com.sprint.Book_Partner_Application.dto.ApiResponse;
 import com.sprint.Book_Partner_Application.dto.PageResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +19,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/titles")
 public class TitleController {
 
-    private final TitleService titleService;
+    @Autowired
+    private TitleService titleService;
 
     public TitleController(TitleService titleService) {
         this.titleService = titleService;

@@ -30,7 +30,7 @@ class AuthorRepositoryTest {
     @BeforeEach
     void setup() {
 
-        // FIRST AUTHOR (manual object creation)
+        // FIRST AUTHOR
         Author author1 = new Author();
         author1.setAuId("111-11-1111");
         author1.setAuFname("John");
@@ -95,16 +95,15 @@ class AuthorRepositoryTest {
     @Test
     void testFindWithFilters() {
         Page<Author> result = authorRepository.findWithFilters(
-                "Chennai", "TN", 1, PageRequest.of(0, 10));
+                PageRequest.of(0, 10));
 
         assertFalse(result.isEmpty());
-        assertEquals("Chennai", result.getContent().get(0).getCity());
     }
 
     @Test
     void testFindWithFilters_NullParams() {
         Page<Author> result = authorRepository.findWithFilters(
-                null, null, null, PageRequest.of(0, 10));
+                PageRequest.of(0, 10));
 
         assertFalse(result.isEmpty());
     }

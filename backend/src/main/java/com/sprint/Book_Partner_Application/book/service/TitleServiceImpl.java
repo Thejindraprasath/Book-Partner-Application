@@ -24,6 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service implementation for Title module.
+ * Handles business logic for titles and royalty schedules.
+ */
 @Service
 @Transactional
 public class TitleServiceImpl implements TitleService {
@@ -46,23 +50,14 @@ public class TitleServiceImpl implements TitleService {
         this.saleRepository = saleRepository;
     }
 
-    // ================= CREATE =================
+    // ================= CREATE TITLE =================
     @Override
     public TitleResponse createTitle(TitleCreateRequest request) {
 
         if (titleRepository.existsById(request.getTitleId()))
             throw new TitleAlreadyExistsException(request.getTitleId());
 
-        if (request.getType() != null &&
-                !InvalidTitleTypeException.VALID_TYPES.contains(request.getType()))
-            throw new InvalidTitleTypeException(request.getType());
-
-        if (request.getPrice() != null && request.getPrice() <= 0)
-            throw new InvalidPriceException(request.getPrice());
-
-        if (request.getRoyalty() != null &&
-                (request.getRoyalty() < 0 || request.getRoyalty() > 100))
-            throw new InvalidRoyaltyException(request.getRoyalty());
+        validateTitle(request.getType(), request.getPrice(), request.getRoyalty());
 
         Publisher publisher = null;
         if (request.getPubId() != null) {
@@ -82,28 +77,20 @@ public class TitleServiceImpl implements TitleService {
         title.setNotes(request.getNotes());
         title.setPubdate(request.getPubdate());
 
-        Title saved = titleRepository.save(title);
-
-        return mapToResponse(saved);
+        return mapToResponse(titleRepository.save(title));
     }
 
-    // ================= READ ALL =================
+    // ================= GET ALL =================
     @Override
     @Transactional(readOnly = true)
     public PageResponse<TitleResponse> getAllTitles(Pageable pageable) {
 
         Page<Title> page = titleRepository.findWithFilters(pageable);
 
-        List<TitleResponse> responseList = new ArrayList<>();
-
-        for (Title t : page.getContent()) {
-            responseList.add(mapToResponse(t));
-        }
-
         return PageResponse.from(page.map(this::mapToResponse));
     }
 
-    // ================= READ ONE =================
+    // ================= GET ONE =================
     @Override
     @Transactional(readOnly = true)
     public TitleResponse getTitleById(String titleId) {
@@ -121,16 +108,7 @@ public class TitleServiceImpl implements TitleService {
         Title title = titleRepository.findById(titleId)
                 .orElseThrow(() -> new TitleNotFoundException(titleId));
 
-        if (request.getType() != null &&
-                !InvalidTitleTypeException.VALID_TYPES.contains(request.getType()))
-            throw new InvalidTitleTypeException(request.getType());
-
-        if (request.getPrice() != null && request.getPrice() <= 0)
-            throw new InvalidPriceException(request.getPrice());
-
-        if (request.getRoyalty() != null &&
-                (request.getRoyalty() < 0 || request.getRoyalty() > 100))
-            throw new InvalidRoyaltyException(request.getRoyalty());
+        validateTitle(request.getType(), request.getPrice(), request.getRoyalty());
 
         if (request.getPubId() != null) {
             Publisher pub = publisherRepository.findById(request.getPubId())
@@ -157,13 +135,11 @@ public class TitleServiceImpl implements TitleService {
         Title title = titleRepository.findById(titleId)
                 .orElseThrow(() -> new TitleNotFoundException(titleId));
 
-        List<?> sales = saleRepository.findByTitleId(titleId);
-        if (!sales.isEmpty())
-            throw new TitleHasActiveSalesException(titleId, sales.size());
+        if (!saleRepository.findByTitleId(titleId).isEmpty())
+            throw new TitleHasActiveSalesException(titleId, 1);
 
-        List<TitleAuthor> links = titleAuthorRepository.findByTitleId(titleId);
-        if (!links.isEmpty())
-            throw new TitleHasActiveAuthorsException(titleId, links.size());
+        if (!titleAuthorRepository.findByTitleId(titleId).isEmpty())
+            throw new TitleHasActiveAuthorsException(titleId, 1);
 
         titleRepository.delete(title);
     }
@@ -179,9 +155,7 @@ public class TitleServiceImpl implements TitleService {
         List<AuthorResponse> result = new ArrayList<>();
 
         for (TitleAuthor ta : list) {
-
             if (ta.getAuthor() != null) {
-
                 var a = ta.getAuthor();
 
                 AuthorResponse res = new AuthorResponse();
@@ -211,36 +185,26 @@ public class TitleServiceImpl implements TitleService {
 
         validateRange(request.getLorange(), request.getHirange(), request.getTitleId(), null);
 
-        if (request.getRoyalty() != null &&
-                (request.getRoyalty() < 0 || request.getRoyalty() > 100))
-            throw new InvalidRoyaltyException(request.getRoyalty());
-
         RoySched rs = new RoySched();
         rs.setTitle(title);
         rs.setLorange(request.getLorange());
         rs.setHirange(request.getHirange());
         rs.setRoyalty(request.getRoyalty());
 
-        RoySched saved = roySchedRepository.save(rs);
-
-        return mapRoySchedToResponse(saved);
+        return mapRoySchedToResponse(roySchedRepository.save(rs));
     }
 
     // ================= UPDATE ROYSCHED =================
     @Override
-    public RoySchedResponse updateRoySched(Long roySchedId, RoySchedUpdateRequest request) {
+    public RoySchedResponse updateRoySched(Long id, RoySchedUpdateRequest request) {
 
-        RoySched rs = roySchedRepository.findById(roySchedId)
-                .orElseThrow(() -> new RoySchedNotFoundException(roySchedId));
+        RoySched rs = roySchedRepository.findById(id)
+                .orElseThrow(() -> new RoySchedNotFoundException(id));
 
-        int newLo = request.getLorange() != null ? request.getLorange() : rs.getLorange();
-        int newHi = request.getHirange() != null ? request.getHirange() : rs.getHirange();
+        Integer newLo = request.getLorange() != null ? request.getLorange() : rs.getLorange();
+        Integer newHi = request.getHirange() != null ? request.getHirange() : rs.getHirange();
 
-        validateRange(newLo, newHi, rs.getTitle().getTitleId(), roySchedId);
-
-        if (request.getRoyalty() != null &&
-                (request.getRoyalty() < 0 || request.getRoyalty() > 100))
-            throw new InvalidRoyaltyException(request.getRoyalty());
+        validateRange(newLo, newHi, rs.getTitle().getTitleId(), id);
 
         if (request.getLorange() != null) rs.setLorange(request.getLorange());
         if (request.getHirange() != null) rs.setHirange(request.getHirange());
@@ -250,6 +214,18 @@ public class TitleServiceImpl implements TitleService {
     }
 
     // ================= VALIDATION =================
+    private void validateTitle(String type, Double price, Integer royalty) {
+
+        if (type != null && !InvalidTitleTypeException.VALID_TYPES.contains(type))
+            throw new InvalidTitleTypeException(type);
+
+        if (price != null && price <= 0)
+            throw new InvalidPriceException(price);
+
+        if (royalty != null && (royalty < 0 || royalty > 100))
+            throw new InvalidRoyaltyException(royalty);
+    }
+
     private void validateRange(Integer lo, Integer hi, String titleId, Long currentId) {
 
         if (lo != null && hi != null) {
@@ -257,17 +233,12 @@ public class TitleServiceImpl implements TitleService {
             if (lo >= hi)
                 throw new InvalidRoySchedRangeException(lo, hi);
 
-            List<RoySched> list = roySchedRepository.findByTitle_TitleId(titleId);
+            for (RoySched e : roySchedRepository.findByTitle_TitleId(titleId)) {
 
-            for (RoySched e : list) {
+                if (e.getRoySchedId().equals(currentId)) continue;
 
-                if (e.getRoySchedId().equals(currentId)) {
-                    continue;
-                }
-
-                if (lo <= e.getHirange() && hi >= e.getLorange()) {
+                if (lo <= e.getHirange() && hi >= e.getLorange())
                     throw new RoySchedRangeOverlapException(titleId, lo, hi);
-                }
             }
         }
     }

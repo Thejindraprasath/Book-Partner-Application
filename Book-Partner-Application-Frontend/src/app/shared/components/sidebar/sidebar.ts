@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
@@ -6,31 +5,54 @@ import { filter, map, startWith } from 'rxjs';
 
 import { APP_MODULES, getEndpointsForModule } from '../../../config/api.config';
 import { SessionService } from '../../../core/auth/session.service';
+import { EndpointDefinition, ModuleDefinition } from '../../../models/module.model';
+
+interface SidebarSection {
+  label: string;
+  route: string;
+  endpoints: EndpointDefinition[];
+}
 
 @Component({
   selector: 'app-sidebar',
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
   private readonly sessionService = inject(SessionService);
   private readonly router = inject(Router);
+
   private readonly currentUrlSignal = toSignal(
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd),
       map((event) => event.urlAfterRedirects),
-      startWith(this.router.url)
+      startWith(this.router.url),
     ),
-    { initialValue: this.router.url }
+    { initialValue: this.router.url },
   );
 
-  readonly currentModule = computed(() => this.sessionService.currentModule());
   readonly homeRoute = '/';
-  readonly currentModuleDetails = computed(() =>
-    APP_MODULES.find((moduleItem) => moduleItem.id === this.currentModule())
-  );
-  readonly activeSanjaiSection = computed(() => {
+  readonly currentModuleId = computed(() => this.sessionService.currentModule());
+  readonly currentModuleDetails = computed(() => this.findCurrentModule());
+  readonly currentEndpoints = computed(() => this.getCurrentEndpoints());
+  readonly activeSanjaiSection = computed(() => this.getActiveSanjaiSection());
+
+  private findCurrentModule(): ModuleDefinition | undefined {
+    return APP_MODULES.find((moduleItem) => moduleItem.id === this.currentModuleId());
+  }
+
+  private getCurrentEndpoints(): EndpointDefinition[] {
+    const moduleId = this.currentModuleId();
+
+    if (!moduleId || moduleId === 'sanjai') {
+      return [];
+    }
+
+    return getEndpointsForModule(moduleId);
+  }
+
+  private getActiveSanjaiSection(): SidebarSection | null {
     const currentUrl = this.currentUrlSignal();
 
     if (currentUrl.startsWith('/sanjai/publishers')) {
@@ -50,35 +72,18 @@ export class Sidebar {
     }
 
     return null;
-  });
-  readonly currentEndpoints = computed(() => {
-    const moduleId = this.currentModule();
-    if (!moduleId) {
-      return [];
-    }
-
-    if (moduleId === 'sanjai') {
-      return [];
-    }
-
-    return getEndpointsForModule(moduleId);
-  });
+  }
 
   endpointRoute(moduleRoute: string, endpointRoute: string): string {
     return `${moduleRoute}/${endpointRoute}`;
   }
 
-  isRouteActiveOrInside(route: string): boolean {
-    const currentUrl = this.currentUrlSignal();
-
-    return currentUrl === route || currentUrl.startsWith(`${route}/`);
-  }
-
-  openRoute(route: string): string {
-    return route;
-  }
-
   isRouteActive(route: string): boolean {
     return this.currentUrlSignal() === route;
+  }
+
+  isRouteActiveOrInside(route: string): boolean {
+    const currentUrl = this.currentUrlSignal();
+    return currentUrl === route || currentUrl.startsWith(`${route}/`);
   }
 }

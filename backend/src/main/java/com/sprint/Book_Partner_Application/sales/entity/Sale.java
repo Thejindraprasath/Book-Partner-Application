@@ -137,7 +137,6 @@ public class Sale {
     }
 // ================= COMPOSITE KEY CLASS =================
 
-    @Data
     public static class SaleId implements Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -157,8 +156,32 @@ public class Sale {
             this.titleId = titleId;
         }
 
-        // IMPORTANT: Explicit equals and hashCode
+        // Getters and Setters
+        public String getStorId() {
+            return storId;
+        }
 
+        public void setStorId(String storId) {
+            this.storId = storId;
+        }
+
+        public String getOrdNum() {
+            return ordNum;
+        }
+
+        public void setOrdNum(String ordNum) {
+            this.ordNum = ordNum;
+        }
+
+        public String getTitleId() {
+            return titleId;
+        }
+
+        public void setTitleId(String titleId) {
+            this.titleId = titleId;
+        }
+
+        // equals()
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -169,9 +192,20 @@ public class Sale {
                     Objects.equals(titleId, that.titleId);
         }
 
+        // hashCode()
         @Override
         public int hashCode() {
             return Objects.hash(storId, ordNum, titleId);
+        }
+
+        // Optional: toString()
+        @Override
+        public String toString() {
+            return "SaleId{" +
+                    "storId='" + storId + '\'' +
+                    ", ordNum='" + ordNum + '\'' +
+                    ", titleId='" + titleId + '\'' +
+                    '}';
         }
     }
 }

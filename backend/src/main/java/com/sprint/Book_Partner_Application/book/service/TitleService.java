@@ -17,9 +17,7 @@ public interface TitleService {
 
     TitleResponse createTitle(TitleCreateRequest request);
 
-    PageResponse<TitleResponse> getAllTitles(
-            Pageable pageable
-    );
+    PageResponse<TitleResponse> getAllTitles(Pageable pageable);
 
     TitleResponse getTitleById(String titleId);
 

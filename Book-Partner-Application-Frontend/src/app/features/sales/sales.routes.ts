@@ -1,13 +1,22 @@
 import { Routes } from '@angular/router';
 
-import { getEndpointsForModule } from '../../config/api.config';
+import { SALES_ENDPOINTS, SALES_MODULE_ID, SALES_ROUTE } from './sales.data';
 
-const endpointRoutes: Routes = getEndpointsForModule('sales').map((endpoint) => ({
-  path: endpoint.route,
-  loadComponent: () =>
-    import('../../shared/components/endpoint-runner/endpoint-runner').then((m) => m.EndpointRunner),
-  data: { moduleId: 'sales', moduleRoute: '/sales', endpoint },
-}));
+const salesEndpointRunner = () =>
+  import('../../shared/components/endpoint-runner/endpoint-runner').then((m) => m.EndpointRunner);
+
+// We build one route per endpoint so every sales API screen has its own URL.
+const endpointRoutes: Routes = SALES_ENDPOINTS.map((endpoint) => {
+  return {
+    path: endpoint.route,
+    loadComponent: salesEndpointRunner,
+    data: {
+      moduleId: SALES_MODULE_ID,
+      moduleRoute: SALES_ROUTE,
+      endpoint,
+    },
+  };
+});
 
 export const salesRoutes: Routes = [
   {

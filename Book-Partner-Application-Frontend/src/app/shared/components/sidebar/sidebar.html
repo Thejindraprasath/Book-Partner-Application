@@ -12,7 +12,7 @@
 
   <nav class="flex flex-col gap-2">
     <a
-      [attr.href]="homeRoute"
+      [routerLink]="homeRoute"
       [class.bg-white]="isRouteActive(homeRoute)"
       [class.text-slate-950]="isRouteActive(homeRoute)"
       class="rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800"
@@ -21,7 +21,7 @@
     </a>
 
     <a
-      [attr.href]="moduleItem.route"
+      [routerLink]="moduleItem.route"
       [class.bg-white]="isRouteActive(moduleItem.route)"
       [class.text-slate-950]="isRouteActive(moduleItem.route)"
       class="rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800"
@@ -31,15 +31,16 @@
 
     @if (moduleItem.id === 'sanjai') {
     <a
-      href="/sanjai/publishers"
+      routerLink="/sanjai/publishers"
       [class.bg-white]="isRouteActiveOrInside('/sanjai/publishers')"
       [class.text-slate-950]="isRouteActiveOrInside('/sanjai/publishers')"
       class="rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800"
     >
       Publisher Module
     </a>
+
     <a
-      href="/sanjai/employees"
+      routerLink="/sanjai/employees"
       [class.bg-white]="isRouteActiveOrInside('/sanjai/employees')"
       [class.text-slate-950]="isRouteActiveOrInside('/sanjai/employees')"
       class="rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800"
@@ -53,7 +54,7 @@
       <div class="flex flex-col gap-2">
         @for (endpoint of section.endpoints; track endpoint.id) {
         <a
-          [attr.href]="endpointRoute(section.route, endpoint.route)"
+          [routerLink]="endpointRoute(section.route, endpoint.route)"
           [class.bg-white]="isRouteActive(endpointRoute(section.route, endpoint.route))"
           [class.text-slate-950]="isRouteActive(endpointRoute(section.route, endpoint.route))"
           class="rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800"
@@ -67,7 +68,7 @@
     } @else {
     @for (endpoint of currentEndpoints(); track endpoint.id) {
     <a
-      [attr.href]="endpointRoute(moduleItem.route, endpoint.route)"
+      [routerLink]="endpointRoute(moduleItem.route, endpoint.route)"
       [class.bg-white]="isRouteActive(endpointRoute(moduleItem.route, endpoint.route))"
       [class.text-slate-950]="isRouteActive(endpointRoute(moduleItem.route, endpoint.route))"
       class="rounded-xl px-3 py-2 text-sm text-slate-200 transition hover:bg-slate-800"

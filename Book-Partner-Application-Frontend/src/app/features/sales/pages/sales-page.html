@@ -25,24 +25,14 @@
 
   <div class="grid gap-4 xl:grid-cols-2">
     @for (endpoint of endpoints; track endpoint.id) {
-    <a [attr.href]="endpointHref(endpoint.route)" class="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-2xl">
+    <a
+      [routerLink]="getEndpointLink(endpoint.route)"
+      class="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
+    >
       <div class="h-1 w-full bg-gradient-to-r from-sky-500 via-cyan-500 to-emerald-500"></div>
       <div class="p-5 sm:p-6">
         <div class="flex items-start gap-4">
-          @switch (endpoint.method) {
-          @case ('GET') {
-          <span class="inline-flex min-w-20 items-center justify-center rounded-2xl bg-sky-500 px-4 py-2 text-sm font-bold tracking-wide text-white shadow-sm">GET</span>
-          }
-          @case ('POST') {
-          <span class="inline-flex min-w-20 items-center justify-center rounded-2xl bg-emerald-500 px-4 py-2 text-sm font-bold tracking-wide text-white shadow-sm">POST</span>
-          }
-          @case ('PUT') {
-          <span class="inline-flex min-w-20 items-center justify-center rounded-2xl bg-amber-500 px-4 py-2 text-sm font-bold tracking-wide text-white shadow-sm">PUT</span>
-          }
-          @case ('DELETE') {
-          <span class="inline-flex min-w-20 items-center justify-center rounded-2xl bg-rose-500 px-4 py-2 text-sm font-bold tracking-wide text-white shadow-sm">DELETE</span>
-          }
-          }
+          <span [class]="getMethodBadgeClass(endpoint.method)">{{ endpoint.method }}</span>
 
           <div class="min-w-0 flex-1">
             <p class="text-xs uppercase tracking-[0.3em] text-slate-400">{{ endpoint.title }}</p>
@@ -50,7 +40,7 @@
             <p class="mt-2 text-sm leading-6 text-slate-600">{{ endpoint.description }}</p>
           </div>
 
-          <span class="mt-2 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500">→</span>
+          <span class="mt-2 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500">-></span>
         </div>
 
         <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-inner">

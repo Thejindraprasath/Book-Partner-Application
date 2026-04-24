@@ -28,7 +28,7 @@ export const publishersRoutes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/publishers-page/publishers-page').then((m) => m.PublishersPage),
+      import('./pages/publishers-page').then((m) => m.PublishersPage),
   },
   ...endpointRoutes,
 ];

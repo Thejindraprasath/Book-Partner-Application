@@ -34,6 +34,10 @@ export class Employee {
         return this.getAllJobs(values);
       case 'createJob':
         return this.createJob(values);
+      case 'getJobById':
+        return this.getJobById(values);
+      case 'updateJob':
+        return this.updateJob(values);
       default:
         throw new Error(`Unknown employee endpoint: ${endpointId}`);
     }
@@ -102,4 +106,20 @@ export class Employee {
     const requestBody = pickBody(values, ['jobDesc', 'minLvl', 'maxLvl']);
     return this.http.post<ApiResponse<unknown>>(`${this.baseUrl}/jobs`, requestBody);
   }
+
+private getJobById(values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
+  const jobId = values['jobId'];
+  return this.http.get<ApiResponse<unknown>>(`${this.baseUrl}/jobs/${jobId}`);
+}
+
+private updateJob(values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
+  const jobId = values['jobId'];
+
+  const requestBody = pickBody(values, ['jobDesc', 'minLvl', 'maxLvl']);
+
+  return this.http.put<ApiResponse<unknown>>(
+    `${this.baseUrl}/jobs/${jobId}`,
+    requestBody
+  );
+}
 }

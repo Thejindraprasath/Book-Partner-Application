@@ -173,17 +173,6 @@ export const MODULE_ENDPOINTS: Record<string, EndpointDefinition[]> = {
       ]
     },
     {
-      id: 'getDiscountsByBranch',
-      title: 'Get Discounts By Branch',
-      description: 'Fetch discounts for one store.',
-      route: 'discounts/branch',
-      apiPath: '/api/v1/discounts/branch/{storeId}',
-      method: 'GET',
-      formFields: [
-        { name: 'storeId', label: 'Store ID', type: 'text', location: 'path', required: true }
-      ]
-    },
-    {
       id: 'updateDiscount',
       title: 'Update Discount',
       description: 'Update discount details.',

@@ -13,23 +13,21 @@ import com.sprint.Book_Partner_Application.publisher.dto.response.PublisherRespo
 import com.sprint.Book_Partner_Application.publisher.entity.Publisher;
 import com.sprint.Book_Partner_Application.publisher.exception.*;
 import com.sprint.Book_Partner_Application.publisher.repository.PublisherRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-
+import java.util.*;
 
 @Service
 @Transactional
 public class PublisherServiceImpl implements PublisherService {
+
     private static final Set<String> STANDARD_PUB_IDS =
-            Set.of("1389", "0736", "0877", "1622", "1756");
+            new HashSet<>(Arrays.asList("1389", "0736", "0877", "1622", "1756"));
 
     @Autowired
     private PublisherRepository publisherRepository;
@@ -40,8 +38,7 @@ public class PublisherServiceImpl implements PublisherService {
     @Autowired
     private TitleRepository titleRepository;
 
-    // ─── CREATE ─────────────────────────────────────────────
-
+    // CREATE
     @Override
     public PublisherResponse createPublisher(PublisherCreateRequest request) {
 
@@ -50,7 +47,7 @@ public class PublisherServiceImpl implements PublisherService {
         }
 
         boolean isStandard = STANDARD_PUB_IDS.contains(request.getPubId());
-        boolean isNinetyNineX = request.getPubId().matches("^99[0-9]{2}$+");
+        boolean isNinetyNineX = request.getPubId().matches("^99[0-9]{2}$");
 
         if (!isStandard && !isNinetyNineX) {
             throw new InvalidPublisherIdException(request.getPubId());
@@ -68,21 +65,23 @@ public class PublisherServiceImpl implements PublisherService {
         return mapToResponse(saved);
     }
 
-    // ─── READ ALL ─────────────────────────────────────────────
-
+    // READ ALL
     @Override
     @Transactional(readOnly = true)
     public PageResponse<PublisherResponse> getAllPublishers(Pageable pageable) {
 
-        return PageResponse.from(
-                publisherRepository
-                        .findWithFilters(pageable)
-                        .map(this::mapToResponse)
-        );
+        Page<Publisher> page = publisherRepository.findWithFilters(pageable);
+
+        List<PublisherResponse> responseList = new ArrayList<>();
+
+        for (Publisher p : page.getContent()) {
+            responseList.add(mapToResponse(p));
+        }
+
+        return PageResponse.from(page, responseList);
     }
 
-    // ─── READ ONE ─────────────────────────────────────────────
-
+    // READ ONE
     @Override
     @Transactional(readOnly = true)
     public PublisherResponse getPublisherById(String pubId) {
@@ -93,8 +92,7 @@ public class PublisherServiceImpl implements PublisherService {
         return mapToResponse(publisher);
     }
 
-    // ─── UPDATE ─────────────────────────────────────────────
-
+    // UPDATE
     @Override
     public PublisherResponse updatePublisher(String pubId, PublisherUpdateRequest request) {
 
@@ -119,8 +117,7 @@ public class PublisherServiceImpl implements PublisherService {
         return mapToResponse(updated);
     }
 
-    // ─── DELETE ─────────────────────────────────────────────
-
+    // DELETE
     @Override
     public void deletePublisher(String pubId) {
 
@@ -143,21 +140,17 @@ public class PublisherServiceImpl implements PublisherService {
         publisherRepository.delete(publisher);
     }
 
-    // ─── EMPLOYEES ─────────────────────────────────────────────
-
+    // EMPLOYEES
     @Override
     @Transactional(readOnly = true)
     public List<EmployeeResponse> getEmployeesByPublisher(String pubId) {
 
-        // Step 1: Validate publisher
         publisherRepository.findById(pubId)
                 .orElseThrow(() -> new PublisherNotFoundException(pubId));
 
-        // Step 2: Fetch employees
         List<Employee> employees =
                 employeeRepository.findByPublisher_PubId(pubId);
 
-        // Step 3: Convert to DTO
         List<EmployeeResponse> responseList = new ArrayList<>();
 
         for (Employee e : employees) {
@@ -172,9 +165,6 @@ public class PublisherServiceImpl implements PublisherService {
             if (e.getJob() != null) {
                 res.setJobId(e.getJob().getJobId());
                 res.setJobDesc(e.getJob().getJobDesc());
-            } else {
-                res.setJobId(null);
-                res.setJobDesc(null);
             }
 
             res.setJobLvl(e.getJobLvl());
@@ -182,9 +172,6 @@ public class PublisherServiceImpl implements PublisherService {
             if (e.getPublisher() != null) {
                 res.setPubId(e.getPublisher().getPubId());
                 res.setPubName(e.getPublisher().getPubName());
-            } else {
-                res.setPubId(null);
-                res.setPubName(null);
             }
 
             res.setHireDate(e.getHireDate());
@@ -195,23 +182,19 @@ public class PublisherServiceImpl implements PublisherService {
         return responseList;
     }
 
-    // ─── TITLES ─────────────────────────────────────────────
-
+    // TITLES
     @Override
     @Transactional(readOnly = true)
-    public List<TitleResponse> getProductsByPublisher(String pubId) {
+    public List<TitleResponse> getTitlesByPublisher(String pubId) {
 
-        // Step 1: Validate publisher
         publisherRepository.findById(pubId)
                 .orElseThrow(() -> new PublisherNotFoundException(pubId));
 
-        // Step 2: Fetch titles
         List<Title> titles =
                 titleRepository
                         .findByPublisher_PubId(pubId, Pageable.unpaged())
                         .getContent();
 
-        // Step 3: Convert to DTO
         List<TitleResponse> responseList = new ArrayList<>();
 
         for (Title t : titles) {
@@ -225,9 +208,6 @@ public class PublisherServiceImpl implements PublisherService {
             if (t.getPublisher() != null) {
                 res.setPubId(t.getPublisher().getPubId());
                 res.setPubName(t.getPublisher().getPubName());
-            } else {
-                res.setPubId(null);
-                res.setPubName(null);
             }
 
             res.setPrice(t.getPrice());
@@ -243,8 +223,7 @@ public class PublisherServiceImpl implements PublisherService {
         return responseList;
     }
 
-    // ─── MAPPER ─────────────────────────────────────────────
-
+    // MAPPER
     private PublisherResponse mapToResponse(Publisher publisher) {
 
         PublisherResponse response = new PublisherResponse();

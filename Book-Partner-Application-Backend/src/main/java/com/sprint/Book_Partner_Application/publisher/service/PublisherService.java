@@ -25,5 +25,5 @@ public interface PublisherService {
 
     List<EmployeeResponse> getEmployeesByPublisher(String pubId);
 
-    List<TitleResponse> getProductsByPublisher(String pubId);
+    List<TitleResponse> getTitlesByPublisher(String pubId);
 }

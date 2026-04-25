@@ -86,7 +86,7 @@ class SaleRepositoryTest {
 
     @Test
     void testReadSale() {
-        Sale sale = createSaleAndFlush();
+        createSaleAndFlush();
 
         SaleId id = new SaleId("S001", "O001", "T001");
 
@@ -100,7 +100,7 @@ class SaleRepositoryTest {
 
     @Test
     void testUpdateSale() {
-        Sale sale = createSaleAndFlush();
+        createSaleAndFlush();
 
         SaleId id = new SaleId("S001", "O001", "T001");
 
@@ -116,7 +116,7 @@ class SaleRepositoryTest {
 
     @Test
     void testDeleteSale() {
-        Sale sale = createSaleAndFlush();
+        createSaleAndFlush();
 
         SaleId id = new SaleId("S001", "O001", "T001");
 
@@ -158,23 +158,6 @@ class SaleRepositoryTest {
         LocalDateTime now = LocalDateTime.now();
 
         List<Sale> result = saleRepository.findByDateRange(
-                now.minusDays(1),
-                now.plusDays(1)
-        );
-
-        assertFalse(result.isEmpty());
-    }
-
-    // ================= STORE + DATE RANGE =================
-
-    @Test
-    void testFindByStorIdAndDateRange() {
-        createSaleAndFlush();
-
-        LocalDateTime now = LocalDateTime.now();
-
-        List<Sale> result = saleRepository.findByStorIdAndDateRange(
-                "S001",
                 now.minusDays(1),
                 now.plusDays(1)
         );

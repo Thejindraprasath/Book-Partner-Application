@@ -33,8 +33,8 @@ public class EmployeeController {
     }
 
     @GetMapping("/jobs")
-    public ResponseEntity<ApiResponse<List<JobResponse>>> getAllJobs() {
-        return ResponseEntity.ok(ApiResponse.success(employeeService.getAllJobs()));
+    public PageResponse<JobResponse> getAllJobs(Pageable pageable) {
+        return employeeService.getAllJobs(pageable);
     }
 
     @GetMapping("/jobs/{jobId}")

@@ -11,6 +11,7 @@ import com.sprint.Book_Partner_Application.publisher.service.PublisherService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class PublisherController {
                 .body(ApiResponse.success("Publisher created successfully", response));
     }
 
-    // ───────────── GET ALL ─────────────
+    // ───────────── GET ALL ─────────────(sort="pubName",direction= Sort.Direction.ASC-to do sorting in the pagination)/PageRequest.of(2, 5, Sort.by("pubName").descending());
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<PublisherResponse>>> getAllPublishers(@PageableDefault(size = 10) Pageable pageable) {
 

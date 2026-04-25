@@ -64,16 +64,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<JobResponse> getAllJobs() {
+    public PageResponse<JobResponse> getAllJobs(Pageable pageable) {
 
-        List<Job> jobs = jobRepository.findAll();
+        Page<Job> page = jobRepository.findAll(pageable);
+
         List<JobResponse> responseList = new ArrayList<>();
 
-        for (Job j : jobs) {
+        for (Job j : page.getContent()) {
             responseList.add(mapJobToResponse(j));
         }
 
-        return responseList;
+        return PageResponse.from(page, responseList);
     }
 
     @Override

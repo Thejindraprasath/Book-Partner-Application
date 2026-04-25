@@ -34,6 +34,12 @@ export class Store {
         return this.getStoreDiscounts(values);
       case 'listDiscounts':
         return this.getAllDiscounts();
+        case 'createDiscount':
+                return this.createDiscount(values);
+      case 'getDiscountByType':
+        return this.getDiscountByType(values);
+      case 'updateDiscount':
+        return this.updateDiscount(values);
       default:
         throw new Error(`Unknown store endpoint: ${endpointId}`);
     }
@@ -90,4 +96,39 @@ export class Store {
   private getAllDiscounts(): Observable<ApiResponse<unknown>> {
     return this.http.get<ApiResponse<unknown>>(`${this.baseUrl}/discounts`);
   }
+  private createDiscount(values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
+    const requestBody = {
+      discounttype: values['discounttype']?? values['discountType'],
+      storId: values['storId'],
+      lowqty: values['lowqty'],
+      highqty: values['highqty'],
+      discount: values['discount'],
+    };
+
+    return this.http.post<ApiResponse<unknown>>(
+      `${this.baseUrl}/discounts`,
+      requestBody
+    );
+  }
+  private getDiscountByType(values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
+      const discountType = values['discountType'];
+
+      return this.http.get<ApiResponse<unknown>>(
+        `${this.baseUrl}/discounts/${discountType}`
+      );
+    }
+  private updateDiscount(values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
+      const discountId = values['discountId'];
+
+      const requestBody = pickBody(values, [
+        'discountType',
+        'discount',
+        'startDate',
+        'endDate',
+      ]);
+      return this.http.put<ApiResponse<unknown>>(
+        `${this.baseUrl}/discounts/${discountId}`,
+        requestBody
+      );
+    }
 }

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { STORES_ENDPOINTS, STORES_MODULE, STORES_ROUTE } from '../../stores.data';
+import { STORES_ENDPOINTS, STORES_MODULE, STORES_ROUTE } from '../stores.data';
 
 @Component({
   selector: 'app-stores-page',

@@ -8,7 +8,9 @@ export const routes: Routes = [
   {
     path: '',
     loadChildren: () =>
-      import('./features/landing/landing.routes').then((m) => m.landingRoutes),
+      import('./features/landing/landing/landing.routes').then(
+        (m) => m.landingRoutes
+      ),
   },
   {
     path: '',
@@ -18,7 +20,7 @@ export const routes: Routes = [
       {
         path: 'login/:moduleId',
         loadChildren: () =>
-          import('./features/auth/auth.routes').then((m) => m.authRoutes),
+          import('./features/auth/auth.route').then((m) => m.authRoutes),
       },
     ],
   },
@@ -40,7 +42,9 @@ export const routes: Routes = [
         canActivate: [moduleGuard, roleGuard],
         data: { moduleId: 'author', roles: ['ROLE_AUTHOR'] },
         loadChildren: () =>
-          import('./features/authors/authors.routes').then((m) => m.authorsRoutes),
+          import('./features/authors/authors.route').then(
+            (m) => m.authorsRoutes
+          ),
       },
       {
         path: 'book',
@@ -54,7 +58,9 @@ export const routes: Routes = [
         canActivate: [moduleGuard],
         data: { moduleId: 'sanjai' },
         loadChildren: () =>
-          import('./features/sanjai/sanjai.routes').then((m) => m.sanjaiRoutes),
+          import('./features/sanjai/sanjai.routes').then(
+            (m) => m.sanjaiRoutes
+          ),
       },
       {
         path: 'sales',

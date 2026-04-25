@@ -22,7 +22,7 @@ export const salesRoutes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/sales-page/sales-page').then((m) => m.SalesPage),
+      import('./pages/sales-page').then((m) => m.SalesPage),
   },
   ...endpointRoutes,
 ];

@@ -6,7 +6,7 @@ export const sanjaiRoutes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/sanjai-page/sanjai-page').then((m) => m.SanjaiPage),
+      import('./pages/sanjai-page').then((m) => m.SanjaiPage),
   },
   // Publisher endpoints live under /sanjai/publishers.
   {

@@ -3,8 +3,8 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { getModuleById } from '../../../../config/api.config';
-import { AuthService } from '../../../../core/auth/auth.service';
+import { getModuleById } from '../../../config/api.config';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-login',

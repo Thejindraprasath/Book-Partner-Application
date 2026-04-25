@@ -1,25 +1,28 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { AUTHORS_ENDPOINTS, AUTHORS_MODULE, AUTHORS_ROUTE } from '../../authors.data';
+import { AUTHORS_ENDPOINTS, AUTHORS_MODULE, AUTHORS_ROUTE } from '../authors.data';
 
 @Component({
   selector: 'app-authors-page',
+  standalone: true,
   imports: [RouterLink],
   templateUrl: './authors-page.html',
   styleUrl: './authors-page.css',
 })
 export class AuthorsPage {
-  // Basic page details for the author module.
+  // Module details
   readonly moduleItem = AUTHORS_MODULE;
 
-  // Every endpoint card shown on this page.
+  // Endpoints list
   readonly endpoints = AUTHORS_ENDPOINTS;
 
+  // Generate route link
   getEndpointLink(endpointRoute: string): string {
     return `${AUTHORS_ROUTE}/${endpointRoute}`;
   }
 
+  // Badge styling based on method
   getMethodBadgeClass(method: string): string {
     switch (method) {
       case 'POST':

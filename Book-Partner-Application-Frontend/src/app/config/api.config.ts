@@ -137,6 +137,59 @@ export const MODULE_ENDPOINTS: Record<string, EndpointDefinition[]> = {
       apiPath: '/api/v1/discounts',
       method: 'GET',
       formFields: []
+    },
+    {
+      id: 'createDiscount',
+      title: 'Create Discount',
+      description: 'Create a new discount record.',
+      route: 'discounts/create',
+      apiPath: '/api/v1/discounts',
+      method: 'POST',
+      formFields: [
+        { name: 'discountType', label: 'Discount Type', type: 'text', location: 'body', required: true },
+        { name: 'storId', label: 'Store ID', type: 'text', location: 'body', required: true },
+        { name: 'lowqty', label: 'Low Quantity', type: 'number', location: 'body', required: true },
+        { name: 'highqty', label: 'High Quantity', type: 'number', location: 'body', required: true },
+        { name: 'discount', label: 'Discount', type: 'number', location: 'body', required: true }
+      ]
+    },
+    {
+      id: 'getDiscountByType',
+      title: 'Get Discount By Type',
+      description: 'Fetch discount by type.',
+      route: 'discounts/by-type',
+      apiPath: '/api/v1/discounts/{discountType}',
+      method: 'GET',
+      formFields: [
+        { name: 'discountType', label: 'Discount Type', type: 'text', location: 'path', required: true }
+      ]
+    },
+    {
+      id: 'getDiscountsByBranch',
+      title: 'Get Discounts By Branch',
+      description: 'Fetch discounts for one store.',
+      route: 'discounts/branch',
+      apiPath: '/api/v1/discounts/branch/{storeId}',
+      method: 'GET',
+      formFields: [
+        { name: 'storeId', label: 'Store ID', type: 'text', location: 'path', required: true }
+      ]
+    },
+    {
+      id: 'updateDiscount',
+      title: 'Update Discount',
+      description: 'Update discount details.',
+      route: 'discounts/update',
+      apiPath: '/api/v1/discounts/{discountId}',
+      method: 'PUT',
+      formFields: [
+        { name: 'discountId', label: 'Discount ID', type: 'number', location: 'path', required: true },
+        { name: 'discountType', label: 'Discount Type', type: 'text', location: 'body' },
+        { name: 'storId', label: 'Store ID', type: 'text', location: 'body' },
+        { name: 'lowqty', label: 'Low Quantity', type: 'number', location: 'body' },
+        { name: 'highqty', label: 'High Quantity', type: 'number', location: 'body' },
+        { name: 'discount', label: 'Discount', type: 'number', location: 'body' }
+      ]
     }
   ],
   author: [
@@ -232,7 +285,9 @@ export const MODULE_ENDPOINTS: Record<string, EndpointDefinition[]> = {
       route: 'books/by-id',
       apiPath: '/api/titles/{id}',
       method: 'GET',
-      formFields: [{ name: 'id', label: 'Title ID', type: 'text', location: 'path', required: true }]
+      formFields: [
+        { name: 'id', label: 'Title ID', type: 'text', location: 'path', required: true }
+      ]
     },
     {
       id: 'createBook',
@@ -281,7 +336,48 @@ export const MODULE_ENDPOINTS: Record<string, EndpointDefinition[]> = {
       route: 'books/delete',
       apiPath: '/api/titles/{id}',
       method: 'DELETE',
-      formFields: [{ name: 'id', label: 'Title ID', type: 'text', location: 'path', required: true }]
+      formFields: [
+        { name: 'id', label: 'Title ID', type: 'text', location: 'path', required: true }
+      ]
+    },
+    {
+      id: 'getAuthorsByTitle',
+      title: 'Get Authors By Title',
+      description: 'Fetch all authors linked to a specific title.',
+      route: 'books/authors',
+      apiPath: '/api/titles/{id}/authors',
+      method: 'GET',
+      formFields: [
+        { name: 'id', label: 'Title ID', type: 'text', location: 'path', required: true }
+      ]
+    },
+    {
+      id: 'createRoySched',
+      title: 'Create Royalty Schedule',
+      description: 'Create royalty schedule for a title.',
+      route: 'books/roysched/create',
+      apiPath: '/api/titles/roysched',
+      method: 'POST',
+      formFields: [
+        { name: 'titleId', label: 'Title ID', type: 'text', location: 'body', required: true },
+        { name: 'lorange', label: 'Low Range', type: 'number', location: 'body', required: true },
+        { name: 'hirange', label: 'High Range', type: 'number', location: 'body', required: true },
+        { name: 'royalty', label: 'Royalty', type: 'number', location: 'body', required: true }
+      ]
+    },
+    {
+      id: 'updateRoySched',
+      title: 'Update Royalty Schedule',
+      description: 'Update an existing royalty schedule.',
+      route: 'books/roysched/update',
+      apiPath: '/api/titles/roysched/{id}',
+      method: 'PUT',
+      formFields: [
+        { name: 'id', label: 'Royalty Schedule ID', type: 'number', location: 'path', required: true },
+        { name: 'lorange', label: 'Low Range', type: 'number', location: 'body' },
+        { name: 'hirange', label: 'High Range', type: 'number', location: 'body' },
+        { name: 'royalty', label: 'Royalty', type: 'number', location: 'body' }
+      ]
     }
   ],
   publisher: [
@@ -458,6 +554,32 @@ export const MODULE_ENDPOINTS: Record<string, EndpointDefinition[]> = {
         { name: 'jobDesc', label: 'Job Description', type: 'text', location: 'body', required: true },
         { name: 'minLvl', label: 'Minimum Level', type: 'number', location: 'body', required: true },
         { name: 'maxLvl', label: 'Maximum Level', type: 'number', location: 'body', required: true }
+      ]
+    }
+    ,
+    {
+      id: 'getJobById',
+      title: 'Get Job By ID',
+      description: 'Fetch one job using job ID.',
+      route: 'employees/jobs/by-id',
+      apiPath: '/api/employees/jobs/{jobId}',
+      method: 'GET',
+      formFields: [
+        { name: 'jobId', label: 'Job ID', type: 'number', location: 'path', required: true }
+      ]
+    },
+    {
+      id: 'updateJob',
+      title: 'Update Job',
+      description: 'Update an existing job.',
+      route: 'employees/jobs/update',
+      apiPath: '/api/employees/jobs/{jobId}',
+      method: 'PUT',
+      formFields: [
+        { name: 'jobId', label: 'Job ID', type: 'number', location: 'path', required: true },
+        { name: 'jobDesc', label: 'Job Description', type: 'text', location: 'body' },
+        { name: 'minLvl', label: 'Minimum Level', type: 'number', location: 'body' },
+        { name: 'maxLvl', label: 'Maximum Level', type: 'number', location: 'body' }
       ]
     }
   ],

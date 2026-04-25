@@ -7,18 +7,15 @@ const authorEndpointRunner = () =>
     (m) => m.EndpointRunner
   );
 
-// Each endpoint gets its own route
-const endpointRoutes: Routes = AUTHORS_ENDPOINTS.map((endpoint: any) => {
-  return {
-    path: endpoint.route,
-    loadComponent: authorEndpointRunner,
-    data: {
-      moduleId: AUTHORS_MODULE.id,
-      moduleRoute: AUTHORS_ROUTE,
-      endpoint,
-    },
-  };
-});
+const endpointRoutes: Routes = AUTHORS_ENDPOINTS.map((endpoint) => ({
+  path: endpoint.route,
+  loadComponent: authorEndpointRunner,
+  data: {
+    moduleId: AUTHORS_MODULE.id,
+    moduleRoute: AUTHORS_ROUTE,
+    endpoint,
+  },
+}));
 
 export const authorsRoutes: Routes = [
   {

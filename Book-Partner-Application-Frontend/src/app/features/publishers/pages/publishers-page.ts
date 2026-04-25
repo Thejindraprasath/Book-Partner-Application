@@ -6,7 +6,7 @@ import {
   PUBLISHERS_PAGE_DESCRIPTION,
   PUBLISHERS_PAGE_TITLE,
   PUBLISHERS_ROUTE,
-} from '../../publishers.data';
+} from '../publishers.data';
 
 @Component({
   selector: 'app-publishers-page',

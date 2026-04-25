@@ -24,7 +24,7 @@ export const storesRoutes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/stores-page/stores-page').then((m) => m.StoresPage),
+      import('./pages/stores-page').then((m) => m.StoresPage),
   },
   ...endpointRoutes,
 ];

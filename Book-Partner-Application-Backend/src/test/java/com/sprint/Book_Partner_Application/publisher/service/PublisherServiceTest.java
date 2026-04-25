@@ -142,7 +142,7 @@ class PublisherServiceTest {
     }
 
     @Test
-    void getProductsByPartner_success() {
+    void getTitlesByPartner_success() {
 
         Title title = new Title();
         title.setTitleId("T1");
@@ -155,7 +155,7 @@ class PublisherServiceTest {
         when(titleRepository.findByPublisher_PubId(eq("1389"), any()))
                 .thenReturn(new PageImpl<>(list));
 
-        List<TitleResponse> result = publisherService.getProductsByPublisher("1389");
+        List<TitleResponse> result = publisherService.getTitlesByPublisher("1389");
 
         assertEquals(1, result.size());
     }

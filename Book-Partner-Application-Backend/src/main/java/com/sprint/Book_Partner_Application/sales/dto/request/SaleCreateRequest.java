@@ -1,11 +1,8 @@
 package com.sprint.Book_Partner_Application.sales.dto.request;
 
 import jakarta.validation.constraints.*;
-import lombok.Builder;
-
 import java.time.LocalDateTime;
 
-@Builder
 public class SaleCreateRequest {
 
     @NotBlank(message = "Store ID is required")

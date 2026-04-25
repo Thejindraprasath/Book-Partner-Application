@@ -24,7 +24,7 @@ export const booksRoutes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/books-page/books-page').then((m) => m.BooksPage),
+      import('./pages/books-page').then((m) => m.BooksPage),
   },
   ...endpointRoutes,
 ];

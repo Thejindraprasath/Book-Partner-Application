@@ -6,7 +6,7 @@ import {
   EMPLOYEES_PAGE_DESCRIPTION,
   EMPLOYEES_PAGE_TITLE,
   EMPLOYEES_ROUTE,
-} from '../../employees.data';
+} from '../employees.data';
 
 @Component({
   selector: 'app-employees-page',

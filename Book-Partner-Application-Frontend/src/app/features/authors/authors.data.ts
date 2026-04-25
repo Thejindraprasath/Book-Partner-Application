@@ -1,35 +1,44 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+export const AUTHORS_MODULE = {
+  id: 'author',
+  label: 'Authors Module',
+  description: 'Manage author records including creating, viewing, updating, and deleting author details.',
+  route: '/author',
+  roles: ['ROLE_AUTHOR'],
+};
 
-import { AUTHORS_ENDPOINTS, AUTHORS_MODULE, AUTHORS_ROUTE } from '../../authors.data';
+export const AUTHORS_ROUTE = AUTHORS_MODULE.route;
 
-@Component({
-  selector: 'app-authors-page',
-  imports: [RouterLink],
-  templateUrl: './authors-page.html',
-  styleUrl: './authors-page.css',
-})
-export class AuthorsPage {
-  // Basic page details for the author module.
-  readonly moduleItem = AUTHORS_MODULE;
-
-  // Every endpoint card shown on this page.
-  readonly endpoints = AUTHORS_ENDPOINTS;
-
-  getEndpointLink(endpointRoute: string): string {
-    return `${AUTHORS_ROUTE}/${endpointRoute}`;
-  }
-
-  getMethodBadgeClass(method: string): string {
-    switch (method) {
-      case 'POST':
-        return 'inline-flex min-w-20 items-center justify-center rounded-2xl bg-emerald-500 px-4 py-2 text-sm font-bold tracking-wide text-white shadow-sm';
-      case 'PUT':
-        return 'inline-flex min-w-20 items-center justify-center rounded-2xl bg-amber-500 px-4 py-2 text-sm font-bold tracking-wide text-white shadow-sm';
-      case 'DELETE':
-        return 'inline-flex min-w-20 items-center justify-center rounded-2xl bg-rose-500 px-4 py-2 text-sm font-bold tracking-wide text-white shadow-sm';
-      default:
-        return 'inline-flex min-w-20 items-center justify-center rounded-2xl bg-sky-500 px-4 py-2 text-sm font-bold tracking-wide text-white shadow-sm';
-    }
-  }
-}
+export const AUTHORS_ENDPOINTS = [
+  {
+    id: 'get-all-authors',
+    route: 'get-all',
+    method: 'GET',
+    title: 'View Authors',
+    description: 'Fetch and display all available author records.',
+    apiPath: '/api/v1/authors',
+  },
+  {
+    id: 'create-author',
+    route: 'create',
+    method: 'POST',
+    title: 'Create Author',
+    description: 'Add a new author record with valid author details.',
+    apiPath: '/api/v1/authors',
+  },
+  {
+    id: 'update-author',
+    route: 'update',
+    method: 'PUT',
+    title: 'Update Author',
+    description: 'Modify existing author information using author ID.',
+    apiPath: '/api/v1/authors/{authorId}',
+  },
+  {
+    id: 'delete-author',
+    route: 'delete',
+    method: 'DELETE',
+    title: 'Delete Author',
+    description: 'Remove an author record using author ID.',
+    apiPath: '/api/v1/authors/{authorId}',
+  },
+];

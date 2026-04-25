@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { BOOKS_ENDPOINTS, BOOKS_MODULE, BOOKS_ROUTE } from '../../books.data';
+import { BOOKS_ENDPOINTS, BOOKS_MODULE, BOOKS_ROUTE } from '../books.data';
 
 @Component({
   selector: 'app-books-page',

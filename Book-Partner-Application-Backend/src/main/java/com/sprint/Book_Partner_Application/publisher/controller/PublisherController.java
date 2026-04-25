@@ -102,7 +102,7 @@ public class PublisherController {
             @PathVariable String pubId) {
 
         List<TitleResponse> titles =
-                publisherService.getProductsByPublisher(pubId);
+                publisherService.getTitlesByPublisher(pubId);
 
         return ResponseEntity.ok(ApiResponse.success(titles));
     }

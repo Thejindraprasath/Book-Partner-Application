@@ -24,7 +24,7 @@ export const employeesRoutes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/employees-page/employees-page').then((m) => m.EmployeesPage),
+      import('./pages/employees-page').then((m) => m.EmployeesPage),
   },
   ...endpointRoutes,
 ];

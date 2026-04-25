@@ -127,7 +127,15 @@ export const MODULE_ENDPOINTS: Record<string, EndpointDefinition[]> = {
       route: 'stores/discounts',
       apiPath: '/api/v1/stores/{storeId}/discounts',
       method: 'GET',
-      formFields: [{ name: 'storeId', label: 'Store ID', type: 'text', location: 'path', required: true }]
+      formFields: [
+        {
+          name: 'storeId',
+          label: 'Store ID',
+          type: 'text',
+          location: 'path',
+          required: true
+        }
+      ]
     },
     {
       id: 'listDiscounts',

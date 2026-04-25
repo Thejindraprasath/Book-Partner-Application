@@ -22,10 +22,4 @@ public interface SaleRepository extends JpaRepository<Sale, Sale.SaleId> {
     List<Sale> findByDateRange(
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to);
-
-    @Query("SELECT s FROM Sale s WHERE s.storId = :storId AND s.ordDate BETWEEN :from AND :to")
-    List<Sale> findByStorIdAndDateRange(
-            @Param("storId") String storId,
-            @Param("from") LocalDateTime from,
-            @Param("to") LocalDateTime to);
 }

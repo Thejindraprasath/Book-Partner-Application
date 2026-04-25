@@ -26,9 +26,10 @@ import {
 
 @Component({
   selector: 'app-endpoint-runner',
+  standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, Pagination, Table],
   templateUrl: './endpoint-runner.html',
-  styleUrl: './endpoint-runner.css',
+  styleUrls: ['./endpoint-runner.css'],
 })
 export class EndpointRunner implements OnInit {
   private readonly route = inject(ActivatedRoute);

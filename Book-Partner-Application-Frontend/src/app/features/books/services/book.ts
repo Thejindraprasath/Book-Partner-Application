@@ -11,23 +11,34 @@ import { ApiResponse } from '../../../models/api-response.model';
 export class BookService {
   private readonly http = inject(HttpClient);
 
-  // Every book API call starts with this same base path.
   private readonly baseUrl = '/api/titles';
 
-  // The shared endpoint runner calls this method.
-  // Each case goes to a small helper method so the file is easier to read.
   execute(endpointId: string, values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
     switch (endpointId) {
       case 'listBooks':
         return this.getAllBooks(values);
+
       case 'getBookById':
         return this.getBookById(values);
+
       case 'createBook':
         return this.createBook(values);
+
       case 'updateBook':
         return this.updateBook(values);
+
       case 'deleteBook':
         return this.deleteBook(values);
+
+      case 'getAuthorsByTitle':
+        return this.getAuthorsByTitle(values);
+
+      case 'createRoySched':
+        return this.createRoySched(values);
+
+      case 'updateRoySched':
+        return this.updateRoySched(values);
+
       default:
         throw new Error(`Unknown book endpoint: ${endpointId}`);
     }
@@ -81,5 +92,36 @@ export class BookService {
   private deleteBook(values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
     const bookId = values['id'];
     return this.http.delete<ApiResponse<unknown>>(`${this.baseUrl}/${bookId}`);
+  }
+
+  private getAuthorsByTitle(values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
+    const id = values['id'];
+    return this.http.get<ApiResponse<unknown>>(`${this.baseUrl}/${id}/authors`);
+  }
+
+  private createRoySched(values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
+    const requestBody = pickBody(values, [
+      'titleId',
+      'lorange',
+      'hirange',
+      'royalty',
+    ]);
+
+    return this.http.post<ApiResponse<unknown>>(`${this.baseUrl}/roysched`, requestBody);
+  }
+
+  private updateRoySched(values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
+    const roySchedId = values['roySchedId'];
+
+    const requestBody = pickBody(values, [
+      'lorange',
+      'hirange',
+      'royalty',
+    ]);
+
+    return this.http.put<ApiResponse<unknown>>(
+      `${this.baseUrl}/roysched/${roySchedId}`,
+      requestBody
+    );
   }
 }

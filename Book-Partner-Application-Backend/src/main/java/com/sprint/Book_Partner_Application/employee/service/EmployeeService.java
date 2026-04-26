@@ -15,7 +15,7 @@ public interface EmployeeService {
     // ───────────── JOB ─────────────
     JobResponse createJob(JobCreateRequest request);
 
-    List<JobResponse> getAllJobs();
+    PageResponse<JobResponse> getAllJobs(Pageable pageable);
 
     JobResponse getJobById(Short jobId);
 

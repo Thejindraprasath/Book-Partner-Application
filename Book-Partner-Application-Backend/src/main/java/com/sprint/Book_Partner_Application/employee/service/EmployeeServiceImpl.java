@@ -43,12 +43,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public JobResponse createJob(JobCreateRequest request) {
 
-        if (request.getMinLvl() >= request.getMaxLvl()
+        if (request.getJobDesc() == null || request.getJobDesc().isBlank()
+                || request.getMinLvl() == null
+                || request.getMaxLvl() == null
+                || request.getMinLvl() >= request.getMaxLvl()
                 || request.getMinLvl() < 10
                 || request.getMaxLvl() > 250) {
             throw new InvalidJobLevelRangeException(
-                    request.getMinLvl(),
-                    request.getMaxLvl()
+                    request.getMinLvl() != null ? request.getMinLvl() : 0,
+                    request.getMaxLvl() != null ? request.getMaxLvl() : 0
             );
         }
 
@@ -64,16 +67,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<JobResponse> getAllJobs() {
+    public PageResponse<JobResponse> getAllJobs(Pageable pageable) {
 
-        List<Job> jobs = jobRepository.findAll();
+        Page<Job> page = jobRepository.findAll(pageable);
+
         List<JobResponse> responseList = new ArrayList<>();
 
-        for (Job j : jobs) {
+        for (Job j : page.getContent()) {
             responseList.add(mapJobToResponse(j));
         }
 
-        return responseList;
+        return PageResponse.from(page, responseList);
     }
 
     @Override
@@ -91,33 +95,42 @@ public class EmployeeServiceImpl implements EmployeeService {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new JobNotFoundException(jobId));
 
-        if (request.getMinLvl() >= request.getMaxLvl()
-                || request.getMinLvl() < 10
-                || request.getMaxLvl() > 250) {
+        int resolvedMinLvl = request.getMinLvl() != null
+                ? request.getMinLvl()
+                : job.getMinLvl();
+        int resolvedMaxLvl = request.getMaxLvl() != null
+                ? request.getMaxLvl()
+                : job.getMaxLvl();
+
+        if (resolvedMinLvl >= resolvedMaxLvl
+                || resolvedMinLvl < 10
+                || resolvedMaxLvl > 250) {
             throw new InvalidJobLevelRangeException(
-                    request.getMinLvl(),
-                    request.getMaxLvl()
+                    resolvedMinLvl,
+                    resolvedMaxLvl
             );
         }
 
         List<Employee> employees = employeeRepository.findByJob_JobId(jobId);
 
         for (Employee emp : employees) {
-            if (emp.getJobLvl() < request.getMinLvl()
-                    || emp.getJobLvl() > request.getMaxLvl()) {
+            if (emp.getJobLvl() < resolvedMinLvl
+                    || emp.getJobLvl() > resolvedMaxLvl) {
 
                 throw new JobLevelUpdateBreaksEmployeesException(
                         emp.getEmpId(),
                         emp.getJobLvl(),
-                        request.getMinLvl(),
-                        request.getMaxLvl()
+                        resolvedMinLvl,
+                        resolvedMaxLvl
                 );
             }
         }
 
-        job.setJobDesc(request.getJobDesc());
-        job.setMinLvl(request.getMinLvl());
-        job.setMaxLvl(request.getMaxLvl());
+        if (request.getJobDesc() != null && !request.getJobDesc().isBlank()) {
+            job.setJobDesc(request.getJobDesc());
+        }
+        job.setMinLvl(resolvedMinLvl);
+        job.setMaxLvl(resolvedMaxLvl);
 
         Job updated = jobRepository.save(job);
 

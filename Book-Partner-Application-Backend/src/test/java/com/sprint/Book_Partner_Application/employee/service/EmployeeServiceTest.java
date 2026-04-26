@@ -110,6 +110,22 @@ class EmployeeServiceTest {
     }
 
     @Test
+    void updateJob_partialRange_usesExistingValues() {
+        when(jobRepository.findById((short) 1)).thenReturn(Optional.of(job));
+        when(employeeRepository.findByJob_JobId((short) 1)).thenReturn(Collections.emptyList());
+        when(jobRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        JobCreateRequest req = new JobCreateRequest();
+        req.setMinLvl(20);
+
+        var res = employeeService.updateJob((short) 1, req);
+
+        assertEquals(20, res.getMinLvl());
+        assertEquals(100, res.getMaxLvl());
+        assertEquals("Developer", res.getJobDesc());
+    }
+
+    @Test
     void createEmployee_success() {
         when(employeeRepository.existsById("E1")).thenReturn(false);
         when(jobRepository.findById((short) 1)).thenReturn(Optional.of(job));

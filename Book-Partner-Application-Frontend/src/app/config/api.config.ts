@@ -127,7 +127,15 @@ export const MODULE_ENDPOINTS: Record<string, EndpointDefinition[]> = {
       route: 'stores/discounts',
       apiPath: '/api/v1/stores/{storeId}/discounts',
       method: 'GET',
-      formFields: [{ name: 'storeId', label: 'Store ID', type: 'text', location: 'path', required: true }]
+      formFields: [
+        {
+          name: 'storeId',
+          label: 'Store ID',
+          type: 'text',
+          location: 'path',
+          required: true
+        }
+      ]
     },
     {
       id: 'listDiscounts',
@@ -162,17 +170,6 @@ export const MODULE_ENDPOINTS: Record<string, EndpointDefinition[]> = {
       method: 'GET',
       formFields: [
         { name: 'discountType', label: 'Discount Type', type: 'text', location: 'path', required: true }
-      ]
-    },
-    {
-      id: 'getDiscountsByBranch',
-      title: 'Get Discounts By Branch',
-      description: 'Fetch discounts for one store.',
-      route: 'discounts/branch',
-      apiPath: '/api/v1/discounts/branch/{storeId}',
-      method: 'GET',
-      formFields: [
-        { name: 'storeId', label: 'Store ID', type: 'text', location: 'path', required: true }
       ]
     },
     {

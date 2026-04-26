@@ -1,5 +1,7 @@
 package com.sprint.Book_Partner_Application.book.controller;
 
+import com.sprint.Book_Partner_Application.book.dto.request.RoySchedCreateRequest;
+import com.sprint.Book_Partner_Application.book.dto.request.RoySchedUpdateRequest;
 import com.sprint.Book_Partner_Application.book.dto.request.TitleCreateRequest;
 import com.sprint.Book_Partner_Application.book.dto.request.TitleUpdateRequest;
 import com.sprint.Book_Partner_Application.book.dto.response.TitleResponse;
@@ -87,5 +89,40 @@ public class TitleController {
 
         return ResponseEntity.ok(
                 ApiResponse.successMessage("Title deleted successfully"));
+    }
+    // ================= GET AUTHORS BY TITLE =================
+    @GetMapping("/{id}/authors")
+    public ResponseEntity<ApiResponse<?>> getAuthorsByTitle(@PathVariable("id") String id) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Authors fetched successfully",
+                        titleService.getAuthorsByTitle(id))
+        );
+    }
+
+    // ================= CREATE ROYSCHED =================
+    @PostMapping("/roysched")
+    public ResponseEntity<ApiResponse<?>> createRoySched(
+            @RequestBody RoySchedCreateRequest request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(
+                        "Royalty schedule created successfully",
+                        titleService.createRoySched(request))
+                );
+    }
+
+    // ================= UPDATE ROYSCHED =================
+    @PutMapping("/roysched/{id}")
+    public ResponseEntity<ApiResponse<?>> updateRoySched(
+            @PathVariable("id") Long id,
+            @RequestBody RoySchedUpdateRequest request) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Royalty schedule updated successfully",
+                        titleService.updateRoySched(id, request))
+        );
     }
 }

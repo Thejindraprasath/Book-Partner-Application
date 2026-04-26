@@ -14,17 +14,21 @@ import {
   templateUrl: './publishers-page.html',
   styleUrl: './publishers-page.css',
 })
+// Module page that lists all publisher actions inside Sanjai.
 export class PublishersPage {
+  // Text shown in the page header.
   readonly pageTitle = PUBLISHERS_PAGE_TITLE;
   readonly pageDescription = PUBLISHERS_PAGE_DESCRIPTION;
 
-  // Every endpoint card shown on this page.
+  // All publisher endpoint cards shown on this page.
   readonly endpoints = PUBLISHERS_ENDPOINTS;
 
+  // Build the route to the selected publisher action page.
   getEndpointLink(endpointRoute: string): string {
     return `${PUBLISHERS_ROUTE}/${endpointRoute}`;
   }
 
+  // Return a color based on the HTTP method so actions are easier to scan.
   getMethodBadgeClass(method: string): string {
     switch (method) {
       case 'POST':

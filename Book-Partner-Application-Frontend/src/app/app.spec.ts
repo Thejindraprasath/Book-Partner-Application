@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 
+// Basic smoke tests for the root application component.
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({

@@ -19,6 +19,7 @@ export class ApiExecutorService {
   private readonly employeeService = inject(Employee);
   private readonly salesService = inject(Sales);
 
+  // Send the request to the correct feature service based on the active module.
   execute(moduleId: string, endpointId: string, formValue: Record<string, unknown>): Observable<unknown> {
     switch (moduleId) {
       case 'store':

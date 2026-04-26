@@ -11,8 +11,10 @@ import { ApiResponse } from '../../../models/api-response.model';
 export class BookService {
   private readonly http = inject(HttpClient);
 
+  // All book requests start with this API path.
   private readonly baseUrl = '/api/titles';
 
+  // The shared endpoint runner calls this method to dispatch one book action.
   execute(endpointId: string, values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
     switch (endpointId) {
       case 'listBooks':

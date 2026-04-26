@@ -21,6 +21,7 @@ export class Login {
   readonly moduleId = this.route.snapshot.paramMap.get('moduleId') ?? '';
   readonly moduleItem = getModuleById(this.moduleId);
 
+  // Simple login form shared by all modules.
   readonly form = this.formBuilder.group({
     username: ['', Validators.required],
     password: ['', Validators.required],
@@ -41,6 +42,7 @@ export class Login {
     const username = this.form.get('username')?.value ?? '';
     const password = this.form.get('password')?.value ?? '';
 
+    // Try to log in, then verify that the user belongs to the selected module.
     this.isLoading.set(true);
     this.authService.login(this.moduleId, username, password).subscribe({
       next: (user) => this.handleLoginSuccess(user.roles),
@@ -54,6 +56,8 @@ export class Login {
       return;
     }
 
+    // The same backend session can hold different roles, so make sure
+    // the user entered this module through the correct login card.
     const hasModuleAccess = this.moduleItem.roles.some((role) => userRoles.includes(role));
 
     if (!hasModuleAccess) {
@@ -68,6 +72,7 @@ export class Login {
   private handleWrongModuleLogin(): void {
     const moduleLabel = this.moduleItem?.label ?? 'this module';
 
+    // Immediately log out again so the wrong module session is not kept open.
     this.authService.logout().subscribe({
       next: () => {
         this.errorMessage.set(`Use the correct credentials for ${moduleLabel}.`);
@@ -81,6 +86,7 @@ export class Login {
   }
 
   private handleLoginError(error: HttpErrorResponse): void {
+    // Show the backend message when available, otherwise use a simple fallback.
     this.errorMessage.set(
       error.error?.message ?? 'Login failed. Please check your username and password.',
     );

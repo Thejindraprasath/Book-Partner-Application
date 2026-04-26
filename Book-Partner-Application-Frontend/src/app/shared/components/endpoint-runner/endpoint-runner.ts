@@ -31,6 +31,7 @@ import {
   templateUrl: './endpoint-runner.html',
   styleUrls: ['./endpoint-runner.css'],
 })
+// Shared page that renders one API action form and shows the result.
 export class EndpointRunner implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly formBuilder = inject(FormBuilder);
@@ -41,7 +42,7 @@ export class EndpointRunner implements OnInit {
   readonly moduleRoute = this.route.snapshot.data['moduleRoute'] as string;
   readonly endpoint = this.route.snapshot.data['endpoint'] as EndpointDefinition;
 
-  // The form is built from the endpoint config, so one shared page can handle many APIs.
+  // The form is built from the endpoint config, so one page can handle many APIs.
   readonly form = this.buildForm();
 
   readonly isLoading = signal(false);
@@ -129,6 +130,7 @@ export class EndpointRunner implements OnInit {
   });
 
   ngOnInit(): void {
+    // List endpoints can load immediately with default filters.
     if (!this.isListView()) {
       return;
     }
@@ -146,6 +148,7 @@ export class EndpointRunner implements OnInit {
       return;
     }
 
+    // Turn the form into a clean payload and send the request.
     const formValues = this.normalizeValues();
     this.lastSubmittedValues.set(formValues);
     this.runRequest(formValues);
@@ -218,6 +221,7 @@ export class EndpointRunner implements OnInit {
       return;
     }
 
+    // Reuse the last submitted filters and only replace the page number.
     const nextValues = { ...currentValues, page: pageNumber };
 
     this.form.patchValue({ page: pageNumber });
@@ -226,6 +230,7 @@ export class EndpointRunner implements OnInit {
   }
 
   private buildForm() {
+    // Build controls from the endpoint definition instead of hardcoding each form.
     const controls = Object.fromEntries(
       this.endpoint.formFields.map((field) => [
         field.name,
@@ -249,6 +254,7 @@ export class EndpointRunner implements OnInit {
   private runRequest(values: Record<string, unknown>): void {
     this.isLoading.set(true);
 
+    // The executor chooses the correct feature service behind the scenes.
     this.apiExecutor.execute(this.moduleId, this.endpoint.id, values).subscribe({
       next: (response) => this.handleSuccess(response),
       error: (error: HttpErrorResponse) => this.handleError(error, values),
@@ -256,6 +262,7 @@ export class EndpointRunner implements OnInit {
   }
 
   private handleSuccess(response: unknown): void {
+    // Store both the raw response and the extracted display data.
     const responseBody = this.unwrapResponse(response);
 
     this.rawResponse.set(response ?? null);
@@ -266,6 +273,7 @@ export class EndpointRunner implements OnInit {
   }
 
   private handleError(error: HttpErrorResponse, values: Record<string, unknown>): void {
+    // Keep a readable message for the UI and preserve raw error details for debugging.
     this.errorStatus.set(error.status || null);
     this.rawError.set(error.error ?? { message: error.message, status: error.status });
     this.errorMessage.set(this.buildErrorMessage(error, values));
@@ -300,6 +308,7 @@ export class EndpointRunner implements OnInit {
       validators.push(Validators.pattern(pattern));
     }
 
+    // Number fields always have a minimum so blank and negative values are controlled consistently.
     if (field.type === 'number') {
       validators.push(Validators.min(this.minValueForField(field.name)));
     }
@@ -334,6 +343,7 @@ export class EndpointRunner implements OnInit {
     );
     const lowerCaseMessage = backendMessage.toLowerCase();
 
+    // Some expired-session responses come back as HTML instead of JSON, so detect those too.
     if (
       error.status === 401 ||
       lowerCaseMessage.includes('authentication required') ||
@@ -424,6 +434,7 @@ export class EndpointRunner implements OnInit {
   }
 
   private buildDeleteSummaryRow(): Record<string, unknown> {
+    // DELETE responses often have no record body, so show a small summary instead.
     const values = this.lastSubmittedValues() ?? {};
     const row: Record<string, unknown> = {
       action: 'Deleted',
@@ -460,6 +471,7 @@ export class EndpointRunner implements OnInit {
   }
 
   private extractRows(value: unknown): unknown[] {
+    // Support both plain arrays and paged backend responses with a content array.
     if (Array.isArray(value)) {
       return value;
     }

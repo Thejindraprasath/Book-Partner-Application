@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { Publisher } from './publisher';
 
+// Basic smoke test for the publisher service.
 describe('Publisher', () => {
   let service: Publisher;
 

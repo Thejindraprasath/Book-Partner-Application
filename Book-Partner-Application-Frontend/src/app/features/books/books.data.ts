@@ -1,7 +1,7 @@
 import { getEndpointsForModule, getModuleById } from '../../config/api.config';
 import { EndpointDefinition, ModuleDefinition } from '../../models/module.model';
 
-// This file keeps book feature values in one easy place.
+// Keep book-specific IDs, routes, and endpoint lists in one place.
 export const BOOKS_MODULE_ID = 'book';
 export const BOOKS_ROUTE = '/book';
 

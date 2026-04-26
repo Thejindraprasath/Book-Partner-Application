@@ -1,7 +1,9 @@
 import { EndpointDefinition, ModuleDefinition } from '../models/module.model';
 
+// Base backend URL used when a request is sent with a relative path.
 export const API_BASE_URL = 'http://localhost:8081';
 
+// Central list of modules shown on the landing page and used across routing and login.
 export const APP_MODULES: ModuleDefinition[] = [
   {
     id: 'store',
@@ -50,6 +52,7 @@ export const APP_MODULES: ModuleDefinition[] = [
   },
 ];
 
+// Central list of endpoint definitions used to build forms, pages, and request routing.
 export const MODULE_ENDPOINTS: Record<string, EndpointDefinition[]> = {
   store: [
     {

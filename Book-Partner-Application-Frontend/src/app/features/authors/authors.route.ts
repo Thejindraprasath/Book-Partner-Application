@@ -7,6 +7,7 @@ const authorEndpointRunner = () =>
     (m) => m.EndpointRunner
   );
 
+// Build one child route per author action so the shared endpoint runner can load it by URL.
 const endpointRoutes: Routes = AUTHORS_ENDPOINTS.map((endpoint) => ({
   path: endpoint.route,
   loadComponent: authorEndpointRunner,
@@ -18,10 +19,12 @@ const endpointRoutes: Routes = AUTHORS_ENDPOINTS.map((endpoint) => ({
 }));
 
 export const authorsRoutes: Routes = [
+  // Main page for the author module.
   {
     path: '',
     loadComponent: () =>
       import('./pages/authors-page').then((m) => m.AuthorsPage),
   },
+  // Action pages like add, update, delete, and search are added here automatically.
   ...endpointRoutes,
 ];

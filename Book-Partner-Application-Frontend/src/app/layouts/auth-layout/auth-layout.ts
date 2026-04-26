@@ -7,4 +7,5 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './auth-layout.html',
   styleUrl: './auth-layout.css',
 })
+// Simple layout used for login-related pages.
 export class AuthLayout {}

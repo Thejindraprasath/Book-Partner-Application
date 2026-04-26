@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PublishersPage } from './publishers-page';
 
+// Basic smoke test for the publishers page component.
 describe('PublishersPage', () => {
   let component: PublishersPage;
   let fixture: ComponentFixture<PublishersPage>;

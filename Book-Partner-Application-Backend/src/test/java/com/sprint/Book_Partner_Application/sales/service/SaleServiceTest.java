@@ -28,10 +28,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockitoExtension.class) //add extra behavior (Mockito support)
 class SaleServiceTest {
 
-    @Mock
+    @Mock //fake object
     private SaleRepository saleRepository;
 
     @Mock
@@ -71,6 +71,7 @@ class SaleServiceTest {
 
     @Test
     void createSale_success() {
+        // Mocking DB call: whenever findById is called with any value, return a non-empty Optional (store found)
         when(storeRepository.findById(any()))
                 .thenReturn(Optional.of(new Store()));
 

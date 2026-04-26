@@ -9,17 +9,20 @@ import { BOOKS_ENDPOINTS, BOOKS_MODULE, BOOKS_ROUTE } from '../books.data';
   templateUrl: './books-page.html',
   styleUrl: './books-page.css',
 })
+// Module page that lists all book actions the user can open.
 export class BooksPage {
-  // Basic page details for the book module.
+  // Basic details shown in the page header.
   readonly moduleItem = BOOKS_MODULE;
 
-  // Every endpoint card shown on this page.
+  // All book endpoint cards shown on this page.
   readonly endpoints = BOOKS_ENDPOINTS;
 
+  // Build the route to the selected book action page.
   getEndpointLink(endpointRoute: string): string {
     return `${BOOKS_ROUTE}/${endpointRoute}`;
   }
 
+  // Return a color based on the HTTP method so actions are easier to scan.
   getMethodBadgeClass(method: string): string {
     switch (method) {
       case 'POST':

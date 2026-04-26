@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Landing } from './landing';
 
+// Basic smoke test for the landing page component.
 describe('Landing', () => {
   let component: Landing;
   let fixture: ComponentFixture<Landing>;

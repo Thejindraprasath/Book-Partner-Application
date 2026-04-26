@@ -7,7 +7,7 @@ const bookEndpointRunner = () =>
     (m) => m.EndpointRunner,
   );
 
-// Each endpoint gets its own route so it can open inside the shared runner.
+// Build one child route per book action so the shared endpoint runner can load it by URL.
 const endpointRoutes: Routes = BOOKS_ENDPOINTS.map((endpoint) => {
   return {
     path: endpoint.route,
@@ -21,10 +21,12 @@ const endpointRoutes: Routes = BOOKS_ENDPOINTS.map((endpoint) => {
 });
 
 export const booksRoutes: Routes = [
+  // Main page for the book module.
   {
     path: '',
     loadComponent: () =>
       import('./pages/books-page').then((m) => m.BooksPage),
   },
+  // Action pages like add, update, delete, and search are added here automatically.
   ...endpointRoutes,
 ];

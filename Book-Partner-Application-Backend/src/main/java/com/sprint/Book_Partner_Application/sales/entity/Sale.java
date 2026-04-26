@@ -139,6 +139,8 @@ public class Sale {
 
     public static class SaleId implements Serializable {
 
+        //Unique Version Id used to verify the version during
+        //serialization and deserialization
         private static final long serialVersionUID = 1L;
 
         private String storId;
@@ -187,7 +189,7 @@ public class Sale {
             if (this == o) return true;
             if (!(o instanceof SaleId)) return false;
             SaleId that = (SaleId) o;
-            return Objects.equals(storId, that.storId) &&
+            return Objects.equals(storId, that.storId) && //Objects.equals safely handles null values
                     Objects.equals(ordNum, that.ordNum) &&
                     Objects.equals(titleId, that.titleId);
         }

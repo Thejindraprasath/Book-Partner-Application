@@ -10,6 +10,7 @@ import { SessionService } from '../../../core/auth/session.service';
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
+// Top navigation bar shown after login.
 export class Navbar {
   private readonly authService = inject(AuthService);
   private readonly sessionService = inject(SessionService);
@@ -19,6 +20,7 @@ export class Navbar {
   readonly homeRoute = '/';
 
   logout(): void {
+    // Try backend logout first. If it fails, still clear the local session and go home.
     this.authService.logout().subscribe({
       next: () => this.router.navigateByUrl('/'),
       error: () => {

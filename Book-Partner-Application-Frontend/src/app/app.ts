@@ -7,5 +7,6 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
+// Root component that hosts the router outlet for the whole application.
 export class App {
 }

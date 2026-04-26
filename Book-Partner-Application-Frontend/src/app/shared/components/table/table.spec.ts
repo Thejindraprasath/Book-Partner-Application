@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Table } from './table';
 
+// Basic smoke test for the shared table component.
 describe('Table', () => {
   let component: Table;
   let fixture: ComponentFixture<Table>;

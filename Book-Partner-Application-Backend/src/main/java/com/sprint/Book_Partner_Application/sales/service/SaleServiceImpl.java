@@ -25,6 +25,13 @@ import java.util.List;
 
 @Service
 @Transactional
+/* Ensures all database operations in this service are executed in a single transaction.
+   If any operation fails, all changes will be rolled back to maintain data consistency.
+   Example: Save sale, update store, update title stock.
+   If any step (like store or title update) fails,
+   the entire transaction will be rolled back.
+   This prevents partial data (e.g., sale saved but others failed)
+   and keeps the database consistent. */
 public class SaleServiceImpl implements SaleService {
 
     @Autowired

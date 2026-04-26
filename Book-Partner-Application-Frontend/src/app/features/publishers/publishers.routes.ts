@@ -11,7 +11,7 @@ const publisherEndpointRunner = () =>
     (m) => m.EndpointRunner,
   );
 
-// Each endpoint gets its own route so it can open inside the shared runner.
+// Build one child route per publisher action so the shared endpoint runner can load it by URL.
 const endpointRoutes: Routes = PUBLISHERS_ENDPOINTS.map((endpoint) => {
   return {
     path: endpoint.route,
@@ -25,10 +25,12 @@ const endpointRoutes: Routes = PUBLISHERS_ENDPOINTS.map((endpoint) => {
 });
 
 export const publishersRoutes: Routes = [
+  // Main page for the publisher module.
   {
     path: '',
     loadComponent: () =>
       import('./pages/publishers-page').then((m) => m.PublishersPage),
   },
+  // Action pages like add, update, delete, and search are added here automatically.
   ...endpointRoutes,
 ];

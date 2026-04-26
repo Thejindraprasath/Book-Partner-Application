@@ -5,6 +5,7 @@ import { moduleGuard } from './core/guards/module.guard';
 import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
+  // Group 1: open the landing page when the user visits the root URL.
   {
     path: '',
     loadChildren: () =>
@@ -12,6 +13,7 @@ export const routes: Routes = [
         (m) => m.landingRoutes
       ),
   },
+  // Group 2: show login pages inside the auth layout.
   {
     path: '',
     loadComponent: () =>
@@ -24,12 +26,15 @@ export const routes: Routes = [
       },
     ],
   },
+  // Group 3: all business modules live inside the main layout.
+  // The user must be logged in before opening any route in this group.
   {
     path: '',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./layouts/main-layout/main-layout').then((m) => m.MainLayout),
     children: [
+      // Store pages: only for users who belong to the store module and have store role access.
       {
         path: 'store',
         canActivate: [moduleGuard, roleGuard],
@@ -37,6 +42,7 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/stores/stores.routes').then((m) => m.storesRoutes),
       },
+      // Author pages: only for users who belong to the author module and have author role access.
       {
         path: 'author',
         canActivate: [moduleGuard, roleGuard],
@@ -46,6 +52,7 @@ export const routes: Routes = [
             (m) => m.authorsRoutes
           ),
       },
+      // Book pages: only for users who belong to the book module and have book role access.
       {
         path: 'book',
         canActivate: [moduleGuard, roleGuard],
@@ -53,6 +60,7 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/books/books.routes').then((m) => m.booksRoutes),
       },
+      // Sanjai pages: first check the module, then let child routes check more specific roles.
       {
         path: 'sanjai',
         canActivate: [moduleGuard],
@@ -62,6 +70,7 @@ export const routes: Routes = [
             (m) => m.sanjaiRoutes
           ),
       },
+      // Sales pages: only for users who belong to the sales module and have sales role access.
       {
         path: 'sales',
         canActivate: [moduleGuard, roleGuard],
@@ -69,11 +78,13 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/sales/sales.routes').then((m) => m.salesRoutes),
       },
+      // Old publishers URL: send it to the new nested Sanjai publishers route.
       {
         path: 'publishers',
         pathMatch: 'full',
         redirectTo: 'sanjai/publishers',
       },
+      // Old employees URL: send it to the new nested Sanjai employees route.
       {
         path: 'employees',
         pathMatch: 'full',
@@ -81,6 +92,7 @@ export const routes: Routes = [
       },
     ],
   },
+  // If the URL does not match anything, send the user back to the landing page.
   {
     path: '**',
     redirectTo: '',

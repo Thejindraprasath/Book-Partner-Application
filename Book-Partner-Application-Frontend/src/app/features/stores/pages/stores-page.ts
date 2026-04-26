@@ -9,17 +9,20 @@ import { STORES_ENDPOINTS, STORES_MODULE, STORES_ROUTE } from '../stores.data';
   templateUrl: './stores-page.html',
   styleUrl: './stores-page.css',
 })
+// Module page that lists all store actions the user can open.
 export class StoresPage {
-  // Basic page details for the store module.
+  // Basic details shown in the page header.
   readonly moduleItem = STORES_MODULE;
 
-  // Every endpoint card shown on this page.
+  // All store endpoint cards shown on this page.
   readonly endpoints = STORES_ENDPOINTS;
 
+  // Build the route to the selected store action page.
   getEndpointLink(endpointRoute: string): string {
     return `${STORES_ROUTE}/${endpointRoute}`;
   }
 
+  // Return a color based on the HTTP method so actions are easier to scan.
   getMethodBadgeClass(method: string): string {
     switch (method) {
       case 'POST':

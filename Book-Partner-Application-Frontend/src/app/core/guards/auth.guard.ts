@@ -10,10 +10,13 @@ export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
+  // If login data is already in session storage, allow the route immediately.
   if (sessionService.isLoggedIn()) {
     return true;
   }
 
+  // If the page is refreshed, ask the backend for the current user.
+  // If that fails, send the user back to the landing page.
   return authService.fetchCurrentUser().pipe(
     map(() => true),
     catchError(() => of(router.createUrlTree(['/'])))

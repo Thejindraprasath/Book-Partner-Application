@@ -11,11 +11,10 @@ import { ApiResponse } from '../../../models/api-response.model';
 export class Sales {
   private readonly http = inject(HttpClient);
 
-  // Every sales API call starts with this same base path.
+  // All sales requests start with this API path.
   private readonly baseUrl = '/api/v1/transactions';
 
-  // This method is called by the shared endpoint runner.
-  // We keep the switch, but each case now goes to a small helper method.
+  // The shared endpoint runner calls this method to dispatch one sales action.
   execute(endpointId: string, values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
     switch (endpointId) {
       case 'listSales':

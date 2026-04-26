@@ -340,40 +340,91 @@ export const MODULE_ENDPOINTS: Record<string, EndpointDefinition[]> = {
     {
       id: 'getAuthorsByTitle',
       title: 'Get Authors By Title',
-      description: 'Fetch all authors linked to a specific title.',
-      route: 'books/authors',
+      description: 'Fetch authors for a specific title',
+      route: 'authors',
       apiPath: '/api/titles/{id}/authors',
       method: 'GET',
       formFields: [
-        { name: 'id', label: 'Title ID', type: 'text', location: 'path', required: true }
+        {
+          name: 'id',
+          label: 'Title ID',
+          type: 'text',
+          location: 'path',
+          required: true
+        }
       ]
     },
     {
       id: 'createRoySched',
       title: 'Create Royalty Schedule',
-      description: 'Create royalty schedule for a title.',
-      route: 'books/roysched/create',
+      description: 'Create royalty schedule for a title',
+      route: 'roysched/create',
       apiPath: '/api/titles/roysched',
       method: 'POST',
       formFields: [
-        { name: 'titleId', label: 'Title ID', type: 'text', location: 'body', required: true },
-        { name: 'lorange', label: 'Low Range', type: 'number', location: 'body', required: true },
-        { name: 'hirange', label: 'High Range', type: 'number', location: 'body', required: true },
-        { name: 'royalty', label: 'Royalty', type: 'number', location: 'body', required: true }
+        {
+          name: 'titleId',
+          label: 'Title ID',
+          type: 'text',
+          location: 'body',
+          required: true
+        },
+        {
+          name: 'lorange',
+          label: 'Low Range',
+          type: 'number',
+          location: 'body',
+          required: true
+        },
+        {
+          name: 'hirange',
+          label: 'High Range',
+          type: 'number',
+          location: 'body',
+          required: true
+        },
+        {
+          name: 'royalty',
+          label: 'Royalty %',
+          type: 'number',
+          location: 'body',
+          required: true
+        }
       ]
     },
     {
       id: 'updateRoySched',
       title: 'Update Royalty Schedule',
-      description: 'Update an existing royalty schedule.',
-      route: 'books/roysched/update',
+      description: 'Update royalty schedule',
+      route: 'roysched/update',
       apiPath: '/api/titles/roysched/{id}',
       method: 'PUT',
       formFields: [
-        { name: 'id', label: 'Royalty Schedule ID', type: 'number', location: 'path', required: true },
-        { name: 'lorange', label: 'Low Range', type: 'number', location: 'body' },
-        { name: 'hirange', label: 'High Range', type: 'number', location: 'body' },
-        { name: 'royalty', label: 'Royalty', type: 'number', location: 'body' }
+        {
+          name: 'roySchedId',
+          label: 'RoySched ID',
+          type: 'number',
+          location: 'path',
+          required: true
+        },
+        {
+          name: 'lorange',
+          label: 'Low Range',
+          type: 'number',
+          location: 'body'
+        },
+        {
+          name: 'hirange',
+          label: 'High Range',
+          type: 'number',
+          location: 'body'
+        },
+        {
+          name: 'royalty',
+          label: 'Royalty %',
+          type: 'number',
+          location: 'body'
+        }
       ]
     }
   ],

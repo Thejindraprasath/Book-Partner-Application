@@ -14,9 +14,7 @@ public interface AuthorService {
 
     AuthorResponse createAuthor(AuthorCreateRequest request);
 
-    PageResponse<AuthorResponse> getAllAuthors(
-            Pageable pageable
-    );
+    PageResponse<AuthorResponse> getAllAuthors(Pageable pageable);
 
     AuthorResponse getAuthorById(String auId);
 

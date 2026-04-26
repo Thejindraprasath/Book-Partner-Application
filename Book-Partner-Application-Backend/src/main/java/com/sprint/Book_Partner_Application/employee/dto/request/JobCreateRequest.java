@@ -5,19 +5,18 @@ import jakarta.validation.constraints.*;
 
 public class JobCreateRequest {
 
-    @NotBlank(message = "Job description is required")
     private String jobDesc;
 
     @Min(value = 10, message = "Minimum level must be at least 10")
-    private int minLvl;
+    private Integer minLvl;
 
     @Max(value = 250, message = "Maximum level must not exceed 250")
-    private int maxLvl;
+    private Integer maxLvl;
 
     public JobCreateRequest() {
     }
 
-    public JobCreateRequest(String jobDesc, int minLvl, int maxLvl) {
+    public JobCreateRequest(String jobDesc, Integer minLvl, Integer maxLvl) {
         this.jobDesc = jobDesc;
         this.minLvl = minLvl;
         this.maxLvl = maxLvl;
@@ -31,19 +30,19 @@ public class JobCreateRequest {
         this.jobDesc = jobDesc;
     }
 
-    public int getMinLvl() {
+    public Integer getMinLvl() {
         return minLvl;
     }
 
-    public void setMinLvl(int minLvl) {
+    public void setMinLvl(Integer minLvl) {
         this.minLvl = minLvl;
     }
 
-    public int getMaxLvl() {
+    public Integer getMaxLvl() {
         return maxLvl;
     }
 
-    public void setMaxLvl(int maxLvl) {
+    public void setMaxLvl(Integer maxLvl) {
         this.maxLvl = maxLvl;
     }
 }

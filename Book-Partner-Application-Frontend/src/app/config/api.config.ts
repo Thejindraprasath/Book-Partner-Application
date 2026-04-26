@@ -534,11 +534,7 @@ export const MODULE_ENDPOINTS: Record<string, EndpointDefinition[]> = {
       route: 'employees/jobs',
       apiPath: '/api/employees/jobs',
       method: 'GET',
-      formFields: [
-        { name: 'page', label: 'Page', type: 'number', location: 'query', defaultValue: 0 },
-        { name: 'size', label: 'Page Size', type: 'number', location: 'query', defaultValue: 10 },
-        { name: 'sort', label: 'Sort', type: 'text', location: 'query', defaultValue: 'jobId,asc' }
-      ]
+      formFields: []
     },
     {
       id: 'createJob',

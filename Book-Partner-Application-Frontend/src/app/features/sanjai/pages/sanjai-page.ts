@@ -7,4 +7,5 @@ import { RouterLink } from '@angular/router';
   templateUrl: './sanjai-page.html',
   styleUrl: './sanjai-page.css',
 })
+// Entry page for the Sanjai module before the user chooses publishers or employees.
 export class SanjaiPage {}

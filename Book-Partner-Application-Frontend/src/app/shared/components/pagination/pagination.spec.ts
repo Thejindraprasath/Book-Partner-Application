@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Pagination } from './pagination';
 
+// Basic smoke test for the shared pagination component.
 describe('Pagination', () => {
   let component: Pagination;
   let fixture: ComponentFixture<Pagination>;

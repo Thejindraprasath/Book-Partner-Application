@@ -9,17 +9,20 @@ import { SALES_ENDPOINTS, SALES_MODULE, SALES_ROUTE } from '../sales.data';
   templateUrl: './sales-page.html',
   styleUrl: './sales-page.css',
 })
+// Module page that lists all sales actions the user can open.
 export class SalesPage {
-  // Basic page details for the sales module.
+  // Basic details shown in the page header.
   readonly moduleItem = SALES_MODULE;
 
-  // Every endpoint card shown on this page.
+  // All sales endpoint cards shown on this page.
   readonly endpoints = SALES_ENDPOINTS;
 
+  // Build the route to the selected sales action page.
   getEndpointLink(endpointRoute: string): string {
     return `${SALES_ROUTE}/${endpointRoute}`;
   }
 
+  // Return a color based on the HTTP method so actions are easier to scan.
   getMethodBadgeClass(method: string): string {
     switch (method) {
       case 'POST':

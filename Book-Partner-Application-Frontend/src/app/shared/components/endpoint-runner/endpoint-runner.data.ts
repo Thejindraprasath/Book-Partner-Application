@@ -1,4 +1,4 @@
-// These small lookup objects keep the main component shorter and easier to read.
+// Lookup values used by the shared endpoint runner for labels, placeholders, and validation.
 
 export const ENTITY_LABELS: Record<string, string> = {
   store: 'Store',

@@ -11,11 +11,10 @@ import { ApiResponse } from '../../../models/api-response.model';
 export class Store {
   private readonly http = inject(HttpClient);
 
-  // Store endpoints share the same API version prefix.
+  // Store and discount requests share the same API version prefix.
   private readonly baseUrl = '/api/v1';
 
-  // The shared endpoint runner calls this method.
-  // Each case goes to a small helper method so the file is easier to read.
+  // The shared endpoint runner calls this method to dispatch one store action.
   execute(endpointId: string, values: Record<string, unknown>): Observable<unknown> {
     switch (endpointId) {
       case 'listStores':

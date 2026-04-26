@@ -19,6 +19,7 @@ interface SidebarSection {
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
+// Sidebar that shows the current module and its available endpoints.
 export class Sidebar {
   private readonly sessionService = inject(SessionService);
   private readonly router = inject(Router);
@@ -45,6 +46,7 @@ export class Sidebar {
   private getCurrentEndpoints(): EndpointDefinition[] {
     const moduleId = this.currentModuleId();
 
+    // Sanjai does not show one flat list because its endpoints are split by section.
     if (!moduleId || moduleId === 'sanjai') {
       return [];
     }
@@ -55,6 +57,7 @@ export class Sidebar {
   private getActiveSanjaiSection(): SidebarSection | null {
     const currentUrl = this.currentUrlSignal();
 
+    // Decide which nested Sanjai section is active from the current URL.
     if (currentUrl.startsWith('/sanjai/publishers')) {
       return {
         label: 'Publisher Endpoints',
@@ -83,6 +86,7 @@ export class Sidebar {
   }
 
   isRouteActiveOrInside(route: string): boolean {
+    // Treat child pages as active too, so parent menu items stay highlighted.
     const currentUrl = this.currentUrlSignal();
     return currentUrl === route || currentUrl.startsWith(`${route}/`);
   }

@@ -3,12 +3,13 @@ import { Routes } from '@angular/router';
 import { roleGuard } from '../../core/guards/role.guard';
 
 export const sanjaiRoutes: Routes = [
+  // Main page for the Sanjai module.
   {
     path: '',
     loadComponent: () =>
       import('./pages/sanjai-page').then((m) => m.SanjaiPage),
   },
-  // Publisher endpoints live under /sanjai/publishers.
+  // Publisher pages live under /sanjai/publishers and require publisher role access.
   {
     path: 'publishers',
     canActivate: [roleGuard],
@@ -16,7 +17,7 @@ export const sanjaiRoutes: Routes = [
     loadChildren: () =>
       import('../publishers/publishers.routes').then((m) => m.publishersRoutes),
   },
-  // Employee endpoints live under /sanjai/employees.
+  // Employee pages live under /sanjai/employees and require employee role access.
   {
     path: 'employees',
     canActivate: [roleGuard],

@@ -11,11 +11,10 @@ import { ApiResponse } from '../../../models/api-response.model';
 export class Employee {
   private readonly http = inject(HttpClient);
 
-  // Every employee API call starts with this same base path.
+  // All employee requests start with this API path.
   private readonly baseUrl = '/api/employees';
 
-  // The shared endpoint runner calls this method.
-  // Each case goes to a small helper method so the file is easier to read.
+  // The shared endpoint runner calls this method to dispatch one employee action.
   execute(endpointId: string, values: Record<string, unknown>): Observable<ApiResponse<unknown>> {
     switch (endpointId) {
       case 'listEmployees':

@@ -10,19 +10,20 @@ import { AUTHORS_ENDPOINTS, AUTHORS_MODULE, AUTHORS_ROUTE } from '../authors.dat
   templateUrl: './authors-page.html',
   styleUrl: './authors-page.css',
 })
+// Module page that lists all author actions the user can open.
 export class AuthorsPage {
-  // Module details
+  // Basic details shown in the page header.
   readonly moduleItem = AUTHORS_MODULE;
 
-  // Endpoints list
+  // All author endpoint cards shown on this page.
   readonly endpoints = AUTHORS_ENDPOINTS;
 
-  // Generate route link
+  // Build the route to the selected author action page.
   getEndpointLink(endpointRoute: string): string {
     return `${AUTHORS_ROUTE}/${endpointRoute}`;
   }
 
-  // Badge styling based on method
+  // Return a color based on the HTTP method so actions are easier to scan.
   getMethodBadgeClass(method: string): string {
     switch (method) {
       case 'POST':

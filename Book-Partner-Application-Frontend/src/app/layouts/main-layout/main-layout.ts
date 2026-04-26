@@ -10,4 +10,6 @@ import { Sidebar } from '../../shared/components/sidebar/sidebar';
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css',
 })
+// Main application shell used after login.
+// It keeps the navbar and sidebar visible while child pages change.
 export class MainLayout {}

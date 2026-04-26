@@ -8,8 +8,11 @@ import { errorInterceptor } from './core/interceptors/error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    // Catch browser-level runtime errors in one central place.
     provideBrowserGlobalErrorListeners(),
+    // Register the full app route list.
     provideRouter(routes),
+    // Run the shared request/response interceptors for every HTTP call.
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor]))
   ]
 };

@@ -1,3 +1,4 @@
+// Defines one input field shown in the shared endpoint form.
 export interface FormFieldDefinition {
   name: string;
   label: string;
@@ -8,6 +9,7 @@ export interface FormFieldDefinition {
   placeholder?: string;
 }
 
+// Describes one API action that can be shown and executed in the UI.
 export interface EndpointDefinition {
   id: string;
   title: string;
@@ -18,6 +20,7 @@ export interface EndpointDefinition {
   formFields: FormFieldDefinition[];
 }
 
+// Describes one top-level module shown in the application.
 export interface ModuleDefinition {
   id: string;
   label: string;

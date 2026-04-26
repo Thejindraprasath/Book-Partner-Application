@@ -7,7 +7,7 @@ const employeeEndpointRunner = () =>
     (m) => m.EndpointRunner,
   );
 
-// Each endpoint gets its own route so it can open inside the shared runner.
+// Build one child route per employee action so the shared endpoint runner can load it by URL.
 const endpointRoutes: Routes = EMPLOYEES_ENDPOINTS.map((endpoint) => {
   return {
     path: endpoint.route,
@@ -21,10 +21,12 @@ const endpointRoutes: Routes = EMPLOYEES_ENDPOINTS.map((endpoint) => {
 });
 
 export const employeesRoutes: Routes = [
+  // Main page for the employee module.
   {
     path: '',
     loadComponent: () =>
       import('./pages/employees-page').then((m) => m.EmployeesPage),
   },
+  // Action pages like add, update, delete, and search are added here automatically.
   ...endpointRoutes,
 ];

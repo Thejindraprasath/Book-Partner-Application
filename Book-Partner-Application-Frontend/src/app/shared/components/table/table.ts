@@ -7,10 +7,12 @@ import { Component, computed, input } from '@angular/core';
   templateUrl: './table.html',
   styleUrl: './table.css',
 })
+// Reusable table that builds its columns from whatever row data it receives.
 export class Table {
   readonly rows = input<unknown[]>([]);
   readonly emptyMessage = input('No records found.');
 
+  // Collect every key used across the rows so the table can build dynamic columns.
   readonly columns = computed(() => {
     const columnNames = new Set<string>();
 
@@ -28,6 +30,7 @@ export class Table {
   });
 
   formatValue(value: unknown): string {
+    // Convert different value types into text that can be displayed safely.
     if (value === null || value === undefined || value === '') {
       return '-';
     }

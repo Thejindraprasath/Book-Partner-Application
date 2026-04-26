@@ -1,3 +1,4 @@
+// Pick only query-string values that actually have content.
 export function toQueryParams(values: Record<string, unknown>, keys: string[]): Record<string, string | number | boolean> {
   const params: Record<string, string | number | boolean> = {};
 
@@ -11,6 +12,7 @@ export function toQueryParams(values: Record<string, unknown>, keys: string[]): 
   return params;
 }
 
+// Pick only body fields that actually have content.
 export function pickBody(values: Record<string, unknown>, keys: string[]): Record<string, unknown> {
   return Object.fromEntries(
     keys

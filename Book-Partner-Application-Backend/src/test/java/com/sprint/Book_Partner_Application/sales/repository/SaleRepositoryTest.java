@@ -20,9 +20,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DataJpaTest
+@DataJpaTest //tests only repository layer
 @ActiveProfiles("test")
-@Import(ValidationAutoConfiguration.class)
+@Import(ValidationAutoConfiguration.class) //enables validation
 class SaleRepositoryTest {
 
     @Autowired
@@ -39,7 +39,7 @@ class SaleRepositoryTest {
 
     // ================= SETUP =================
 
-    @BeforeEach
+    @BeforeEach // Runs before each test to insert required base data
     void init() {
 
         Store store = new Store();
@@ -57,7 +57,9 @@ class SaleRepositoryTest {
     }
 
     // ================= HELPER =================
-
+    // Helper method to create and immediately persist a Sale
+    //save() → may delay DB write
+    //saveAndFlush() → writes immediately
     private Sale createSaleAndFlush() {
         Sale sale = new Sale();
         sale.setStorId("S001");
@@ -69,6 +71,10 @@ class SaleRepositoryTest {
 
         return saleRepository.saveAndFlush(sale);
     }
+
+    //assertNotNull() -> asserst that a condition is true
+    //assertEquals() -> asserts that the two objects are equal
+    //assertFalse() -> asserts that a condition is false
 
     // ================= CREATE =================
 

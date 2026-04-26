@@ -6,6 +6,7 @@ import { Component, computed, input, output } from '@angular/core';
   templateUrl: './pagination.html',
   styleUrl: './pagination.css',
 })
+// Reusable pagination bar for paged API responses.
 export class Pagination {
   readonly pageNumber = input<number | null>(null);
   readonly totalPages = input<number | null>(null);
@@ -16,6 +17,7 @@ export class Pagination {
   readonly nextPage = output<void>();
   readonly pageSelected = output<number>();
 
+  // Show the first page, last page, and a small window around the current page.
   readonly visiblePages = computed(() => {
     const currentPage = this.pageNumber();
     const totalPages = this.totalPages();
@@ -56,6 +58,7 @@ export class Pagination {
   }
 
   selectPage(page: number | 'ellipsis'): void {
+    // Ignore clicks on separators, the current page, or disabled state.
     if (page === 'ellipsis' || this.disabled() || page === this.pageNumber()) {
       return;
     }

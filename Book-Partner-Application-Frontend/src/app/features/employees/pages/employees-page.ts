@@ -14,17 +14,21 @@ import {
   templateUrl: './employees-page.html',
   styleUrl: './employees-page.css',
 })
+// Module page that lists all employee and job actions inside Sanjai.
 export class EmployeesPage {
+  // Text shown in the page header.
   readonly pageTitle = EMPLOYEES_PAGE_TITLE;
   readonly pageDescription = EMPLOYEES_PAGE_DESCRIPTION;
 
-  // Every endpoint card shown on this page.
+  // All employee endpoint cards shown on this page.
   readonly endpoints = EMPLOYEES_ENDPOINTS;
 
+  // Build the route to the selected employee action page.
   getEndpointLink(endpointRoute: string): string {
     return `${EMPLOYEES_ROUTE}/${endpointRoute}`;
   }
 
+  // Return a color based on the HTTP method so actions are easier to scan.
   getMethodBadgeClass(method: string): string {
     switch (method) {
       case 'POST':

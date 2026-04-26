@@ -8,6 +8,7 @@ const SESSION_STORAGE_KEY = 'book-partner-session';
   providedIn: 'root',
 })
 export class SessionService {
+  // Keep the logged-in user in both memory and session storage.
   private readonly sessionState = signal<AuthUser | null>(this.readStoredSession());
 
   readonly user = this.sessionState.asReadonly();
@@ -35,6 +36,7 @@ export class SessionService {
   }
 
   private readStoredSession(): AuthUser | null {
+    // Restore session data after page refresh.
     const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
     if (!stored) {
       return null;
@@ -43,6 +45,7 @@ export class SessionService {
     try {
       return JSON.parse(stored) as AuthUser;
     } catch {
+      // Remove broken session data so it does not keep causing parse errors.
       sessionStorage.removeItem(SESSION_STORAGE_KEY);
       return null;
     }

@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { Sales } from './sales';
 
+// Basic smoke test for the sales service.
 describe('Sales', () => {
   let service: Sales;
 

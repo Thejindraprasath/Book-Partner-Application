@@ -7,7 +7,7 @@ const storeEndpointRunner = () =>
     (m) => m.EndpointRunner,
   );
 
-// Each endpoint gets its own route so it can open inside the shared runner.
+// Build one child route per store action so the shared endpoint runner can load it by URL.
 const endpointRoutes: Routes = STORES_ENDPOINTS.map((endpoint) => {
   return {
     path: endpoint.route,
@@ -21,10 +21,12 @@ const endpointRoutes: Routes = STORES_ENDPOINTS.map((endpoint) => {
 });
 
 export const storesRoutes: Routes = [
+  // Main page for the store module.
   {
     path: '',
     loadComponent: () =>
       import('./pages/stores-page').then((m) => m.StoresPage),
   },
+  // Action pages like add, update, delete, and search are added here automatically.
   ...endpointRoutes,
 ];

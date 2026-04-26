@@ -14,6 +14,7 @@ import { ModuleDefinition } from '../../../models/module.model';
 export class Landing {
   private readonly sessionService = inject(SessionService);
 
+  // Cards for every module shown on the landing page.
   readonly modules = APP_MODULES;
   readonly currentModuleId = computed(() => this.sessionService.currentModule());
 
@@ -21,6 +22,7 @@ export class Landing {
     return ['/login', moduleItem.id];
   }
 
+  // If the user is already logged in, this points to their current module home page.
   currentModuleRoute(): string[] | null {
     const moduleId = this.currentModuleId();
 
@@ -32,6 +34,7 @@ export class Landing {
   }
 
   endpointCount(moduleId: string): number {
+    // Sanjai contains two nested endpoint groups, so its total is combined here.
     if (moduleId === 'sanjai') {
       return getEndpointsForModule('publisher').length + getEndpointsForModule('employee').length;
     }

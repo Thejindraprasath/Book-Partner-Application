@@ -20,6 +20,6 @@ public interface SaleRepository extends JpaRepository<Sale, Sale.SaleId> {
 
     @Query("SELECT s FROM Sale s WHERE s.ordDate BETWEEN :from AND :to")
     List<Sale> findByDateRange(
-            @Param("from") LocalDateTime from,
-            @Param("to") LocalDateTime to);
+            @Param("from") LocalDateTime from, //@Param ensures that the from and to is correctly
+            @Param("to") LocalDateTime to);    //mapped to the :from and :to
 }
